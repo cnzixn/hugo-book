@@ -1,10 +1,9 @@
 ---
 weight: 1
-params:
-  bookFlatSection: true
+bookCollapseSection: false
 ---
 
-# Section 1
+# 简介
 
 ## Ferre hinnitibus erat accipitrem dixi Troiae tollens
 

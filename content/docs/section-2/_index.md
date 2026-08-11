@@ -1,5 +1,6 @@
 ---
 weight: 1
+bookCollapseSection: false
 ---
 
 # Section 2

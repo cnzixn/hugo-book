@@ -1,0 +1,68 @@
+/*
+  You can add custom styles and css variables here.
+*/
+
+/* 自定义暗色主题 - 纯黑风格 */
+:root[data-theme="dark"] {
+  --body-background: #0d0d0d;
+  --body-font-color: #cccccc;
+  --icon-filter: brightness(0) invert(1);
+
+  --color-link: #569cd6;
+  --color-visited-link: #c586c0;
+
+  --gray-100: #141414;
+  --gray-200: #1a1a1a;
+  --gray-500: #666666;
+
+  --color-accent-default:   #808080;
+  --color-accent-note:      #569cd6;
+  --color-accent-tip:       #6a9955;
+  --color-accent-important: #c586c0;
+  --color-accent-warning:   #ce9178;
+  --color-accent-caution:   #f44747;
+}
+
+/* 代码块背景与主背景区分 */
+:root[data-theme="dark"] .markdown pre {
+  background: #1e1e24;
+  border-color: #2d2d3a;
+}
+
+/* 代码块文件名栏 + 复制按钮 */
+.book-codeblock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--gray-100);
+  border: var(--space-1) solid var(--gray-200);
+  border-bottom: 0;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  padding: 2px var(--space-8);
+}
+
+.book-codeblock-header + * {
+  margin-top: 0;
+}
+
+.book-codeblock-header + * pre {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-top: 0;
+}
+
+.book-codeblock-copy {
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  cursor: pointer;
+  padding: 2px 8px;
+  font-size: 0.8em;
+  border-radius: var(--border-radius);
+}
+
+.book-codeblock-copy:hover {
+  color: var(--body-font-color);
+  background: var(--gray-200);
+}

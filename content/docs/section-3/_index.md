@@ -1,7 +1,6 @@
 ---
 weight: 1
-params:
-  bookCollapseSection: true
+bookCollapseSection: false
 ---
 
 # Section 3
