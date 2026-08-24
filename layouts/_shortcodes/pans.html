@@ -1,0 +1,44 @@
+{{/*
+  网盘下载短代码
+  用法: {{< pans "KEY_NAME" >}}
+  数据来源: data/pan.yml
+*/}}
+{{- $name := .Get 0 -}}
+
+{{- with index site.Data.pan $name -}}
+  {{- $baiduUrl := index (where . "url1" "ne" nil) 0 "url1" -}}
+  {{- $xunleiUrl := index (where . "url2" "ne" nil) 0 "url2" -}}
+  {{- $quarkUrl := index (where . "url3" "ne" nil) 0 "url3" -}}
+  {{- $itemName := index (where . "name" "ne" nil) 0 "name" -}}
+  {{- $itemSize := index (where . "size" "ne" nil) 0 "size" -}}
+
+  <div class="book-tabs">
+    <input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-0" checked="checked" />
+    <label for="pan-{{ $name }}-0">百度网盘</label>
+    <div class="book-tabs-content markdown-inner">
+      <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
+      {{- with $baiduUrl -}}
+        <div class="pan-link"><a href="{{ . }}" target="_blank">{{ . }}</a></div>
+      {{- else -}}
+        <div class="pan-link">暂无百度网盘下载</div>
+      {{- end -}}
+    </div>
+
+    <input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-1" />
+    <label for="pan-{{ $name }}-1">夸克网盘</label>
+    <div class="book-tabs-content markdown-inner">
+      <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
+      {{- with $quarkUrl -}}
+        <div class="pan-link"><a href="{{ . }}" target="_blank">{{ . }}</a></div>
+      {{- else -}}
+        <div class="pan-link">暂无夸克网盘下载</div>
+      {{- end -}}
+    </div>
+  </div>
+{{- else -}}
+  <div class="pan-error">
+    网盘文件「{{ $name }}」分享链接已过期...
+  </div>
+{{- end -}}
+
+

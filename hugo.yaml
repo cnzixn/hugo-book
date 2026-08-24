@@ -1,8 +1,8 @@
-baseURL: http://0.0.0.0:1313/
-title: Documentation
+# baseURL: http://0.0.0.0:1313/
+title: 饥荒模组手册
 theme: hugo-book
 
-copyright: "This is a copyright placeholder"
+copyright: "© 2026 - [Hugo Book Theme](https://github.com/alex-shpak/hugo-book/)"
 
 # Book configuration
 disablePathToLower: true
@@ -39,26 +39,29 @@ markup:
 
 menu:
   home:
-    - name: "Documentation"
-      pageRef: "/docs/"
+    - name: "单机"
+      pageRef: "/ds-docs/"
       weight: 10
-    - name: "Github"
-      url: "https://github.com/alex-shpak/hugo-book/"
+    - name: "联机"
+      pageRef: "/dst-docs/"
+      weight: 10
+    - name: "联系"
+      url: "mailto:contact@example.com"
       weight: 20
 
   # before: []
   after:
-    - name: "Github"
-      url: "https://github.com/alex-shpak/hugo-book"
+    - name: "联系"
+      url: "mailto:contact@example.com"
       weight: 10
 
-taxonomies:
-  tag: tags
+# taxonomies:
+#   tag: tags
 
 params:
   # (Optional, default light) Sets color theme: light, dark or auto.
   # Theme 'auto' switches between dark and light modes based on browser/os preferences
-  BookTheme: "dark"
+  BookTheme: "ayu-auto"
 
   # (Optional, default none) Controls table of contents visibility on right side of pages.
   # Start and end levels can be controlled with markup.tableOfContents setting.
@@ -76,7 +79,7 @@ params:
   # (Optional, default docs) Specify root page to render child pages as menu.
   # Page is resoled by .GetPage function: https://gohugo.io/functions/getpage/
   # For backward compatibility you can set '*' to render all sections to menu. Acts same as '/'
-  # BookSection: docs
+  BookSection: '*'
 
   # (Optional, default none) Set template for commit link for the page. Requires enableGitInfo.
   # When set enabled 'Last Modified' and a link to the commit in the footer of the page.

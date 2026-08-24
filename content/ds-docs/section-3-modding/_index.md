@@ -1,5 +1,6 @@
 ---
-weight: 1
+title: 💻开发 Modding
+weight: 30
 bookCollapseSection: false
 ---
 

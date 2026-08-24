@@ -1,0 +1,107 @@
+{{/*
+  主题切换器 - 注入 body 标签末尾
+  只保存亮/暗模式，从当前主题替换后缀
+*/}}
+<script>
+(function() {
+
+  // 切换函数
+  function toggleTheme() {
+    var c = document.documentElement.getAttribute('data-theme');
+    var p = c.split('-');
+    var last = p[p.length - 1];
+    var newMode = (last === 'dark') ? 'light' : 'dark';
+    p[p.length - 1] = newMode;
+    document.documentElement.setAttribute('data-theme', p.join('-'));
+    localStorage.setItem('book-theme-mode', newMode);
+    switchTheme.innerHTML =  (newMode === 'light') ? '☀️' : '🌙';
+    switchTheme.title = (newMode === 'light') ? '亮色主题' : '暗色主题';
+  }
+
+  // 创建切换按钮
+  var switchTheme = document.createElement('button');
+  switchTheme.id = 'theme-switcher';
+  switchTheme.innerHTML = '🌓';
+  switchTheme.title = '切换主题';
+  switchTheme.onclick = toggleTheme;
+  Object.assign(switchTheme.style, {
+    position: 'fixed',
+    bottom: '80px',
+    right: '20px',
+    zIndex: '9999',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    border: '1px solid var(--border)',
+    background: 'var(--code-bg)',
+    cursor: 'pointer',
+    fontSize: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+    transition: 'all 0.2s ease'
+  });
+  switchTheme.onmouseenter = function() { this.style.transform = 'scale(1.1)'; };
+  switchTheme.onmouseleave = function() { this.style.transform = 'scale(1)'; };
+    window.addEventListener('scroll', function() {
+    switchTheme.style.display = (window.scrollY <= 300) ? 'flex' : 'none';
+  });
+
+  document.body.appendChild(switchTheme);
+
+  
+  // 从当前主题中提取基础名和模式
+  var cur = document.documentElement.getAttribute('data-theme');
+  var parts = cur.split('-');
+  var mode = parts[parts.length - 1];
+  var base = parts.slice(0, -1).join('-');
+  // 如果保存了模式，应用它
+  var saved = localStorage.getItem('book-theme-mode');
+  if (saved) {
+    var newTheme = base ? base + '-' + saved : saved;
+    document.documentElement.setAttribute('data-theme', newTheme);
+    switchTheme.innerHTML =  (saved === 'light') ? '☀️' : '🌙';
+    switchTheme.title = (saved === 'light') ? '亮色主题' : '暗色主题';
+  }
+
+  // 返回顶部按钮
+  var backToTop = document.createElement('button');
+  backToTop.id = 'back-to-top';
+  backToTop.innerHTML = '⬆';
+  backToTop.title = '返回顶部';
+  Object.assign(backToTop.style, {
+    position: 'fixed',
+    bottom: '80px',
+    right: '20px',
+    zIndex: '9999',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    border: '1px solid var(--border)',
+    background: 'var(--code-bg)',
+    cursor: 'pointer',
+    fontSize: '18px',
+    display: 'none',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+    transition: 'all 0.2s ease'
+  });
+  backToTop.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  window.addEventListener('scroll', function() {
+    backToTop.style.display = (window.scrollY > 300) ? 'flex' : 'none';
+  });
+
+  document.body.appendChild(backToTop);
+  backToTop.click();
+})();
+</script>
+
+<style>
+#theme-switcher:hover,
+#back-to-top:hover {
+  border-color: var(--primary) !important;
+  background: var(--entry) !important;
+}
+</style>

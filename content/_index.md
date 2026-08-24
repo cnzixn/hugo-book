@@ -4,17 +4,33 @@ layout: landing
 
 <div class="book-hero">
 
-# Documentation {anchor=false}
-This content is rendered from `content/index.md`
+# 饥荒模组手册 {anchor=true}
+-----
 
-{{<button href="/docs/">}}Action{{</button>}}
-
-</div>
 
 {{% columns %}}
-- ## Nunc infans rigidique etiam
-  Lorem markdownum quondam mediamque visis aevi, peregrinaeque Aeacidae, vita vos? Iacet exhortatus picta plures; placet Pandrose tremescere; mediis aera enim resonat scinditur dea nocuit fabrilis est per. Signum pater paventes pectore maris humo, aegide illos religarat si! Romana secutis erat, cum omnia vincere virtutem nomine ascensu poenas? Gradus cum quoque potitur.
 
-- ## Carmina fallacia polluit lenta
-  Lorem markdownum, omnes exire lumen noctis concava multaque fieri inplevere oculi *nisi sua* subigebat iamque? Herse sum `hardBox`, pervenit linguae altera. Clymenen magna illi latera parent omnia felicia ter bifurcum nulla atque alta cannas ita? Pariter stetit carina adspexerit spargentem festa concrevit `process_upnp` primos! Huic et sulphure paelice iuppiter vitat quem genitas, fera vertice relinque.
+- ## 🛠️安装 Installation
+  - 饥荒手游模组安装全流程教学。
+  - 跟着步骤完成配置，妥善解决闪退、模组不生效、版本兼容等各类难题。
+
+- ## 📚️资源 Resources
+  - 收集移动端可用饥荒模组。
+  - 全新角色、创新玩法、便捷辅助......应有尽有，重塑你的荒野冒险。
+
+- ## 💻开发 Modding
+  - 饥荒模组 Lua 开发系列教程。
+  - 读懂模组架构，自制道具、角色与游戏规则，创造属于你的荒野内容。
+
 {{% /columns %}}
+
+-----
+
+<div style="display: flex; gap: 12px; padding: 8px; justify-content: center;">
+{{<button href="/ds-docs/">}} <img src="/icons/ds_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
+{{</button>}}
+{{<button href="/dst-docs/">}} <img src="/icons/dst_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
+{{</button>}}
+</div>
+
+-----

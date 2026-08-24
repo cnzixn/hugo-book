@@ -1,5 +1,6 @@
 ---
-weight: 1
+title: 📚️资源 Resources
+weight: 20
 bookCollapseSection: false
 ---
 
