@@ -1,14 +1,16 @@
-# baseURL: http://0.0.0.0:1313/
+baseURL: https://b.225228.xyz/
 title: 饥荒模组手册
 theme: hugo-book
 
 copyright: "© 2026 - [Hugo Book Theme](https://github.com/alex-shpak/hugo-book/)"
 
 # Book configuration
+# 书籍配置
 disablePathToLower: true
 enableGitInfo: true
 
 # Needed for mermaid/katex shortcodes
+# mermaid/katex 短代码所需配置
 markup:
   goldmark:
     renderer:
@@ -19,9 +21,13 @@ markup:
     style: base16-snazzy
 
 # Multi-lingual mode config
+# 多语言模式配置
 # There are different options to translate files
+# 有多种方式可以翻译文件
 # See https://gohugo.io/content-management/multilingual/#translation-by-filename
+# 参考：https://gohugo.io/content-management/multilingual/#translation-by-filename
 # And https://gohugo.io/content-management/multilingual/#translation-by-content-directory
+# 以及：https://gohugo.io/content-management/multilingual/#translation-by-content-directory
 # languages:
 #   en:
 #     languageName: English
@@ -40,86 +46,128 @@ markup:
 menu:
   home:
     - name: "单机"
-      pageRef: "/ds-docs/"
+      pageRef: "/ds-book/"
       weight: 10
     - name: "联机"
-      pageRef: "/dst-docs/"
+      pageRef: "/dst-book/"
       weight: 10
     - name: "联系"
-      url: "mailto:contact@example.com"
+      url: "mailto:contact@225228.xyz"
       weight: 20
 
-  # before: []
-  after:
-    - name: "联系"
-      url: "mailto:contact@example.com"
-      weight: 10
+  # before: 
+  #   - name: "联系我们"
+  #     url: "mailto:contact@example.com"
+  #     weight: 10
+  # after:
+  #   - name: "联系我们"
+  #     url: "mailto:contact@example.com"
+  #     weight: 10
 
 # taxonomies:
 #   tag: tags
 
 params:
   # (Optional, default light) Sets color theme: light, dark or auto.
+  # （可选，默认 light）设置颜色主题：light、dark 或 auto
   # Theme 'auto' switches between dark and light modes based on browser/os preferences
-  BookTheme: "ayu-auto"
+  # 主题 'auto' 根据浏览器/系统偏好自动切换深色和浅色模式
+  BookTheme: "ayu"
 
   # (Optional, default none) Controls table of contents visibility on right side of pages.
+  # （可选，默认 none）控制页面右侧目录可见性
   # Start and end levels can be controlled with markup.tableOfContents setting.
+  # 起始和结束层级可通过 markup.tableOfContents 设置控制
   # You can also specify this parameter per page in front matter.
+  # 也可以在每页的 front matter 中单独指定此参数
   # BookToC: true
 
   # (Optional, default favicon.png) Set the path to a favicon file.
+  # （可选，默认 favicon.png）设置网站图标路径
   # If the favicon is /static/favicon.png then the path would be favicon.png
+  # 如果图标路径为 /static/favicon.png，则路径写为 favicon.png
   # BookFavicon: "favicon.png"
 
   # (Optional, default none) Set the path to a logo for the book.
+  # （可选，默认 none）设置书籍 logo 路径
   # If the logo is /static/logo.png then the path would be logo.png
+  # 如果 logo 路径为 /static/logo.png，则路径写为 logo.png
   # BookLogo: /logo.png
 
   # (Optional, default docs) Specify root page to render child pages as menu.
+  # （可选，默认 docs）指定根页面以将子页面渲染为菜单
   # Page is resoled by .GetPage function: https://gohugo.io/functions/getpage/
+  # 页面可通过 .GetPage 函数解析：https://gohugo.io/functions/getpage/
   # For backward compatibility you can set '*' to render all sections to menu. Acts same as '/'
-  BookSection: '*'
+  # 为向后兼容，可设置 '*' 将所有 section 渲染为菜单，等同于 '/'
+  BookSection: "/"
 
   # (Optional, default none) Set template for commit link for the page. Requires enableGitInfo.
+  # （可选，默认 none）设置页面提交链接模板，需启用 enableGitInfo
   # When set enabled 'Last Modified' and a link to the commit in the footer of the page.
+  # 设置后页脚显示"最后修改"及提交链接
   # Param is executed as template using .Site, .Page and .GitInfo as context.
-  # BookLastChangeLink: 'https://github.com/alex-shpak/hugo-book/commit/{{ .GitInfo.Hash }}'
+  # 参数以 .Site、.Page 和 .GitInfo 为上下文作为模板执行
+  # BookLastChangeLink: 'https://github.com/cnzixn/hugo-book/commit/{{ .GitInfo.Hash }}'
 
   # (Optional, default none) Set template for edit page link.
+  # （可选，默认 none）设置编辑页面链接模板
   # When set enabled 'Edit this page' link in the footer of the page.
+  # 设置后页脚显示"编辑本页"链接
   # Param is executed as template using .Site, .Page and .Path as context.
-  # BookEditLink: 'https://github.com/alex-shpak/hugo-book/edit/main/exampleSite/{{ .Path }}'
+  # 参数以 .Site、.Page 和 .Path 为上下文作为模板执行
+  # BookEditLink: 'https://github.com/cnzixn/hugo-book/edit/main/{{ .Path }}'
 
   # (Optional, default 'January 2, 2006') Configure the date format used on the pages
+  # （可选，默认 'January 2, 2006'）配置页面使用的日期格式
   # - In git information
+  # - 用于 git 信息
   # - In blog posts
+  # - 用于博客文章
   # https://gohugo.io/functions/time/format/
-  # BookDateFormat: "January 2, 2006"
+  # 参考：https://gohugo.io/functions/time/format/
+  BookDateFormat: "2006-01-02"
 
   # (Optional, default true) Enables search function with flexsearch,
+  # （可选，默认 true）启用基于 flexsearch 的搜索功能
   # Index is built on fly, therefore it might slowdown your website.
+  # 索引在运行时构建，可能会降低网站速度
   # Configuration for indexing can be adjusted in i18n folder per language.
+  # 索引配置可在 i18n 文件夹中按语言调整
   BookSearch: true
 
   # (Optional, default true) Enables comments template on pages
+  # （可选，默认 true）启用页面评论模板
   # By default partals/docs/comments.html includes Disqus template
+  # 默认 partials/docs/comments.html 包含 Disqus 模板
   # See https://gohugo.io/content-management/comments/#configure-disqus
+  # 参考：https://gohugo.io/content-management/comments/#configure-disqus
   # Can be overwritten by same param in page frontmatter
+  # 可在页面 frontmatter 中通过相同参数覆盖
   BookComments: false
 
   # /!\ This is an experimental feature, might be removed or changed at any time
+  # /!\ 这是实验性功能，随时可能被移除或修改
   # (Optional, experimental, default false) Enables portable links and link checks in markdown pages.
+  # （可选，实验性，默认 false）在 markdown 页面启用便携链接和链接检查
   # Portable links meant to work with text editors and let you write markdown without {{< relref >}} shortcode
+  # 便携链接旨在与文本编辑器配合，让你无需 {{< relref >}} 短代码即可编写 markdown
   # Theme will print warning or error if page referenced in markdown does not exists.
+  # 如果 markdown 中引用的页面不存在，主题将打印警告或错误
   # Possible values are false | 'warning' | 'error'
+  # 可选值：false | 'warning' | 'error'
   BookPortableLinks: 'warning'
 
   # /!\ This is an experimental feature, might be removed or changed at any time
+  # /!\ 这是实验性功能，随时可能被移除或修改
   # (Optional, experimental, default false) Enables service worker that caches visited pages and resources for offline use.
+  # （可选，实验性，默认 false）启用服务 worker，缓存访问过的页面和资源以供离线使用
   # can be false, true or 'precache', precache will try to download all content pages on install.
+  # 可选值：false、true 或 'precache'，precache 将在安装时尝试下载所有内容页面
   BookServiceWorker: 'precache'
 
   # /!\ This is an experimental feature, might be removed or changed at any time
+  # /!\ 这是实验性功能，随时可能被移除或修改
   # (Optional, experimental, default false) Enables a drop-down menu for translations only if a translation is present.
+  # （可选，实验性，默认 false）仅当存在译文时启用翻译下拉菜单
   BookTranslatedOnly: false

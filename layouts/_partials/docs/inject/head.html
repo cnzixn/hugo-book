@@ -1,0 +1,7 @@
+{{/*
+  主题预加载脚本 - 内联执行，避免 FOUC 闪烁
+  必须在 <head> 中同步执行，不能用 defer/async
+*/}}
+{{ with resources.Get "js/theme-preload.js" | resources.Minify }}
+<script>{{ .Content | safeJS }}</script>
+{{ end }}

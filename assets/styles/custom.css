@@ -2,6 +2,25 @@
   You can add custom styles and css variables here.
 */
 
+/* Sticky Footer: 内容不足时页脚贴底 */
+body {
+  min-height: 100vh;
+}
+
+main.container {
+  min-height: 100vh;
+}
+
+.book-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.book-page > article {
+  flex: 1;
+}
+
 /* 白天模式：加深分隔线、边框颜色（--gray-200） */
 :root[data-theme="light"],
 :root[data-theme="auto"] {
@@ -20,16 +39,49 @@
   --gray-200: #b0b0b0;
 }
 
+/* 亮色主题代码块白灰色背景 + 黑字 */
+:root[data-theme="light"] .highlight pre,
+:root[data-theme="auto"] .highlight pre,
+:root[data-theme="catppuccin-light"] .highlight pre,
+:root[data-theme="catppuccin-auto"] .highlight pre,
+:root[data-theme="ayu-light"] .highlight pre,
+:root[data-theme="ayu-auto"] .highlight pre,
+:root[data-theme="contrast-light"] .highlight pre,
+:root[data-theme="contrast-auto"] .highlight pre {
+  background: var(--gray-100) !important;
+  color: var(--body-font-color) !important;
+}
+
 /* 代码块文件名栏 + 复制按钮 */
 .book-codeblock-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--gray-100);
+  background: var(--gray-200);
   border: var(--space-1) solid var(--gray-200);
   border-bottom: 0;
   border-radius: var(--border-radius) var(--border-radius) 0 0;
   padding: 2px var(--space-8);
+}
+
+/* 亮色主题：复制按钮文字颜色加深 */
+:root[data-theme="light"] .book-codeblock-copy,
+:root[data-theme="auto"] .book-codeblock-copy,
+:root[data-theme="catppuccin-light"] .book-codeblock-copy,
+:root[data-theme="catppuccin-auto"] .book-codeblock-copy,
+:root[data-theme="ayu-light"] .book-codeblock-copy,
+:root[data-theme="ayu-auto"] .book-codeblock-copy,
+:root[data-theme="contrast-light"] .book-codeblock-copy,
+:root[data-theme="contrast-auto"] .book-codeblock-copy {
+  color: var(--gray-700);
+}
+
+/* 文件名标签无边框 */
+.book-codeblock-header .book-codeblock-filename {
+  border: none;
+  background: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 .book-codeblock-header + * {
@@ -55,7 +107,7 @@
 
 .book-codeblock-copy:hover {
   color: var(--body-font-color);
-  background: var(--gray-200);
+  background: var(--gray-100);
 }
 
 /* PNG 菜单图标：保留原色，不受暗色主题 --icon-filter 影响 */
@@ -82,4 +134,115 @@ a img.book-icon[src$=".png"] {
 
 .pan-info {
   padding: 4px 0;
+}
+
+/* ========== 更新日志时间线 ========== */
+.changelog {
+  position: relative;
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* 时间线竖线 */
+.changelog::before {
+  content: '';
+  position: absolute;
+  left: calc(0.3rem - 1px);
+  top: 0.25rem;
+  bottom: 0.25rem;
+  width: 2px;
+  background: var(--gray-200);
+}
+
+/* 日期标题 */
+.changelog h2 {
+  position: relative;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-accent-note);
+  margin: 1.5rem 0 0.25rem 0;
+  padding-left: 0;
+  line-height: 1.4;
+}
+
+/* 日期标题前的方形标记 */
+.changelog h2::before {
+  content: '';
+  position: absolute;
+  left: calc(0.3rem - 1.5rem);
+  top: 0.77rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--body-background);
+  border: 2px solid var(--color-accent-note);
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+}
+
+/* 第一条记录的日期标题不需要上边距 */
+.changelog > h2:first-child {
+  margin-top: 0;
+}
+
+/* 版本号徽章 - 使用行内代码 */
+.changelog h2 code {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  margin-right: 0.35rem;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius);
+  color: var(--body-font-color);
+  vertical-align: middle;
+  line-height: 1.4;
+}
+
+/* 标签徽章 - 绿色主题（基于颜色区分） */
+.changelog h2 code:nth-of-type(2) {
+  background: var(--color-accent-note);
+  border-color: var(--color-accent-note);
+  color: var(--body-background);
+}
+
+/* 列表 - 更新条目 */
+.changelog ul {
+  margin: 0.5rem 0 1rem 0;
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.changelog ul li {
+  margin: 0.25rem 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--body-font-color);
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+  .changelog {
+    padding-left: 1.2rem;
+  }
+  .changelog::before {
+    left: calc(0.2rem - 1px);
+  }
+  .changelog h2::before {
+    left: calc(0.2rem - 1.2rem);
+    top: 0.7rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    transform: translate(-50%, -50%);
+  }
+  .changelog h2 {
+    font-size: 1rem;
+  }
+}
+
+/* ========== 浮动按钮悬停效果 ========== */
+#theme-switcher:hover,
+#back-to-top:hover {
+  border-color: var(--primary) !important;
+  background: var(--entry) !important;
 }

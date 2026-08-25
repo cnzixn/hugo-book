@@ -1,11 +1,11 @@
 {{/*
   网盘下载短代码
   用法: {{< pans "KEY_NAME" >}}
-  数据来源: data/pan.yml
+  数据来源: data/ds-pan.yml
 */}}
 {{- $name := .Get 0 -}}
 
-{{- with index site.Data.pan $name -}}
+{{- with index site.Data.ds_pan $name -}}
   {{- $baiduUrl := index (where . "url1" "ne" nil) 0 "url1" -}}
   {{- $xunleiUrl := index (where . "url2" "ne" nil) 0 "url2" -}}
   {{- $quarkUrl := index (where . "url3" "ne" nil) 0 "url3" -}}
