@@ -1,11 +1,4 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hugo-book",
-  "compatibility_date": "2026-08-20",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "public"
-  }
+  // wrangler.jsonc
+  "name": "dst-hugo-book"
 }

@@ -1,5 +1,5 @@
 ---
-title: 更新日志
+title: WEB-更新日志
 weight: 100
 ---
 
