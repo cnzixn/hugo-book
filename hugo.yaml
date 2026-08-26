@@ -164,7 +164,7 @@ params:
   # （可选，实验性，默认 false）启用服务 worker，缓存访问过的页面和资源以供离线使用
   # can be false, true or 'precache', precache will try to download all content pages on install.
   # 可选值：false、true 或 'precache'，precache 将在安装时尝试下载所有内容页面
-  BookServiceWorker: 'precache'
+  BookServiceWorker: false
 
   # /!\ This is an experimental feature, might be removed or changed at any time
   # /!\ 这是实验性功能，随时可能被移除或修改
