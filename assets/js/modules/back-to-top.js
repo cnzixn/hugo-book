@@ -49,17 +49,31 @@
       width: '40px',
       height: '40px',
       borderRadius: '50%',
-      border: 'none',
-      background: 'var(--gray-100)',
       cursor: 'pointer',
       fontSize: '18px',
-      color: 'var(--body-font-color)',
       display: 'none',
       alignItems: 'center',
       justifyContent: 'center',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.8)',
-      transition: 'all 0.2s ease'
+      transform: 'scale(1)',
+      transformOrigin: 'center center'
     });
+
+    /**
+     * 仅 transform scale 放大反馈，颜色全由 CSS 固定控制
+     * @param {HTMLElement} btn - 按钮 DOM 元素
+     * @param {number} sizeLevel - 缩放档位：1（默认） / 1.05（按下） / 1.1（悬停）
+     */
+    function forceVisualReset(btn, sizeLevel) {
+      btn.style.transform = 'scale(' + sizeLevel + ')';
+    }
+
+    /* 仅保留矢量尺寸反馈 */
+    backToTop.onmouseenter = function() { forceVisualReset(backToTop, 1.1); };
+    backToTop.onmouseleave = function() { forceVisualReset(backToTop, 1); };
+    backToTop.onmousedown = function() { forceVisualReset(backToTop, 1.05); };
+    backToTop.onmouseup = function() { forceVisualReset(backToTop, 1.1); };
+    backToTop.onfocus = function() { forceVisualReset(backToTop, 1); };
+    backToTop.onblur = function() { forceVisualReset(backToTop, 1); };
 
     backToTop.onclick = function() {
       window.scrollTo({ top: 0, behavior: 'smooth' });

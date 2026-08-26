@@ -258,14 +258,167 @@ a img.book-icon[src$=".png"] {
   }
 }
 
-/* ========== 浮动按钮悬停效果 ========== */
-#theme-switcher:hover,
-#back-to-top:hover {
-  background: var(--gray-200) !important;
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.6),
-    0 2px 6px rgba(0,0,0,0.9),
-    0 0 0 1px rgba(255,255,255,0.06) inset !important;
+/* ========== 浮动按钮：亮/暗模式写死实色，hover 全锁色 ==========
+   选择器用 button#id（元素+ID）比纯 #id 特异性更高，碾压浏览器 UA/任何主题样式
+   配色方案：亮模式白底深字，暗模式深灰底白字，带 1px 细描边，不突兀 */
+
+/* --- 亮色主题（light + auto 默认）：白底 #fff + 深灰字 #111827 + 浅灰描边 #d1d5db --- */
+:root[data-theme*="light"] button#theme-switcher,
+:root[data-theme*="light"] button#back-to-top,
+:root[data-theme="auto"] button#theme-switcher,
+:root[data-theme="auto"] button#back-to-top,
+:root[data-theme*="-auto"] button#theme-switcher,
+:root[data-theme*="-auto"] button#back-to-top {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.30) !important;  /* 下半圈灰色投影 */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  transition: transform 0.2s ease !important;
+  -webkit-transition: -webkit-transform 0.2s ease !important;
+  outline: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* --- 暗色主题（dark + auto 跟随系统暗色）：深灰 #3f3f46 + 白字 #fafafa + 描边 #52525b --- */
+:root[data-theme*="dark"] button#theme-switcher,
+:root[data-theme*="dark"] button#back-to-top {
+  background: #3f3f46 !important;
+  background-color: #3f3f46 !important;
+  background-image: none !important;
+  color: #fafafa !important;
+  border: 1px solid #52525b !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.70) !important;  /* 下半圈灰色投影 */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  transition: transform 0.2s ease !important;
+  -webkit-transition: -webkit-transform 0.2s ease !important;
+  outline: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+/* auto 模式跟随系统暗色（覆盖以上 auto 默认亮态） */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] button#theme-switcher,
+  :root[data-theme="auto"] button#back-to-top,
+  :root[data-theme*="-auto"] button#theme-switcher,
+  :root[data-theme*="-auto"] button#back-to-top {
+    background: #3f3f46 !important;
+    background-color: #3f3f46 !important;
+    color: #fafafa !important;
+    border: 1px solid #52525b !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.70) !important;
+  }
+}
+
+/* ========== 终极锁色：hover/active/focus 全状态 **写死具体颜色**，绝不变色 ==========
+   选择器用最高特异性，亮/暗模式分别写具体实色，不用 inherit（inherit 会偷父级背景色） */
+
+/* 亮色主题下的 hover/focus/active：与默认态亮配色完全一致 */
+:root[data-theme*="light"] button#theme-switcher:hover,
+:root[data-theme*="light"] button#theme-switcher:active,
+:root[data-theme*="light"] button#theme-switcher:focus,
+:root[data-theme*="light"] button#theme-switcher:focus-visible,
+:root[data-theme*="light"] button#back-to-top:hover,
+:root[data-theme*="light"] button#back-to-top:active,
+:root[data-theme*="light"] button#back-to-top:focus,
+:root[data-theme*="light"] button#back-to-top:focus-visible,
+:root[data-theme="auto"] button#theme-switcher:hover,
+:root[data-theme="auto"] button#theme-switcher:active,
+:root[data-theme="auto"] button#theme-switcher:focus,
+:root[data-theme="auto"] button#theme-switcher:focus-visible,
+:root[data-theme="auto"] button#back-to-top:hover,
+:root[data-theme="auto"] button#back-to-top:active,
+:root[data-theme="auto"] button#back-to-top:focus,
+:root[data-theme="auto"] button#back-to-top:focus-visible,
+:root[data-theme*="-auto"] button#theme-switcher:hover,
+:root[data-theme*="-auto"] button#theme-switcher:active,
+:root[data-theme*="-auto"] button#theme-switcher:focus,
+:root[data-theme*="-auto"] button#theme-switcher:focus-visible,
+:root[data-theme*="-auto"] button#back-to-top:hover,
+:root[data-theme*="-auto"] button#back-to-top:active,
+:root[data-theme*="-auto"] button#back-to-top:focus,
+:root[data-theme*="-auto"] button#back-to-top:focus-visible {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.30) !important;  /* 下半圈灰色投影 */
+  outline: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 暗色主题下的 hover/focus/active：与默认态暗配色完全一致 */
+:root[data-theme*="dark"] button#theme-switcher:hover,
+:root[data-theme*="dark"] button#theme-switcher:active,
+:root[data-theme*="dark"] button#theme-switcher:focus,
+:root[data-theme*="dark"] button#theme-switcher:focus-visible,
+:root[data-theme*="dark"] button#back-to-top:hover,
+:root[data-theme*="dark"] button#back-to-top:active,
+:root[data-theme*="dark"] button#back-to-top:focus,
+:root[data-theme*="dark"] button#back-to-top:focus-visible {
+  background: #3f3f46 !important;
+  background-color: #3f3f46 !important;
+  background-image: none !important;
+  color: #fafafa !important;
+  border: 1px solid #52525b !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.70) !important;  /* 下半圈灰色投影 */
+  outline: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* auto 模式跟随系统暗色 hover/focus/active 覆盖 */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] button#theme-switcher:hover,
+  :root[data-theme="auto"] button#theme-switcher:active,
+  :root[data-theme="auto"] button#theme-switcher:focus,
+  :root[data-theme="auto"] button#theme-switcher:focus-visible,
+  :root[data-theme="auto"] button#back-to-top:hover,
+  :root[data-theme="auto"] button#back-to-top:active,
+  :root[data-theme="auto"] button#back-to-top:focus,
+  :root[data-theme="auto"] button#back-to-top:focus-visible,
+  :root[data-theme*="-auto"] button#theme-switcher:hover,
+  :root[data-theme*="-auto"] button#theme-switcher:active,
+  :root[data-theme*="-auto"] button#theme-switcher:focus,
+  :root[data-theme*="-auto"] button#theme-switcher:focus-visible,
+  :root[data-theme*="-auto"] button#back-to-top:hover,
+  :root[data-theme*="-auto"] button#back-to-top:active,
+  :root[data-theme*="-auto"] button#back-to-top:focus,
+  :root[data-theme*="-auto"] button#back-to-top:focus-visible {
+    background: #3f3f46 !important;
+    background-color: #3f3f46 !important;
+    color: #fafafa !important;
+    border: 1px solid #52525b !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.70) !important;
+  }
 }
 
 /* ==========================================================================

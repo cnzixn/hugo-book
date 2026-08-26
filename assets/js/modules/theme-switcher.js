@@ -108,7 +108,7 @@
    */
   function updateButton(mode) {
     if (!switchTheme) return;
-    var icons = { 'auto': '✨', 'light': '☀️', 'dark': '🌙' };
+    var icons = { 'auto': '✨', 'light': '☀️', 'dark': '🌕' };
     var titles = { 'auto': '自动切换', 'light': '亮色主题', 'dark': '暗色主题' };
     switchTheme.innerHTML = icons[mode] || '✨';
     switchTheme.title = titles[mode] || '切换主题';
@@ -142,20 +142,30 @@
       width: '40px',
       height: '40px',
       borderRadius: '50%',
-      border: 'none',
-      background: 'var(--gray-100)',
       cursor: 'pointer',
       fontSize: '20px',
-      color: 'var(--body-font-color)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.8)',
-      transition: 'all 0.2s ease'
+      transform: 'scale(1)',
+      transformOrigin: 'center center'
     });
 
-    switchTheme.onmouseenter = function() { this.style.transform = 'scale(1.1)'; };
-    switchTheme.onmouseleave = function() { this.style.transform = 'scale(1)'; };
+    /**
+     * 仅 transform scale 放大反馈，颜色全由 CSS 固定控制
+     * @param {number} sizeLevel - 缩放档位：1（默认） / 1.05（按下） / 1.1（悬停）
+     */
+    function forceVisualReset(sizeLevel) {
+      switchTheme.style.transform = 'scale(' + sizeLevel + ')';
+    }
+
+    /* 仅保留矢量尺寸反馈 */
+    switchTheme.onmouseenter = function() { forceVisualReset(1.1); };
+    switchTheme.onmouseleave = function() { forceVisualReset(1); };
+    switchTheme.onmousedown = function() { forceVisualReset(1.05); };
+    switchTheme.onmouseup = function() { forceVisualReset(1.1); };
+    switchTheme.onfocus = function() { forceVisualReset(1); };
+    switchTheme.onblur = function() { forceVisualReset(1); };
 
     // 滚动时显示/隐藏（与返回顶部按钮使用同一阈值 300px，保证位置重合时严格互斥）
     // passive: true 让滚动合成先跑，JS 异步执行，不阻塞掉帧
