@@ -93,9 +93,9 @@
    */
   function updateButton(mode) {
     if (!switchTheme) return;
-    var icons = { 'auto': '🌗', 'light': '☀️', 'dark': '🌙' };
+    var icons = { 'auto': '✨', 'light': '☀️', 'dark': '🌙' };
     var titles = { 'auto': '自动切换', 'light': '亮色主题', 'dark': '暗色主题' };
-    switchTheme.innerHTML = icons[mode] || '🌗';
+    switchTheme.innerHTML = icons[mode] || '✨';
     switchTheme.title = titles[mode] || '切换主题';
     updateDisplayByScroll();
   }
