@@ -1,0 +1,44 @@
+# CF Pages 缓存规则（由 _headers 直接控制边缘节点 Cache-Control）
+# 原则：指纹化文件永久缓存 + 普通图片长缓存 + HTML 短缓存+stale
+# 参考：https://developers.cloudflare.com/pages/platform/headers/
+
+# --- 1. HTML 文档：短缓存 5 分钟 + 同时后台回源拿新 ---
+/*.html
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400, stale-if-error=604800
+
+# 站点根 / （首页）也按 HTML 处理
+/
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400, stale-if-error=604800
+
+# --- 2. 带指纹的静态资源（Hugo |Fingerprint "sha256" 产物）---
+# 文件名类似 custom.abc123def456.min.js / book.min.xyz.css，永远不会冲突
+/js/*.*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/css/*.*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# data 目录放的是 ds-mods / dst-mods JSON（也带指纹 FromString + Fingerprint）
+/data/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# --- 3. 无指纹的 static 静态资源 ---
+# 图片 1 年（BM PNG/WebP 等，后续如果换图要改文件名）
+/img/*
+  Cache-Control: public, max-age=31536000, immutable
+/favicon.png
+  Cache-Control: public, max-age=2592000, immutable
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 其他纯静态 JS（pv-tracker / instant.page 自托管）一个月
+/js/*
+  Cache-Control: public, max-age=2592000
+
+# svgs / fonts
+/*.svg
+  Cache-Control: public, max-age=2592000, immutable
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
