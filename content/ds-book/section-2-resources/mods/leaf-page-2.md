@@ -1,6 +1,7 @@
 ---
 title: BM002
 weight: 2002
+draft: true
 aliases:
   - "/p/BM002"
 ---

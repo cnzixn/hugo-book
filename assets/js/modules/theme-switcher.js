@@ -64,7 +64,7 @@
   }
 
   /**
-   * 更新按钮图标和提示
+   * 更新按钮图标、提示和显示隐藏
    */
   function updateButton(mode) {
     if (!switchTheme) return;
@@ -72,6 +72,7 @@
     var titles = { 'auto': '自动切换', 'light': '亮色主题', 'dark': '暗色主题' };
     switchTheme.innerHTML = icons[mode] || '🌗';
     switchTheme.title = titles[mode] || '切换主题';
+    switchTheme.style.display = (window.scrollY < 300) ? 'flex' : 'none';
   }
 
   /**
@@ -97,7 +98,7 @@
       position: 'fixed',
       bottom: '120px',
       right: '20px',
-      zIndex: '9999',
+      zIndex: '9998',
       width: '40px',
       height: '40px',
       borderRadius: '50%',
@@ -115,9 +116,9 @@
     switchTheme.onmouseenter = function() { this.style.transform = 'scale(1.1)'; };
     switchTheme.onmouseleave = function() { this.style.transform = 'scale(1)'; };
 
-    // 滚动时隐藏
+    // 滚动时显示/隐藏（与返回顶部按钮使用同一阈值 300px，保证位置重合时严格互斥）
     window.addEventListener('scroll', function() {
-      switchTheme.style.display = (window.scrollY <= 300) ? 'flex' : 'none';
+      switchTheme.style.display = (window.scrollY < 300) ? 'flex' : 'none';
     });
 
     document.body.appendChild(switchTheme);

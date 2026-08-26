@@ -1,0 +1,45 @@
+{{/*
+  视频播放短代码 - 原生 HTML5 video
+  用法:
+    {{< video src="/videos/demo.mp4" >}}
+    {{< video src="/videos/demo.mp4" poster="/img/poster.jpg" >}}
+    {{< video src="/videos/demo.mp4" autoplay="true" muted="true" >}}
+    {{< video src="/videos/demo.mp4" loop="true" >}}
+    {{< video src="https://www.youtube.com/embed/dQw4w9WgXcQ" type="youtube" >}}
+  参数:
+    src       - 视频源 URL（必填）
+    poster    - 封面图 URL（可选）
+    type      - 视频类型: video/youtube（默认 video）
+    autoplay  - 自动播放: true/false（默认 false）
+    muted     - 静音播放: true/false（默认 false）
+    loop      - 循环播放: true/false（默认 false）
+*/}}
+
+{{- $src := .Get "src" -}}
+{{- $poster := .Get "poster" | default "" -}}
+{{- $type := .Get "type" | default "video" -}}
+{{- $autoplay := .Get "autoplay" | default "false" -}}
+{{- $muted := .Get "muted" | default "false" -}}
+{{- $loop := .Get "loop" | default "false" -}}
+
+{{- if not $src -}}
+  <div class="video-error">
+    ⚠️ 缺少视频源参数 <code>src</code>
+  </div>
+{{- else -}}
+
+{{- if eq $type "youtube" -}}
+  <div class="video-wrapper">
+    <iframe src="{{ $src }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+{{- else -}}
+  <video class="plain-video" src="{{ $src }}"
+    {{ if $poster }}poster="{{ $poster }}"{{ end }}
+    {{ if eq $autoplay "true" }}autoplay{{ end }}
+    {{ if eq $muted "true" }}muted{{ end }}
+    {{ if eq $loop "true" }}loop{{ end }}
+    playsinline controls
+  ></video>
+{{- end -}}
+
+{{- end -}}

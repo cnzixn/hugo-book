@@ -1,0 +1,535 @@
+{{ $panData := index site.Data "dst_pan" }}
+{{ $currentDate := now.Format "20060102" }}
+{{/* 只接收命名参数：keyword=预填关键词，searchOnly=true 只显示搜索结果 */}}
+{{ $searchKeyword := .Get "keyword" | default "" }}
+{{ $searchOnly := .Get "searchOnly" | default "false" }}
+
+
+{{/* 计算标准 WS000-WS999 条目总数 */}}
+{{ $bmCount := 0 }}
+{{ range $id, $itemData := $panData }}
+  {{ if (findRE `^WS\d{6,20}$` (upper $id)) }}
+    {{ $bmCount = add $bmCount 1 }}
+  {{ end }}
+{{ end }}
+
+
+{{/* 创建有序列表的切片 */}}
+{{ $bmItems := slice }}
+{{ range $id, $itemData := $panData }}
+  {{/* 正则匹配：^WS 开头 + 6-20位数字，大小写兼容 */}}
+  {{ if (findRE `^WS\d{6,20}$` (upper $id)) }}
+    {{ $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" }}
+    {{ $size := index (where $itemData "size" "!=" nil) 0 "size" }}
+    {{ $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" }}
+    {{ $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" }}
+    {{ $bmItems = $bmItems | append (dict 
+      "id" $id 
+      "name" $name
+      "size" $size
+      "baiduUrl" $baiduUrl
+      "quarkUrl" $quarkUrl
+    ) }}
+  {{ end }}
+{{ end }}
+
+{{/* 按ID排序后序列化为 JSON */}}
+{{ $sortedItems := sort $bmItems "id" "asc" }}
+{{ $modsJson := $sortedItems | jsonify }}
+
+{{/* 顶部栏：分三行 → 统计 / 排序按钮 / 搜索框 */}}
+<div class="header-bar">
+  <div class="sort-controls">
+    <!-- 第一行：统计信息 + 排序按钮 -->
+    <div class="sort-header">
+      <div class="sort-info">
+        <span>共计 <span id="show-count">0</span> / {{ $bmCount }} 模组</span>
+      </div>
+      <button id="sort-toggle" class="sort-btn" data-sort="asc">
+        <svg class="icon-asc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5h10"></path>
+          <path d="M11 9h7"></path>
+          <path d="M11 13h4"></path>
+          <path d="m3 17 3 3 3-3"></path>
+          <path d="M6 18V4"></path>
+        </svg>
+        <svg class="icon-desc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5h10"></path>
+          <path d="M11 9h7"></path>
+          <path d="M11 13h4"></path>
+          <path d="m3 7 3-3 3 3"></path>
+          <path d="M6 4v14"></path>
+        </svg>
+        <span class="sort-label">正序</span>
+      </button>
+    </div>
+
+    <!-- 第二行：搜索框（通栏占满） -->
+    <div class="search-box">
+      <input type="text" id="mod-search" placeholder="搜索模组 ID / 名称..." autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<div id="mods-list" class="mods-list"></div>
+
+<div id="scroll-sentinel" class="scroll-sentinel">加载更多...</div>
+
+<script id="mods-data" type="application/json" data-search-only="{{ $searchOnly }}" data-search-keyword="{{ $searchKeyword }}">{{ $modsJson | safeJS }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const PAGE_SIZE = 50;
+  const CURRENT_DATE = '{{ $currentDate }}';
+
+  const modsDataEl = document.getElementById('mods-data');
+  const SEARCH_ONLY = modsDataEl.dataset.searchOnly === 'true';
+  const SEARCH_KEYWORD = modsDataEl.dataset.searchKeyword || '';
+
+  const modsList = document.getElementById('mods-list');
+  const sentinel = document.getElementById('scroll-sentinel');
+  const searchInput = document.getElementById('mod-search');
+  const showCountEl = document.getElementById('show-count');
+  const sortToggleBtn = document.getElementById('sort-toggle');
+
+  // 从 JSON 数据加载
+  const allMods = JSON.parse(modsDataEl.textContent);
+  let filteredMods = SEARCH_ONLY && !SEARCH_KEYWORD ? [] : [...allMods];
+  let currentSort = localStorage.getItem('mods-sort-preference') || 'asc';
+  let currentPage = 0;
+  let isLoading = false;
+
+  /**
+   * 获取站点基础 URL（基于当前访问域名，适配局域网访问）
+   */
+  const SITE_ORIGIN = window.location.origin;
+
+  /**
+   * 初始化：如果传入了搜索关键词，自动填充并过滤
+   */
+  if (SEARCH_KEYWORD) {
+    searchInput.value = SEARCH_KEYWORD;
+  }
+
+
+  // 初始化
+  updateSortButtons();
+  applyFilter();
+
+  /**
+   * 构建单个模组卡片 HTML
+   */
+  function buildModItem(mod) {
+    const idLower = mod.id.toLowerCase();
+    const nameLower = mod.name.toLowerCase();
+    const baiduUrl = mod.baiduUrl ? mod.baiduUrl + '&t=' + CURRENT_DATE : null;
+    const quarkUrl = mod.quarkUrl ? mod.quarkUrl + '&t=' + CURRENT_DATE : null;
+
+    return `
+      <div class="mod-item" data-id="${idLower}" data-name="${nameLower}">
+        <div class="item-main">
+          <div class="item-info">
+            <button onclick="window.location.href='${SITE_ORIGIN}/p/${mod.id}'" class="action-btn" data-href="/p/${mod.id}">
+              <img
+                src="/img/ws/${mod.id}.png"
+                alt="${mod.id}"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='/img/bm/BM000.png'"
+              >
+            </button>
+            <span class="mod-name">
+              ${mod.id}
+              ${mod.name}
+              ${mod.size ? '(' + mod.size + ')' : ''}
+            </span>
+          </div>
+          <div class="item-actions">
+            ${baiduUrl ? `
+              <button onclick="window.open('${baiduUrl}', '_blank')" class="action-btn baidu" title="百度网盘下载">
+                <img src="/img/icons/pan_baidu.webp" alt="百度" loading="lazy">
+              </button>
+            ` : `
+              <button class="action-btn baidu" title="暂无百度下载" disabled>
+                <img src="/img/icons/pan_baidu.webp" alt="百度" loading="lazy">
+              </button>
+            `}
+            ${quarkUrl ? `
+              <button onclick="window.open('${quarkUrl}', '_blank')" class="action-btn quark" title="夸克网盘下载">
+                <img src="/img/icons/pan_quark.webp" alt="夸克" loading="lazy">
+              </button>
+            ` : `
+              <button class="action-btn quark" title="暂无夸克下载" disabled>
+                <img src="/img/icons/pan_quark.webp" alt="夸克" loading="lazy">
+              </button>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * 渲染指定页的模组
+   */
+  function renderPage(pageIndex) {
+    const start = pageIndex * PAGE_SIZE;
+    const end = Math.min(start + PAGE_SIZE, filteredMods.length);
+    const pageMods = filteredMods.slice(start, end);
+
+    if (pageMods.length === 0 && start >= filteredMods.length) {
+      sentinel.style.display = 'none';
+      return;
+    }
+
+    sentinel.style.display = 'block';
+
+    // 第一页清空，后续追加
+    if (pageIndex === 0) {
+      modsList.innerHTML = pageMods.map(buildModItem).join('');
+    } else {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = pageMods.map(buildModItem).join('');
+      while (tempDiv.firstChild) {
+        modsList.appendChild(tempDiv.firstChild);
+      }
+    }
+
+    currentPage = pageIndex + 1;
+  }
+
+  /**
+   * 重新加载（搜索/排序后）
+   */
+  function reload() {
+    currentPage = 0;
+    modsList.innerHTML = '';
+    renderPage(0);
+    showCountEl.textContent = filteredMods.length;
+  }
+
+  /**
+   * 搜索过滤
+   */
+  function applyFilter() {
+    const kw = searchInput.value.trim().toLowerCase();
+    if (!kw) {
+      filteredMods = SEARCH_ONLY ? [] : [...allMods];
+    } else {
+      filteredMods = allMods.filter(m =>
+        m.id.toLowerCase().includes(kw) || m.name.toLowerCase().includes(kw)
+      );
+    }
+    applySort();
+    reload();
+  }
+
+  /**
+   * 排序
+   */
+  function applySort() {
+    filteredMods.sort((a, b) => {
+      if (currentSort === 'asc') {
+        return a.id.localeCompare(b.id);
+      } else {
+        return b.id.localeCompare(a.id);
+      }
+    });
+  }
+
+  /**
+   * 更新排序按钮显示
+   */
+  function updateSortButtons() {
+    const iconAsc = sortToggleBtn.querySelector('.icon-asc');
+    const iconDesc = sortToggleBtn.querySelector('.icon-desc');
+    const label = sortToggleBtn.querySelector('.sort-label');
+    if (currentSort === 'asc') {
+      iconAsc.style.display = 'inline-block';
+      iconDesc.style.display = 'none';
+      label.textContent = '正序';
+    } else {
+      iconAsc.style.display = 'none';
+      iconDesc.style.display = 'inline-block';
+      label.textContent = '倒序';
+    }
+  }
+
+  /**
+   * IntersectionObserver: 滚动到底部自动加载
+   */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !isLoading) {
+        const totalPages = Math.ceil(filteredMods.length / PAGE_SIZE);
+        if (currentPage < totalPages) {
+          isLoading = true;
+          sentinel.textContent = '加载中...';
+          // 使用 setTimeout 避免阻塞
+          setTimeout(() => {
+            renderPage(currentPage);
+            isLoading = false;
+            sentinel.textContent = currentPage >= totalPages ? '已加载全部' : '加载更多...';
+          }, 50);
+        }
+      }
+    });
+  }, {
+    rootMargin: '200px',
+    threshold: 0
+  });
+
+  observer.observe(sentinel);
+
+  // 事件绑定：排序切换
+  sortToggleBtn.addEventListener('click', () => {
+    currentSort = currentSort === 'asc' ? 'desc' : 'asc';
+    localStorage.setItem('mods-sort-preference', currentSort);
+    updateSortButtons();
+    applyFilter();
+  });
+
+  // 搜索防抖
+  let searchTimer = null;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(applyFilter, 200);
+  });
+});
+</script>
+
+<style>
+/* 顶部整体栏 */
+.header-bar {
+  margin: 1.5rem 0 1rem 0;
+}
+
+/* 容器改为纵向排列，内部元素各自独占一行 */
+.sort-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 0.75rem 1rem;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: calc(var(--border-radius) * 2);
+}
+
+/* 第一行：统计信息 + 排序按钮（同一行） */
+.sort-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sort-info {
+  font-size: var(--font-size-smaller);
+  color: var(--gray-500);
+}
+
+.sort-header .sort-btn {
+  flex-shrink: 0;
+}
+
+/* 搜索框：通栏占满整行 */
+.search-box {
+  width: 100%;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: calc(var(--border-radius) * 2);
+  color: var(--body-font-color);
+  font-size: var(--font-size-smaller);
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+.search-box input:focus {
+  border-color: var(--color-accent-note);
+}
+
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  background: var(--body-background);
+  border: 1px solid var(--gray-200);
+  border-radius: calc(var(--border-radius) * 1.5);
+  color: var(--body-font-color);
+  font-size: var(--font-size-smaller);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sort-btn:hover {
+  border-color: var(--color-accent-note);
+  background: var(--gray-100);
+}
+
+.sort-btn svg {
+  stroke: currentColor;
+}
+
+.sort-btn .icon-desc {
+  display: none;
+}
+
+.sort-btn .sort-label {
+  font-size: var(--font-size-smaller);
+}
+
+/* 列表样式 */
+.mods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--body-font-color);
+  font-family: inherit;
+}
+
+.mods-list button,
+.mods-list input {
+  font-family: inherit;
+}
+
+.mod-item {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: calc(var(--border-radius) * 2);
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.mod-item:hover {
+  background: var(--body-background);
+}
+
+.item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mod-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--body-font-color);
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 3px;
+}
+
+.mod-name::-webkit-scrollbar {
+  height: 1.5px;
+}
+.mod-name::-webkit-scrollbar-thumb {
+  background-color: var(--gray-500);
+  border-radius: 3px;
+}
+.mod-name::-webkit-scrollbar-track {
+  background-color: var(--gray-100);
+  border: 0.6px solid var(--gray-200);
+  border-radius: 3px;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  flex-shrink: 0;
+}
+
+.action-btn img {
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--gray-200);
+  border-radius: 3px;
+  object-fit: contain;
+  display: block;
+}
+
+.action-btn:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.action-btn:disabled img {
+  filter: grayscale(100%);
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.08);
+}
+
+.action-btn:hover img {
+  filter: grayscale(0%);
+  border-color: var(--color-accent-note);
+}
+
+/* 滚动哨兵 */
+.scroll-sentinel {
+  text-align: center;
+  padding: 1rem;
+  color: var(--gray-500);
+  font-size: var(--font-size-smaller);
+}
+
+/* 移动端优化 */
+@media (max-width: 480px) {
+  .sort-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .sort-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .mod-item {
+    padding: 0.875rem;
+  }
+  .item-main {
+    gap: 0.5rem;
+  }
+  .item-info {
+    gap: 0.375rem;
+  }
+  .mod-name {
+    font-size: 0.875rem;
+  }
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+}
+</style>

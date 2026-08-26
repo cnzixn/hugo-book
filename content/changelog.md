@@ -1,6 +1,7 @@
 ---
-title: BOOK-更新日志
-weight: 100
+title: "📌 日志 - 模组手册"
+draft: true
+weight: 3
 ---
 
 {{% changelog %}}

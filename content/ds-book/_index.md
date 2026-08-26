@@ -1,5 +1,5 @@
 ---
-title: 饥荒-手游单机版
+title: 饥荒 - 手游单机版
 weight: 1
 bookCollapseSection: true
 bookIcon: ds_icon
@@ -16,7 +16,7 @@ bookIcon: ds_icon
 -----
 
 - 部分地区无法访问，需要使用“加速器”。
-- 选“美区”，可用招行“万事达借记卡”付款。
+- 推荐选“美区”，用招行“万事达借记卡”付款购买。
 
 -----
 
@@ -25,14 +25,12 @@ bookIcon: ds_icon
   {{<button href="https://play.google.com/store/apps/details?id=com.kleientertainment.doNotStarveShipwrecked&hl=en_CA">}}🛍️ Google Play{{</button>}}
 </div>
 
-注：有条件的话，请付费支持一下官方正版。我们后续安装模组不会用到官方版，使用的是网盘下载的“试玩版”。 
+注：安装模组不会用官方版，使用的是网盘的“试玩版”。 
 
 
-## 游戏截图
------
 
-{{< figure src="/img/ds/4E31FB73E8A68FE4287A8A47D890859B.jpg" caption="" >}}
-{{< figure src="/img/ds/D4F323F3876EBF86B9282335AACFB775.jpg" caption="" >}}
+<!-- {{< figure src="/img/ds/4E31FB73E8A68FE4287A8A47D890859B.jpg" caption="" >}} -->
+<!-- {{< figure src="/img/ds/D4F323F3876EBF86B9282335AACFB775.jpg" caption="" >}} -->
 
 -----
 

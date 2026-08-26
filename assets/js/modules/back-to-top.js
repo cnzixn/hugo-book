@@ -41,15 +41,18 @@
     };
 
     window.addEventListener('scroll', updateVisibility);
+
     document.body.appendChild(backToTop);
   }
 
   /**
-   * 根据滚动位置更新按钮可见性
+   * 根据滚动位置更新返回顶部按钮可见性
+   *   scrollY <  300 → 隐藏
+   *   scrollY >= 300 → 显示（与主题按钮位置重合、显示状态相反）
    */
   function updateVisibility() {
     if (!backToTop) return;
-    backToTop.style.display = (window.scrollY > SCROLL_THRESHOLD) ? 'flex' : 'none';
+    backToTop.style.display = (window.scrollY >= SCROLL_THRESHOLD) ? 'flex' : 'none';
   }
 
   /**
