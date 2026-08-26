@@ -240,63 +240,6 @@ a img.book-icon[src$=".png"] {
   }
 }
 
-/* ========== 视频播放器 ========== */
-/* 原生 video：跟主题的 .markdown img 保持一致，不做任何裁剪/滤镜 */
-.markdown video.plain-video {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  background: #000;
-  border-radius: calc(var(--border-radius) * 2);
-  border: 1px solid var(--gray-200);
-  box-sizing: border-box;
-  margin: 1.5rem auto;
-  max-width: 900px;
-}
-
-.video-wrapper {
-  max-width: 900px;
-  margin: 1.5rem auto;
-}
-
-.video-wrapper iframe {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  display: block;
-  border-radius: calc(var(--border-radius) * 2);
-  border: 1px solid var(--gray-200);
-}
-
-/* 播放器容器在小屏幕全宽 */
-@media (max-width: 768px) {
-  .markdown video.plain-video,
-  .video-wrapper {
-    max-width: 100%;
-    margin: 1rem 0;
-  }
-  .markdown video.plain-video,
-  .video-wrapper iframe {
-    border-radius: var(--border-radius);
-  }
-}
-
-/* 错误提示样式 */
-.video-error {
-  padding: 1rem 1.5rem;
-  background: var(--gray-100);
-  border: 1px solid var(--color-accent-note);
-  border-radius: var(--border-radius);
-  color: var(--body-font-color);
-  font-size: 0.9375rem;
-}
-
-.video-error code {
-  background: var(--gray-200);
-  padding: 0.1rem 0.4rem;
-  border-radius: 3px;
-  font-size: 0.875em;
-}
-
 /* ========== 浮动按钮悬停效果 ========== */
 #theme-switcher:hover,
 #back-to-top:hover {
