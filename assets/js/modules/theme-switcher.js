@@ -1,7 +1,7 @@
-/**
- * 主题切换器模块
- * 功能：auto(按时间) / light / dark 三态切换、主题记忆、浮动按钮
- */
+  /**
+   * 主题切换器模块
+   * 功能：auto(按时间) / light / dark 三态切换、主题记忆、浮动按钮
+   */
 (function(global) {
   'use strict';
 
@@ -9,6 +9,8 @@
   var THEME_STORAGE_KEY = 'book-theme-mode';
   var DAY_START = 6;   // 白天开始时间（小时）
   var DAY_END = 18;    // 黑夜开始时间（小时）
+  var SCROLL_THRESHOLD = 300;
+  var pendingScrollUpdate = false;
 
   /**
    * 根据时间判断应该使用的模式
@@ -64,6 +66,29 @@
   }
 
   /**
+   * 按当前 scrollY 同步显示状态（scrollY<300 显示，>=300 隐藏）
+   * 用 requestAnimationFrame 合并写入，避免每秒 120 次 style reflow
+   */
+  function updateDisplayByScroll() {
+    if (!switchTheme) return;
+    switchTheme.style.display = (window.scrollY < SCROLL_THRESHOLD) ? 'flex' : 'none';
+    pendingScrollUpdate = false;
+  }
+
+  /**
+   * 滚动回调（passive，不阻塞浏览器合成线程）
+   */
+  function onScroll() {
+    if (pendingScrollUpdate) return;
+    pendingScrollUpdate = true;
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(updateDisplayByScroll);
+    } else {
+      updateDisplayByScroll();
+    }
+  }
+
+  /**
    * 更新按钮图标、提示和显示隐藏
    */
   function updateButton(mode) {
@@ -72,7 +97,7 @@
     var titles = { 'auto': '自动切换', 'light': '亮色主题', 'dark': '暗色主题' };
     switchTheme.innerHTML = icons[mode] || '🌗';
     switchTheme.title = titles[mode] || '切换主题';
-    switchTheme.style.display = (window.scrollY < 300) ? 'flex' : 'none';
+    updateDisplayByScroll();
   }
 
   /**
@@ -117,9 +142,8 @@
     switchTheme.onmouseleave = function() { this.style.transform = 'scale(1)'; };
 
     // 滚动时显示/隐藏（与返回顶部按钮使用同一阈值 300px，保证位置重合时严格互斥）
-    window.addEventListener('scroll', function() {
-      switchTheme.style.display = (window.scrollY < 300) ? 'flex' : 'none';
-    });
+    // passive: true 让滚动合成先跑，JS 异步执行，不阻塞掉帧
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     document.body.appendChild(switchTheme);
   }
@@ -133,13 +157,13 @@
     applyMode(mode);
     updateButton(mode);
 
-    // auto 模式下，每分钟检查一次是否需要切换
+    // auto 模式下，每分钟检查一次是否需要切换白天/黑夜
     setInterval(function() {
       var currentMode = localStorage.getItem(THEME_STORAGE_KEY);
       if (currentMode === 'auto') {
         applyMode('auto');
       }
-    }, 60000); // 60秒检查一次
+    }, 60000);
   }
 
   // 导出模块

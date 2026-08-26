@@ -1,4 +1,34 @@
 {{/*
+  【最高优先级】在任何资源加载前立即清理残留 Service Worker
+  根因：旧 SW precache 模式会拦截全站 fetch（包括 document HTML），
+        sw.unregister 如果放在 body 末尾执行，当前页 document 早已经被 SW 拦截完卡住 2s+；
+        提前到 <head> 顶部同步执行：
+          - 本次访问的后续资源（CSS/JS/图片）不再被 SW 拦截
+          - 用户下一次点击站内链接跳页时，SW 已卸载，document 直连 CF，<100ms 完成
+*/}}
+<script>
+  (function () {
+    try {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          for (var i = 0; i < regs.length; i++) regs[i].unregister();
+        });
+        // 再兜底：直接删掉 caches 里的旧 precache 缓存名字（hugo-book 默认前缀 hugo-book-*）
+        if ('caches' in window) {
+          caches.keys().then(function (keys) {
+            for (var j = 0; j < keys.length; j++) {
+              if (/^(hugo-book|book-precache|workbox-precache)/.test(keys[j])) {
+                caches.delete(keys[j]);
+              }
+            }
+          });
+        }
+      }
+    } catch (e) { /* 隐私模式 / 旧浏览器静默 */ }
+  })();
+</script>
+
+{{/*
   主题预加载脚本 - 内联执行，避免 FOUC 闪烁
   必须在 <head> 中同步执行，不能用 defer/async
 */}}

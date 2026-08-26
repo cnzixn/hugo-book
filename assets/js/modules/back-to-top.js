@@ -7,6 +7,30 @@
 
   var backToTop = null;
   var SCROLL_THRESHOLD = 300;
+  var pendingScrollUpdate = false;
+
+  /**
+   * 按 scrollY 同步显示状态（scrollY >= 300 显示，<300 隐藏）
+   * 用 requestAnimationFrame 合并写入，避免滚动期间每秒多次 reflow
+   */
+  function updateVisibilityByScroll() {
+    if (!backToTop) return;
+    backToTop.style.display = (window.scrollY >= SCROLL_THRESHOLD) ? 'flex' : 'none';
+    pendingScrollUpdate = false;
+  }
+
+  /**
+   * 滚动回调（passive 不阻塞合成）
+   */
+  function onScroll() {
+    if (pendingScrollUpdate) return;
+    pendingScrollUpdate = true;
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(updateVisibilityByScroll);
+    } else {
+      updateVisibilityByScroll();
+    }
+  }
 
   /**
    * 创建返回顶部按钮
@@ -40,19 +64,19 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.addEventListener('scroll', updateVisibility);
+    // passive: true → 不阻塞滚动合成线程，降低掉帧
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     document.body.appendChild(backToTop);
   }
 
   /**
-   * 根据滚动位置更新返回顶部按钮可见性
+   * 根据滚动位置更新返回顶部按钮可见性（对外兼容接口）
    *   scrollY <  300 → 隐藏
    *   scrollY >= 300 → 显示（与主题按钮位置重合、显示状态相反）
    */
   function updateVisibility() {
-    if (!backToTop) return;
-    backToTop.style.display = (window.scrollY >= SCROLL_THRESHOLD) ? 'flex' : 'none';
+    updateVisibilityByScroll();
   }
 
   /**
