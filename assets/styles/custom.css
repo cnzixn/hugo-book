@@ -38,6 +38,10 @@ main.container {
 :root[data-theme="contrast-auto"] {
   --gray-200: #b0b0b0;
 }
+:root[data-theme="github-light"],
+:root[data-theme="github-auto"] {
+  --gray-200: #b5bcc2;
+}
 
 /* 亮色主题代码块白灰色背景 + 黑字 */
 :root[data-theme="light"] .highlight pre,
@@ -47,7 +51,19 @@ main.container {
 :root[data-theme="ayu-light"] .highlight pre,
 :root[data-theme="ayu-auto"] .highlight pre,
 :root[data-theme="contrast-light"] .highlight pre,
-:root[data-theme="contrast-auto"] .highlight pre {
+:root[data-theme="contrast-auto"] .highlight pre,
+:root[data-theme="github-light"] .highlight pre,
+:root[data-theme="github-auto"] .highlight pre {
+  background: var(--gray-100) !important;
+  color: var(--body-font-color) !important;
+}
+
+/* 暗色主题代码块背景 + 浅字（含 github-dark） */
+:root[data-theme="dark"] .highlight pre,
+:root[data-theme="catppuccin-dark"] .highlight pre,
+:root[data-theme="ayu-dark"] .highlight pre,
+:root[data-theme="contrast-dark"] .highlight pre,
+:root[data-theme="github-dark"] .highlight pre {
   background: var(--gray-100) !important;
   color: var(--body-font-color) !important;
 }
@@ -72,7 +88,9 @@ main.container {
 :root[data-theme="ayu-light"] .book-codeblock-copy,
 :root[data-theme="ayu-auto"] .book-codeblock-copy,
 :root[data-theme="contrast-light"] .book-codeblock-copy,
-:root[data-theme="contrast-auto"] .book-codeblock-copy {
+:root[data-theme="contrast-auto"] .book-codeblock-copy,
+:root[data-theme="github-light"] .book-codeblock-copy,
+:root[data-theme="github-auto"] .book-codeblock-copy {
   color: var(--gray-700);
 }
 
@@ -243,6 +261,89 @@ a img.book-icon[src$=".png"] {
 /* ========== 浮动按钮悬停效果 ========== */
 #theme-switcher:hover,
 #back-to-top:hover {
-  border-color: var(--primary) !important;
-  background: var(--entry) !important;
+  background: var(--gray-200) !important;
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.6),
+    0 2px 6px rgba(0,0,0,0.9),
+    0 0 0 1px rgba(255,255,255,0.06) inset !important;
+}
+
+/* ==========================================================================
+   自定义主题：GitHub Primer 三件套（github-light / github-dark / github-auto）
+   配色源自用户提供的 GitHub Dark 风格 + GitHub 官方 Primer Design Tokens
+   ========================================================================== */
+
+/* github-light + github-auto（浅色默认） */
+:root[data-theme="github-light"],
+:root[data-theme="github-auto"] {
+  color-scheme: light;
+
+  --body-background: #ffffff;
+  --body-font-color: #1f2328;
+  --icon-filter: none;
+
+  --color-link: #0969da;
+  --color-visited-link: #8250df;
+
+  --gray-100: #f6f8fa;
+  --gray-200: #d0d7de;
+  --gray-500: #656d76;
+  --gray-700: #1f2328;
+
+  --color-accent-default:   #656d76;
+  --color-accent-note:      #0969da;
+  --color-accent-tip:       #1a7f37;
+  --color-accent-important: #8250df;
+  --color-accent-warning:   #9a6700;
+  --color-accent-caution:   #cf222e;
+}
+
+/* github-dark */
+:root[data-theme="github-dark"] {
+  color-scheme: dark;
+
+  --body-background: #0d1117;
+  --body-font-color: #c9d1d9;
+  --icon-filter: brightness(0) invert(1);
+
+  --color-link: #58a6ff;
+  --color-visited-link: #a371f7;
+
+  --gray-100: #161b22;
+  --gray-200: #30363d;
+  --gray-500: #8b949e;
+  --gray-700: #c9d1d9;
+
+  --color-accent-default:   #8b949e;
+  --color-accent-note:      #58a6ff;
+  --color-accent-tip:       #2ea043;
+  --color-accent-important: #a371f7;
+  --color-accent-warning:   #d2991d;
+  --color-accent-caution:   #da3633;
+}
+
+/* github-auto：跟随系统切换暗色 */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="github-auto"] {
+    color-scheme: dark;
+
+    --body-background: #0d1117;
+    --body-font-color: #c9d1d9;
+    --icon-filter: brightness(0) invert(1);
+
+    --color-link: #58a6ff;
+    --color-visited-link: #a371f7;
+
+    --gray-100: #161b22;
+    --gray-200: #30363d;
+    --gray-500: #8b949e;
+    --gray-700: #c9d1d9;
+
+    --color-accent-default:   #8b949e;
+    --color-accent-note:      #58a6ff;
+    --color-accent-tip:       #2ea043;
+    --color-accent-important: #a371f7;
+    --color-accent-warning:   #d2991d;
+    --color-accent-caution:   #da3633;
+  }
 }

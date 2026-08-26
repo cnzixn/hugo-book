@@ -72,7 +72,7 @@ params:
   # （可选，默认 light）设置颜色主题：light、dark 或 auto
   # Theme 'auto' switches between dark and light modes based on browser/os preferences
   # 主题 'auto' 根据浏览器/系统偏好自动切换深色和浅色模式
-  BookTheme: "ayu"
+  BookTheme: "github-auto"
 
   # (Optional, default none) Controls table of contents visibility on right side of pages.
   # （可选，默认 none）控制页面右侧目录可见性

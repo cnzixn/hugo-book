@@ -49,14 +49,15 @@
       width: '40px',
       height: '40px',
       borderRadius: '50%',
-      border: '1px solid var(--border)',
-      background: 'var(--code-bg)',
+      border: 'none',
+      background: 'var(--gray-100)',
       cursor: 'pointer',
       fontSize: '18px',
+      color: 'var(--body-font-color)',
       display: 'none',
       alignItems: 'center',
       justifyContent: 'center',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.8)',
       transition: 'all 0.2s ease'
     });
 

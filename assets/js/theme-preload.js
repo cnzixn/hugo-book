@@ -20,15 +20,32 @@
   var cur = document.documentElement.getAttribute('data-theme');
   if (!cur) return;
 
+  /**
+   * 解析 data-theme，分离基础主题名和当前模式
+   * 规则：最后一段是 light/dark 才视为模式，否则整体为基础主题名
+   */
+  function parseTheme(themeStr) {
+    var parts = themeStr.split('-');
+    var last = parts[parts.length - 1];
+    if (last === 'light' || last === 'dark' || last === 'auto') {
+      return {
+        base: parts.slice(0, -1).join('-'),
+        mode: last
+      };
+    }
+    return { base: themeStr, mode: null };
+  }
+
   // 获取保存的模式，默认 auto
-  var mode = localStorage.getItem(STORAGE_KEY) || 'auto';
+  var savedMode = localStorage.getItem(STORAGE_KEY);
+  var parsed = parseTheme(cur);
+  // 优先级：localStorage > data-theme 自带后缀 > auto
+  var mode = savedMode || parsed.mode || 'auto';
 
   // 解析实际应用的模式
   var effectiveMode = (mode === 'auto') ? getAutoMode() : mode;
 
   // 应用到 DOM
-  var parts = cur.split('-');
-  var base = parts.slice(0, -1).join('-');
-  var newTheme = base ? base + '-' + effectiveMode : effectiveMode;
+  var newTheme = parsed.base ? parsed.base + '-' + effectiveMode : effectiveMode;
   document.documentElement.setAttribute('data-theme', newTheme);
 })();

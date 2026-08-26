@@ -31,6 +31,22 @@
   }
 
   /**
+   * 解析 data-theme，分离基础主题名和当前模式
+   * 规则：最后一段是 light/dark 才视为模式，否则整体为基础主题名
+   */
+  function parseTheme(themeStr) {
+    var parts = themeStr.split('-');
+    var last = parts[parts.length - 1];
+    if (last === 'light' || last === 'dark' || last === 'auto') {
+      return {
+        base: parts.slice(0, -1).join('-'),
+        mode: last
+      };
+    }
+    return { base: themeStr, mode: null };
+  }
+
+  /**
    * 应用指定模式到 DOM
    */
   function applyMode(mode) {
@@ -38,9 +54,8 @@
     if (!cur) return;
 
     var effectiveMode = getEffectiveMode(mode);
-    var parts = cur.split('-');
-    var base = parts.slice(0, -1).join('-');
-    var newTheme = base ? base + '-' + effectiveMode : effectiveMode;
+    var parsed = parseTheme(cur);
+    var newTheme = parsed.base ? parsed.base + '-' + effectiveMode : effectiveMode;
     document.documentElement.setAttribute('data-theme', newTheme);
   }
 
@@ -127,14 +142,15 @@
       width: '40px',
       height: '40px',
       borderRadius: '50%',
-      border: '1px solid var(--border)',
-      background: 'var(--code-bg)',
+      border: 'none',
+      background: 'var(--gray-100)',
       cursor: 'pointer',
       fontSize: '20px',
+      color: 'var(--body-font-color)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.8)',
       transition: 'all 0.2s ease'
     });
 
