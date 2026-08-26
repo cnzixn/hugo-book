@@ -1,13 +1,14 @@
 {{/*
   自定义脚本 - 构建时合并所有 JS 模块
   使用 Hugo 资源管道：Concat + Minify + Fingerprint
+  [TEMP] 临时注释掉 ThemeSwitcher 便于排查性能问题，需要恢复时把 $themeSwitcher 加回 slice 即可
 */}}
 {{ $gesture := resources.Get "js/modules/gesture.js" }}
-{{ $themeSwitcher := resources.Get "js/modules/theme-switcher.js" }}
+{{/* $themeSwitcher := resources.Get "js/modules/theme-switcher.js" */}}
 {{ $backToTop := resources.Get "js/modules/back-to-top.js" }}
 {{ $main := resources.Get "js/main.js" }}
 
-{{ $combined := slice $gesture $themeSwitcher $backToTop $main | resources.Concat "js/custom.js" | resources.Minify | resources.Fingerprint "sha256" }}
+{{ $combined := slice $gesture $backToTop $main | resources.Concat "js/custom.js" | resources.Minify | resources.Fingerprint "sha256" }}
 
 <script src="{{ $combined.RelPermalink }}" integrity="{{ $combined.Data.Integrity }}" defer></script>
 
