@@ -10,3 +10,21 @@
 {{ $combined := slice $gesture $themeSwitcher $backToTop $main | resources.Concat "js/custom.js" | resources.Minify | resources.Fingerprint "sha256" }}
 
 <script src="{{ $combined.RelPermalink }}" integrity="{{ $combined.Data.Integrity }}" defer></script>
+
+<script>
+  /**
+   * 主动卸载所有旧版 Service Worker
+   * 原因：之前 BookServiceWorker 设为 'precache'，浏览器已经注册过 SW 并在拦截所有请求；
+   *       现在设为 false 后新页面不再注册，但旧 SW 还会常驻。
+   *       这里检测到任何 SW 都直接 unregister，确保用户访问 1 次后永久清理。
+   */
+  (function () {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (var i = 0; i < registrations.length; i++) {
+          registrations[i].unregister();
+        }
+      }).catch(function () { /* 浏览器隐私模式等情况静默失败 */ });
+    }
+  })();
+</script>

@@ -4,41 +4,51 @@
 
 {{ if hugo.IsProduction }}
 <script>
-  // pv-tracker 加载兜底：超时 5 秒后放弃，避免卡住页面 load 事件
-  (function() {
-    var s = document.createElement('script');
-    s.src = 'https://pv.bxq.me/js/pv-tracker.min.js';
-    s.defer = true;
-    s.async = true;
-    var done = false;
-    s.onload = s.onreadystatechange = function() {
-      if (!done && (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete')) {
-        done = true;
-      }
-    };
-    var t = setTimeout(function() {
-      if (!done) {
-        // 超时未加载完成，移除脚本避免阻塞
-        var nodes = document.querySelectorAll('script[src*="pv.bxq.me"]');
-        for (var i = 0; i < nodes.length; i++) {
-          if (nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
-        }
-        // 兜底：把统计的 -- 去掉提示
+  /**
+   * 延迟加载 pv-tracker：等 window.load 之后再注入
+   * 确保不阻塞首屏 load 事件（标签页转圈就是因为有未完成的网络请求）
+   */
+  (function () {
+    function loadPvTracker() {
+      var s = document.createElement('script');
+      s.src = 'https://pv.bxq.me/js/pv-tracker.min.js';
+      s.async = true;
+      var loaded = false;
+      var t;
+
+      s.onload = function () { loaded = true; clearTimeout(t); };
+      s.onerror = function () {
+        loaded = true;
+        clearTimeout(t);
+        // 加载失败：把 -- 置成 - 避免无限等待
         var spans = document.querySelectorAll('span[data-pv], span[data-uv]');
-        for (var i = 0; i < spans.length; i++) {
-          spans[i].textContent = '-';
+        for (var i = 0; i < spans.length; i++) spans[i].textContent = '-';
+      };
+
+      // 即使 load 后注入也设超时，防止后续页面仍被卡住
+      t = setTimeout(function () {
+        if (!loaded) {
+          var nodes = document.querySelectorAll('script[src*="pv.bxq.me"]');
+          for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].parentNode) nodes[i].parentNode.removeChild(nodes[i]);
+          }
+          var spans2 = document.querySelectorAll('span[data-pv], span[data-uv]');
+          for (var i = 0; i < spans2.length; i++) spans2[i].textContent = '-';
         }
-      }
-    }, 5000);
-    s.onerror = function() {
-      done = true;
-      clearTimeout(t);
-      var spans = document.querySelectorAll('span[data-pv], span[data-uv]');
-      for (var i = 0; i < spans.length; i++) {
-        spans[i].textContent = '-';
-      }
-    };
-    document.body.appendChild(s);
+      }, 5000);
+
+      document.body.appendChild(s);
+    }
+
+    // 若页面已 load 完则立即加载，否则等 load 事件
+    if (document.readyState === 'complete') {
+      loadPvTracker();
+    } else {
+      window.addEventListener('load', function () {
+        // 再延迟 200ms，给浏览器一个停下转圈动画的时间窗口
+        setTimeout(loadPvTracker, 200);
+      });
+    }
   })();
 </script>
 {{ end }}
