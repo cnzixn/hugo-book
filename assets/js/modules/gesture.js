@@ -15,6 +15,7 @@
   var touchCurrentX = 0;
   var isSwiping = false;
   var isEdgeSwipe = false;
+  var inScroller = false; // 触摸起点是否位于可横向滑动区域（轮播/横向滚动表格等）
   var menuControl = null;
 
   /**
@@ -32,6 +33,28 @@
       menuControl = document.getElementById('menu-control');
     }
     return menuControl;
+  }
+
+  /**
+   * 判断触摸目标是否位于可横向滑动的区域内
+   * 用途：图片轮播、横向滚动表格等区域自身需要消费横向手势，
+   *       在这些区域内右滑不应拉出菜单
+   * @param {EventTarget} target - 触摸起点元素
+   * @returns {boolean} 位于可横向滑动区域内返回 true
+   */
+  function isInsideHorizontalScroller(target) {
+    var el = target instanceof Element ? target : null;
+    while (el && el !== document.body) {
+      // 存在横向溢出且 overflow-x 允许滚动，视为横向滑动区域
+      if (el.scrollWidth > el.clientWidth + 1) {
+        var overflowX = getComputedStyle(el).overflowX;
+        if (overflowX === 'auto' || overflowX === 'scroll' || overflowX === 'overlay') {
+          return true;
+        }
+      }
+      el = el.parentElement;
+    }
+    return false;
   }
 
   /**
@@ -70,6 +93,8 @@
       touchCurrentX = touchStartX;
       isSwiping = true;
       isEdgeSwipe = (touchStartX <= EDGE_THRESHOLD);
+      // 记录触摸起点是否在可横向滑动区域（轮播/横向表格等）
+      inScroller = isInsideHorizontalScroller(e.target);
     }, { passive: true });
 
     // 触摸移动
@@ -93,6 +118,7 @@
       if (!isSwiping || !isMobile()) {
         isSwiping = false;
         isEdgeSwipe = false;
+        inScroller = false;
         return;
       }
 
@@ -100,8 +126,8 @@
       var ctrl = getMenuControl();
       var isMenuOpen = ctrl && ctrl.checked;
 
-      // 打开菜单：右滑超过阈值
-      if (deltaX >= SWIPE_THRESHOLD) {
+      // 打开菜单：右滑超过阈值，且起点不在可横向滑动区域内（轮播等区域不触发）
+      if (deltaX >= SWIPE_THRESHOLD && !inScroller) {
         if (!isMenuOpen) {
           openMenu();
         }
@@ -113,6 +139,7 @@
 
       isSwiping = false;
       isEdgeSwipe = false;
+      inScroller = false;
     }, { passive: true });
 
     // 点击菜单外部区域关闭菜单
