@@ -1,3 +1,3 @@
-cd d:\Project\MyWiki\hugo-book
-# npx wrangler deploy
-git push origin main
+# cd d:\Project\MyWiki\hugo-book
+
+# git push origin main

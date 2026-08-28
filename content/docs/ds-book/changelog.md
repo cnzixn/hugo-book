@@ -3,6 +3,7 @@ title: "4. 框架日志"
 weight: 40
 aliases:
   - "/ds-changelog"
+no_pv: true
 ---
 
 {{% changelog %}}

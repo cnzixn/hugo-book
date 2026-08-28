@@ -12,6 +12,16 @@
   var STORAGE_SORT_KEY = 'mods-sort-preference';
 
   /**
+   * localStorage 安全访问（隐私模式 Safari 会抛 quota exceeded 异常）
+   */
+  function getStorageItem(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function setStorageItem(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) { /* 忽略存储失败 */ }
+  }
+
+  /**
    * 读取 DOM 配置（shortcode 注入）
    * 支持两种数据来源：
    *   a) 旧兼容模式：textContent 内嵌 JSON（用于开发/临时场景）
@@ -52,18 +62,48 @@
         return reject(new Error('mods-data has neither src nor inline json'));
       }
 
-      fetch(dataSrc, { credentials: 'same-origin', cache: 'force-cache' })
-        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-        .then(parseAndBuild)
-        .catch(function (err) { reject(err); });
+      // fetch + XHR 双重降级（fetch 旧 Safari 不支持 cache 参数，或者根本没有 fetch）
+      if (window.fetch) {
+        try {
+          fetch(dataSrc, { credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+            .then(parseAndBuild)
+            .catch(function (err) {
+              // fetch 失败再用 XHR 试一次
+              xhrGet(dataSrc, parseAndBuild, reject);
+            });
+          return;
+        } catch (e) { /* 立即降级 XHR */ }
+      }
+      xhrGet(dataSrc, parseAndBuild, reject);
     });
   }
 
   /**
+   * 简易 XHR GET 封装（fetch 不可用时兜底）
+   */
+  function xhrGet(url, onSuccess, onError) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onSuccess(xhr.responseText);
+      } else {
+        onError(new Error('XHR HTTP ' + xhr.status));
+      }
+    };
+    try { xhr.send(); } catch (e) { onError(e); }
+  }
+
+  /**
    * 站点基础 URL（用 location.origin 适配本地/局域网/公网）
+   * 旧 Safari 下 origin 可能为空，手动拼接
    */
   function getSiteOrigin() {
-    return window.location.origin;
+    if (window.location.origin) return window.location.origin;
+    return window.location.protocol + '//' + window.location.hostname +
+      (window.location.port ? ':' + window.location.port : '');
   }
 
   /**
@@ -135,7 +175,7 @@
     if (!modsList || !sentinel || !searchInput || !sortToggleBtn) return;
 
     var filteredMods = cfg.searchOnly && !cfg.searchKeyword ? [] : cfg.allMods.slice();
-    var currentSort = localStorage.getItem(STORAGE_SORT_KEY) || 'asc';
+    var currentSort = getStorageItem(STORAGE_SORT_KEY) || 'asc';
     var currentPage = 0;
     var isLoading = false;
 
@@ -216,30 +256,55 @@
       }
     }
 
-    /* ---------- 无限滚动 ---------- */
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting && !isLoading) {
-          var totalPages = Math.ceil(filteredMods.length / PAGE_SIZE);
-          if (currentPage < totalPages) {
-            isLoading = true;
-            sentinel.textContent = '加载中...';
-            setTimeout(function () {
-              renderPage(currentPage);
-              isLoading = false;
-              sentinel.textContent = currentPage >= totalPages ? '已加载全部' : '加载更多...';
-            }, 50);
-          }
-        }
-      });
-    }, { rootMargin: PRELOAD_ROOT, threshold: 0 });
+    /* ---------- 无限滚动（IntersectionObserver 优先，降级为滚动监听） ---------- */
+    function tryLoadMore() {
+      if (isLoading) return;
+      var totalPages = Math.ceil(filteredMods.length / PAGE_SIZE);
+      if (currentPage >= totalPages) {
+        sentinel.textContent = '已加载全部';
+        sentinel.style.display = 'none';
+        return;
+      }
+      isLoading = true;
+      sentinel.textContent = '加载中...';
+      setTimeout(function () {
+        renderPage(currentPage);
+        isLoading = false;
+        var newTotalPages = Math.ceil(filteredMods.length / PAGE_SIZE);
+        sentinel.textContent = currentPage >= newTotalPages ? '已加载全部' : '加载更多...';
+        if (currentPage >= newTotalPages) sentinel.style.display = 'none';
+      }, 50);
+    }
 
-    observer.observe(sentinel);
+    if (global.IntersectionObserver) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) tryLoadMore();
+        });
+      }, { rootMargin: PRELOAD_ROOT, threshold: 0 });
+      observer.observe(sentinel);
+    } else {
+      // 降级：滚动到底部自动加载
+      var scrollTimer = null;
+      var scrollHandler = function () {
+        if (scrollTimer) return;
+        scrollTimer = setTimeout(function () {
+          scrollTimer = null;
+          var sentinelRect;
+          try { sentinelRect = sentinel.getBoundingClientRect(); } catch (e) { return; }
+          var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+          // 哨兵进入视口下方 200px 内就触发
+          if (sentinelRect.top - viewportHeight < 200) tryLoadMore();
+        }, 100);
+      };
+      window.addEventListener('scroll', scrollHandler, false);
+      window.addEventListener('resize', scrollHandler, false);
+    }
 
     /* ---------- 事件 ---------- */
     sortToggleBtn.addEventListener('click', function () {
       currentSort = currentSort === 'asc' ? 'desc' : 'asc';
-      localStorage.setItem(STORAGE_SORT_KEY, currentSort);
+      setStorageItem(STORAGE_SORT_KEY, currentSort);
       updateSortButtons();
       applyFilter();
     });

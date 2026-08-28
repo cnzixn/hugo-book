@@ -7,6 +7,13 @@
 (function() {
   var STORAGE_KEY = 'book-theme-mode';
 
+  /**
+   * localStorage 安全访问（隐私模式 Safari 会抛 quota exceeded 异常）
+   */
+  function safeGetItem(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
   var cur = document.documentElement.getAttribute('data-theme');
   if (!cur) return;
 
@@ -27,7 +34,7 @@
   }
 
   // 获取保存的模式（兼容旧用户：auto 视为无效，回退 light）
-  var savedMode = localStorage.getItem(STORAGE_KEY);
+  var savedMode = safeGetItem(STORAGE_KEY);
   var parsed = parseTheme(cur);
   // 优先级：localStorage > data-theme 自带后缀 > light
   var mode = (savedMode === 'light' || savedMode === 'dark')

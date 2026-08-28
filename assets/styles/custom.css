@@ -5,19 +5,30 @@
 /* Sticky Footer: 内容不足时页脚贴底 */
 body {
   min-height: 100vh;
+  /* 旧版 iOS Safari viewport 高度兼容 */
+  min-height: -webkit-fill-available;
 }
 
 main.container {
   min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 .book-page {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
   flex-direction: column;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 .book-page > article {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
   flex: 1;
 }
 
@@ -60,8 +71,14 @@ main.container {
 
 /* 代码块文件名栏 + 复制按钮 */
 .book-codeblock-header {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
   justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
   background: var(--gray-200);
   border: var(--space-1) solid var(--gray-200);
@@ -116,6 +133,7 @@ main.container {
 /* PNG 菜单图标：保留原色，不受暗色主题 --icon-filter 影响 */
 img.book-icon[src$=".png"] {
   filter: none;
+  -webkit-filter: none;
 }
 
 /* PNG 菜单图标尺寸：保持宽高比，避免被强制为 1em 正方形 */
@@ -124,8 +142,12 @@ a img.book-icon[src$=".png"] {
   height: 1.2em;
 }
 
-/* 网盘链接：防止超长 URL 溢出卡片 */
+/* 网盘链接：防止超长 URL 溢出卡片
+   Safari 兼容：优先用 break-word（旧版 Safari 不支持 anywhere），
+   新版浏览器再用 anywhere 覆盖 */
 .pan-link {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   overflow-wrap: anywhere;
   word-break: break-all;
   max-width: 100%;
@@ -179,6 +201,7 @@ a img.book-icon[src$=".png"] {
   background: var(--body-background);
   border: 2px solid var(--color-accent-note);
   border-radius: 2px;
+  -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
 
@@ -236,6 +259,7 @@ a img.book-icon[src$=".png"] {
     top: 0.7rem;
     width: 0.5rem;
     height: 0.5rem;
+    -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
   }
   .changelog h2 {
@@ -410,11 +434,17 @@ a img.book-icon[src$=".png"] {
     flex: 1;
   }
   .term-header {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-box-align: baseline;
+    -webkit-align-items: baseline;
     align-items: baseline;
     gap: 0.6rem;
+    /* 旧版 Safari 无 flex gap 兜底：子元素用 margin-right */
     margin-bottom: 0.5rem;
   }
+  .term-header > * + * { margin-left: 0.6rem; }
   .term-title {
     margin: 0;
     font-size: 1.25rem;
@@ -432,6 +462,7 @@ a img.book-icon[src$=".png"] {
     border-radius: var(--border-radius);
     text-decoration: none;
     color: inherit;
+    -webkit-transition: background 0.15s, border-color 0.15s;
     transition: background 0.15s, border-color 0.15s;
   }
   .book-post-card:hover {
@@ -451,13 +482,19 @@ a img.book-icon[src$=".png"] {
   }
   .post-card-meta {
     margin-top: 0.35rem;
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
     gap: 0.5rem;
+    -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
     font-size: 0.85rem;
     color: var(--gray-500);
   }
+  .post-card-meta > * + * { margin-left: 0.5rem; }
   .post-card-summary {
     margin-top: 0.5rem;
     font-size: 0.9rem;
@@ -484,14 +521,20 @@ a img.book-icon[src$=".png"] {
     color: var(--gray-500);
   }
   .book-post-meta {
+    display: -webkit-box;
+    display: -webkit-flex;
     display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
     align-items: center;
     gap: 0.75rem;
     font-size: 0.85rem;
     color: var(--gray-500);
     margin-bottom: 1.5rem;
+    -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
   }
+  .book-post-meta > * + * { margin-left: 0.75rem; }
 
 /* ========== 内联 Bootstrap 图标（icon shortcode） ========== */
 /* 外层 span 定尺寸，SVG 撑满；fill=currentColor 自动跟随文字颜色 */
@@ -509,29 +552,51 @@ a img.book-icon[src$=".png"] {
 /* ========== block 修饰的按钮（button shortcode 加 class="btn-block"） ========== */
 /* 撑满内容区宽度，图标文字水平居中；特异性高于主题 a.book-btn[href] 规则 */
 a.book-btn.btn-block[href] {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   gap: 6px;
   width: 100%;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
 
 /* ========== 按钮并排容器（外层 div 加 class="btn-row"） ========== */
 /* 宽屏并排均分，窄屏（不够 200px 时）自动换行为整行铺满 */
 .btn-row {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
   gap: 8px;
 }
+.btn-row > * + * { margin-left: 8px; margin-top: 8px; }
 .btn-row a.book-btn[href] {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 200px;
   flex: 1 1 200px;
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   gap: 6px;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+.btn-row a.book-btn[href] > * + * { margin-left: 6px; }
 
 /* ========== 图片轮播组件（gallery shortcode） ========== */
 .book-gallery {
@@ -542,10 +607,14 @@ a.book-btn.btn-block[href] {
 }
 /* 横向滑动轨道：scroll-snap 吸附，隐藏滚动条；圆角与图片一致(6px)，避免边缘双层圆角 */
 .gallery-track {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
   gap: 12px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;  /* iOS Safari 惯性滚动 */
   scroll-snap-type: x mandatory;
+  -webkit-scroll-snap-type: x mandatory;
   border-radius: 6px;
   scrollbar-width: none;
 }
@@ -553,21 +622,26 @@ a.book-btn.btn-block[href] {
   display: none;
 }
 .gallery-track img {
+  -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   max-height: 260px;
   border: 1px solid var(--gray-200);
   border-radius: 6px;
   scroll-snap-align: start;
+  -webkit-scroll-snap-align: start;
 }
 /* 带链接的图片：外层 a 锁定 flex:none，抵消主题全局 a{flex:auto} */
 .gallery-track a {
+  -webkit-flex: none;
   flex: none;
   display: block;
   line-height: 0;
   scroll-snap-align: start;
+  -webkit-scroll-snap-align: start;
 }
 .gallery-track a img {
   scroll-snap-align: unset;
+  -webkit-scroll-snap-align: unset;
 }
 /* caption 链接：颜色跟随正文，hover 不变色（与全局锁色规则一致） */
 .gallery-caption a {
@@ -582,21 +656,32 @@ a.book-btn.btn-block[href] {
 .gallery-nav {
   position: absolute;
   top: 50%;
+  -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   z-index: 2;
   width: 32px;
   height: 32px;
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   border: none;
   border-radius: 50%;
+  /* color-mix 兼容性：旧版 Safari 不支持，先用 rgba 实色兜底
+     兜底方案：亮/暗主题通用的半透明灰色 */
+  background: rgba(128, 128, 128, 0.7);
   background: color-mix(in srgb, var(--gray-100) 80%, transparent);
   color: var(--body-font-color);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
   opacity: 1;
+  -webkit-transition: opacity 0.2s ease;
   transition: opacity 0.2s ease;
   -webkit-appearance: none;
   appearance: none;
@@ -610,6 +695,8 @@ a.book-btn.btn-block[href] {
 .gallery-nav:hover {
   color: var(--body-font-color);
   filter: none;
+  -webkit-filter: none;
+  -webkit-transform: translateY(-50%) scale(1.1);
   transform: translateY(-50%) scale(1.1);
 }
 /* 滑到边缘时隐藏对应箭头 */
@@ -620,15 +707,24 @@ a.book-btn.btn-block[href] {
 }
 /* 底部说明：手柄图标 + 文字（整体居中） */
 .gallery-caption {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   gap: 8px;
   margin-top: 8px;
   color: var(--body-font-color);
   font-size: 0.9rem;
 }
+.gallery-caption > * + * { margin-left: 8px; }
 .gallery-caption-icon {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
   display: inline-flex;
   width: 18px;
   height: 18px;
@@ -636,4 +732,55 @@ a.book-btn.btn-block[href] {
 .gallery-caption-icon svg {
   width: 100%;
   height: 100%;
+}
+/* ===== iOS 旧版 Safari 菜单打开兼容 =====
+ * 4 个补丁：
+ *  1) 旧 WebKit 对 :checked ~ main 相邻兄弟选择器常不重绘，显式写 visibility/display 兜底
+ *  2) book-menu-content 滑出补 -webkit-transform 前缀（book.css 原版无前缀，旧iOS直接不滑）
+ *  3) label[for=menu-control/toc-control] 放大点击区 + 提升层级 + 去 300ms 延迟
+ *  4) label 内的 img/book-icon pointer-events:none 保证点击永远命中 label 本身不被子元素吞掉
+ */
+@media screen and (max-width: 896px) {
+  #menu-control:checked ~ main .book-menu {
+    visibility: visible !important;
+    display: block !important;
+  }
+  #menu-control:checked ~ main .book-menu .book-menu-content {
+    -webkit-transform: translateX(var(--menu-width));
+            transform: translateX(var(--menu-width));
+    -webkit-box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
+  }
+  body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
+    -webkit-transform: translateX(calc(-1 * var(--menu-width)));
+            transform: translateX(calc(-1 * var(--menu-width)));
+  }
+  #toc-control:checked ~ main .book-toc {
+    visibility: visible !important;
+    display: block !important;
+  }
+  .book-header label[for="menu-control"],
+  .book-header label[for="toc-control"] {
+    position: relative;
+    z-index: 30;
+    display: -webkit-inline-box;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+            align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+            justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .book-header label[for="menu-control"] > img.book-icon,
+  .book-header label[for="menu-control"] > .book-icon,
+  .book-header label[for="toc-control"] > img.book-icon,
+  .book-header label[for="toc-control"] > .book-icon {
+    pointer-events: none;
+  }
 }

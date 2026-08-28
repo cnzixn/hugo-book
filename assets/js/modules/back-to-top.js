@@ -10,13 +10,102 @@
   var pendingScrollUpdate = false;
 
   /**
+   * 安全设置元素样式（兼容旧 Safari：Object.assign 可能失效时，逐个赋值兜底）
+   * @param {HTMLElement} el - 目标元素
+   * @param {Object} styles - 样式键值对
+   */
+  function setStyles(el, styles) {
+    if (Object.assign) {
+      try { Object.assign(el.style, styles); return; } catch (e) { /* 降级 */ }
+    }
+    for (var key in styles) {
+      if (styles.hasOwnProperty(key)) {
+        el.style[key] = styles[key];
+      }
+    }
+  }
+
+  /**
+   * 平滑滚动到页面顶部（Safari 兼容版：原生 smooth 不支持时用定时器模拟）
+   */
+  function smoothScrollToTop() {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Safari 15.4+ 原生 smooth 已经支持
+      // 但为了保险，检测 80ms 后是否真的开始滚动，没动则走降级
+      var startY = window.scrollY || window.pageYOffset;
+      setTimeout(function () {
+        if ((window.scrollY || window.pageYOffset) === startY && startY > 0) {
+          fallbackScrollToTop();
+        }
+      }, 100);
+      return;
+    } catch (e) { /* 降级 */ }
+    fallbackScrollToTop();
+  }
+
+  /**
+   * 手动实现平滑返回顶部（基于 requestAnimationFrame）
+   */
+  function fallbackScrollToTop() {
+    var currentY = window.scrollY || window.pageYOffset;
+    var duration = 400;
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      // easeOutCubic 缓动：看起来更自然
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var targetY = currentY * (1 - eased);
+      window.scrollTo(0, targetY);
+      if (progress < 1 && (window.scrollY || window.pageYOffset) > 0) {
+        if (window.requestAnimationFrame) {
+          window.requestAnimationFrame(step);
+        } else {
+          setTimeout(function () { step(ts + 16); }, 16);
+        }
+      }
+    }
+    if (window.requestAnimationFrame) {
+      window.requestAnimationFrame(step);
+    } else {
+      step(0);
+    }
+  }
+
+  /**
    * 按 scrollY 同步显示状态（scrollY >= 300 显示，<300 隐藏）
    * 用 requestAnimationFrame 合并写入，避免滚动期间每秒多次 reflow
    */
   function updateVisibilityByScroll() {
     if (!backToTop) return;
-    backToTop.style.display = (window.scrollY >= SCROLL_THRESHOLD) ? 'flex' : 'none';
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    backToTop.style.display = (scrollY >= SCROLL_THRESHOLD) ? 'flex' : 'none';
     pendingScrollUpdate = false;
+  }
+
+  /**
+   * 添加事件监听（兼容旧 Safari：addEventListener 第三个参数不支持对象时降级为 false）
+   * @param {EventTarget} target - 监听目标
+   * @param {string} type - 事件名
+   * @param {Function} handler - 回调
+   * @param {Object|boolean} options - 选项
+   */
+  function addSafeListener(target, type, handler, options) {
+    var opts = options;
+    // 检测是否支持 passive 选项
+    var supportsPassive = false;
+    try {
+      var optsTest = Object.defineProperty({}, 'passive', {
+        get: function () { supportsPassive = true; return true; }
+      });
+      window.addEventListener('testPassive', null, optsTest);
+      window.removeEventListener('testPassive', null, optsTest);
+    } catch (e) { supportsPassive = false; }
+    if (!supportsPassive) {
+      opts = (typeof options === 'object') ? (options.capture || false) : options;
+    }
+    target.addEventListener(type, handler, opts);
   }
 
   /**
@@ -41,7 +130,7 @@
     backToTop.innerHTML = '⬆';
     backToTop.title = '返回顶部';
 
-    Object.assign(backToTop.style, {
+    setStyles(backToTop, {
       position: 'fixed',
       bottom: '120px',
       right: '20px',
@@ -55,7 +144,10 @@
       alignItems: 'center',
       justifyContent: 'center',
       transform: 'scale(1)',
-      transformOrigin: 'center center'
+      transformOrigin: 'center center',
+      /* 旧版 Safari 的 webkit 前缀兜底 */
+      webkitTransform: 'scale(1)',
+      webkitTransformOrigin: 'center center'
     });
 
     /**
@@ -64,7 +156,9 @@
      * @param {number} sizeLevel - 缩放档位：1（默认） / 1.05（按下） / 1.1（悬停）
      */
     function forceVisualReset(btn, sizeLevel) {
-      btn.style.transform = 'scale(' + sizeLevel + ')';
+      var scale = 'scale(' + sizeLevel + ')';
+      btn.style.transform = scale;
+      btn.style.webkitTransform = scale;
     }
 
     /* 仅保留矢量尺寸反馈 */
@@ -76,11 +170,11 @@
     backToTop.onblur = function() { forceVisualReset(backToTop, 1); };
 
     backToTop.onclick = function() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      smoothScrollToTop();
     };
 
     // passive: true → 不阻塞滚动合成线程，降低掉帧
-    window.addEventListener('scroll', onScroll, { passive: true });
+    addSafeListener(window, 'scroll', onScroll, { passive: true });
 
     document.body.appendChild(backToTop);
   }

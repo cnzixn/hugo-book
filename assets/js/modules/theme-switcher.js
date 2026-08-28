@@ -11,6 +11,45 @@
   var pendingScrollUpdate = false;
 
   /**
+   * 安全设置元素样式（兼容旧 Safari：Object.assign 失败时逐个赋值兜底）
+   * @param {HTMLElement} el - 目标元素
+   * @param {Object} styles - 样式键值对
+   */
+  function setStyles(el, styles) {
+    if (Object.assign) {
+      try { Object.assign(el.style, styles); return; } catch (e) { /* 降级 */ }
+    }
+    for (var key in styles) {
+      if (styles.hasOwnProperty(key)) {
+        el.style[key] = styles[key];
+      }
+    }
+  }
+
+  /**
+   * 添加事件监听（兼容旧 Safari：passive 选项不支持时降级为布尔值）
+   * @param {EventTarget} target - 监听目标
+   * @param {string} type - 事件名
+   * @param {Function} handler - 回调
+   * @param {Object|boolean} options - 选项
+   */
+  function addSafeListener(target, type, handler, options) {
+    var opts = options;
+    var supportsPassive = false;
+    try {
+      var optsTest = Object.defineProperty({}, 'passive', {
+        get: function () { supportsPassive = true; return true; }
+      });
+      window.addEventListener('testPassive', null, optsTest);
+      window.removeEventListener('testPassive', null, optsTest);
+    } catch (e) { supportsPassive = false; }
+    if (!supportsPassive) {
+      opts = (typeof options === 'object') ? (options.capture || false) : options;
+    }
+    target.addEventListener(type, handler, opts);
+  }
+
+  /**
    * 解析 data-theme，分离基础主题名和当前模式
    * 规则：最后一段是 light/dark 才视为模式，否则整体为基础主题名
    */
@@ -42,15 +81,25 @@
    * 切换主题模式
    */
   function toggleTheme() {
-    var currentMode = localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+    var currentMode = getStorageItem(THEME_STORAGE_KEY) || 'light';
     var nextMode;
 
     // 循环：light → dark → light
     nextMode = (currentMode === 'light') ? 'dark' : 'light';
 
-    localStorage.setItem(THEME_STORAGE_KEY, nextMode);
+    setStorageItem(THEME_STORAGE_KEY, nextMode);
     applyMode(nextMode);
     updateButton(nextMode);
+  }
+
+  /**
+   * localStorage 安全访问（隐私模式 Safari 会抛 quota exceeded 异常）
+   */
+  function getStorageItem(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function setStorageItem(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) { /* 忽略存储失败 */ }
   }
 
   /**
@@ -59,7 +108,8 @@
    */
   function updateDisplayByScroll() {
     if (!switchTheme) return;
-    switchTheme.style.display = (window.scrollY < SCROLL_THRESHOLD) ? 'flex' : 'none';
+    var scrollY = window.scrollY || window.pageYOffset || 0;
+    switchTheme.style.display = (scrollY < SCROLL_THRESHOLD) ? 'flex' : 'none';
     pendingScrollUpdate = false;
   }
 
@@ -92,7 +142,7 @@
    * 获取初始模式（兼容旧用户：auto 视为无效，回退 light）
    */
   function getInitialMode() {
-    var saved = localStorage.getItem(THEME_STORAGE_KEY);
+    var saved = getStorageItem(THEME_STORAGE_KEY);
     if (saved === 'light' || saved === 'dark') {
       return saved;
     }
@@ -107,7 +157,7 @@
     switchTheme.id = 'theme-switcher';
     switchTheme.onclick = toggleTheme;
 
-    Object.assign(switchTheme.style, {
+    setStyles(switchTheme.style, {
       position: 'fixed',
       bottom: '120px',
       right: '20px',
@@ -121,7 +171,10 @@
       alignItems: 'center',
       justifyContent: 'center',
       transform: 'scale(1)',
-      transformOrigin: 'center center'
+      transformOrigin: 'center center',
+      /* 旧版 Safari webkit 前缀兜底 */
+      webkitTransform: 'scale(1)',
+      webkitTransformOrigin: 'center center'
     });
 
     /**
@@ -129,7 +182,9 @@
      * @param {number} sizeLevel - 缩放档位：1（默认） / 1.05（按下） / 1.1（悬停）
      */
     function forceVisualReset(sizeLevel) {
-      switchTheme.style.transform = 'scale(' + sizeLevel + ')';
+      var scale = 'scale(' + sizeLevel + ')';
+      switchTheme.style.transform = scale;
+      switchTheme.style.webkitTransform = scale;
     }
 
     /* 仅保留矢量尺寸反馈 */
@@ -142,7 +197,7 @@
 
     // 滚动时显示/隐藏（与返回顶部按钮使用同一阈值 300px，保证位置重合时严格互斥）
     // passive: true 让滚动合成先跑，JS 异步执行，不阻塞掉帧
-    window.addEventListener('scroll', onScroll, { passive: true });
+    addSafeListener(window, 'scroll', onScroll, { passive: true });
 
     document.body.appendChild(switchTheme);
   }
