@@ -741,23 +741,53 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
  *  4) label 内的 img/book-icon pointer-events:none 保证点击永远命中 label 本身不被子元素吞掉
  */
 @media screen and (max-width: 896px) {
+  /* —— 菜单容器 —— */
   #menu-control:checked ~ main .book-menu {
     visibility: visible !important;
     display: block !important;
+    z-index: 25 !important;
   }
+  /* —— 菜单面板：滑出前缀 + 硬背景 + z-index + 定位（面板必须在遮罩之上） —— */
   #menu-control:checked ~ main .book-menu .book-menu-content {
     -webkit-transform: translateX(var(--menu-width));
             transform: translateX(var(--menu-width));
     -webkit-box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
             box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
+    background: var(--body-background) !important;
+    background-color: var(--body-background) !important;
+    position: relative !important;
+    z-index: 25 !important;
   }
   body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
     -webkit-transform: translateX(calc(-1 * var(--menu-width)));
             transform: translateX(calc(-1 * var(--menu-width)));
   }
+  /* —— 页面变暗：主题原版 .book-page { opacity: .25 }，旧 WebKit 不认兄弟选择器要显式写 —— */
+  #menu-control:checked ~ main .book-page {
+    opacity: 0.25 !important;
+    -webkit-filter: opacity(0.25);
+            filter: opacity(0.25);
+  }
+  /* —— 遮罩层：主题原始只写了 display/position/inset，完全没 background 和 z-index，旧 iOS 还不认兄弟选择器 ——
+     这里硬写：全 !important + 半透明黑 + 固定层级(20：页面之上 / 面板之下)，点遮罩会触发 body.html 的关闭逻辑
+     Safari <14 不支持 inset 合并属性，分写 top/bottom/left/right */
+  #menu-control:checked ~ main .book-menu-overlay {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 20 !important;
+    background-color: rgba(0, 0, 0, 0.45) !important; /* color-mix() 回退色 */
+    background-color: color-mix(in srgb, #000 45%, transparent) !important;
+    cursor: pointer;
+  }
+  /* —— TOC 面板同步补层级兜底 —— */
   #toc-control:checked ~ main .book-toc {
     visibility: visible !important;
     display: block !important;
+    z-index: 25 !important;
   }
   .book-header label[for="menu-control"],
   .book-header label[for="toc-control"] {
