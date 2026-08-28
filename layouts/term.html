@@ -1,0 +1,50 @@
+{{ define "main" }}
+<div class="term-header">
+  <h2 class="term-title">{{ .Title }}</h2>
+  <span class="term-count">{{ len .Pages }} 篇</span>
+</div>
+
+<div class="book-posts-list">
+  {{ range sort .Paginator.Pages "Date" "desc" }}
+  <a href="{{ .RelPermalink }}" class="book-post-card">
+    <h3 class="post-card-title">{{ partial "docs/title" . }}</h3>
+    <div class="post-card-meta">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">
+        {{ .Date.Format ($.Site.Params.BookDateFormat | default "2006-01-02") }}
+      </time>
+      {{- with .Params.categories -}}
+      {{- range . -}}
+      <span class="tag category">{{ . }}</span>
+      {{- end -}}
+      {{- end -}}
+      {{- with .Params.tags -}}
+      {{- range . -}}
+      <span class="tag">{{ . }}</span>
+      {{- end -}}
+      {{- end -}}
+    </div>
+    {{- if .Params.description -}}
+    <div class="post-card-summary">{{ .Params.description }}</div>
+    {{- else if .Summary -}}
+    <div class="post-card-summary">{{ .Plain | truncate 200 }}</div>
+    {{- end -}}
+  </a>
+  {{ end }}
+</div>
+{{ end }}
+
+{{ define "toc-container" }}
+<aside class="book-toc">
+  <div class="book-toc-content">
+    {{ template "toc" . }}
+  </div>
+</aside>
+{{ end }}
+
+{{ define "toc" }}
+  {{ partial "docs/taxonomy" . }}
+{{ end }}
+
+{{ define "footer" }}
+  {{ partial "docs/pagination.html" . }}
+{{ end }}

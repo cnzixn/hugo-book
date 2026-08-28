@@ -1,12 +1,10 @@
 {{/*
   dst-mods shortcode：饥荒联机版模组列表（复用 ds-mods 抽离的 JS/CSS）
-  用法：{{< dst-mods >}} 或 {{< dst-mods keyword="WS" searchOnly="true" >}}
+  用法：{{< dst-mods >}}
 */}}
 
-{{- $panData := index site.Data "dst_pan" -}}
+{{- $panData := index hugo.Data "dst_pan" -}}
 {{- $currentDate := now.Format "20060102" -}}
-{{- $searchKeyword := .Get "keyword" | default "" -}}
-{{- $searchOnly := .Get "searchOnly" | default "false" -}}
 
 
 {{/* ========== 1. 构建 WS000000-WSxxxxxxxxxxxx 切片 ========== */}}
@@ -70,14 +68,12 @@
 <div id="mods-list" class="mods-list"></div>
 <div id="scroll-sentinel" class="scroll-sentinel">加载更多...</div>
 
-{{/* DST：imgBase=/img/ws/，缺省兜底还是 BM000.png（兼容没放 WS 默认图的情况）
+{{/* DST：imgBase=/img/ws/，缺图兜底用 /img/ws/none.png
        数据也改为独立 data-src URL fetch（不内嵌大 JSON 到 HTML） */}}
 <script id="mods-data" type="application/json"
-        data-search-only="{{ $searchOnly }}"
-        data-search-keyword="{{ $searchKeyword }}"
         data-current-date="{{ $currentDate }}"
         data-img-base="/img/ws/"
-        data-img-fallback="/img/bm/BM000.png"
+        data-img-fallback="/img/ws/none.png"
         data-src="{{ $dataAsset.RelPermalink }}"></script>
 
 <script defer src="{{ $jsAsset.RelPermalink }}" integrity="{{ $jsAsset.Data.Integrity }}"></script>

@@ -1,6 +1,6 @@
 ---
 title: "📌 日志 - 模组手册"
-draft: true
+bookHidden: true
 weight: 3
 ---
 

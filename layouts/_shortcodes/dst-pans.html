@@ -5,7 +5,7 @@
 */}}
 {{- $name := .Get 0 -}}
 
-{{- with index site.Data.dst_pan $name -}}
+{{- with index hugo.Data.dst_pan $name -}}
   {{- $baiduUrl := index (where . "url1" "ne" nil) 0 "url1" -}}
   {{- $xunleiUrl := index (where . "url2" "ne" nil) 0 "url2" -}}
   {{- $quarkUrl := index (where . "url3" "ne" nil) 0 "url3" -}}

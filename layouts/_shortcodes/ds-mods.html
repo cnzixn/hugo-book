@@ -1,20 +1,16 @@
 {{/*
   ds-mods shortcode：饥荒单机版模组列表
-  用法：{{< ds-mods >}} 或 {{< ds-mods keyword="BM" searchOnly="true" >}}
+  用法：{{< ds-mods >}}
 
   【性能说明】
-  - 模组数据 JSON 从 site.Data.ds_pan 构建后，通过 Hugo ExecuteAsTemplate 生成独立静态资源 /ds-mods.json
+  - 模组数据 JSON 从 hugo.Data.ds_pan 构建后，通过 Hugo ExecuteAsTemplate 生成独立静态资源 /ds-mods.json
     （由下面的 dataAsset 资源引用发布到站点，避免每个页面内嵌 20KB+ JSON）
   - 列表脚本 / 样式已抽成单独 ds-mods.js / ds-mods.css（assets/ 下），通过 pipeline fingerprint + 缓存
     不再在每个 shortcode 页面重复内联 500+ 行模板代码
 */}}
 
-{{- $panData := index site.Data "ds_pan" -}}
+{{- $panData := index hugo.Data "ds_pan" -}}
 {{- $currentDate := now.Format "20060102" -}}
-
-{{/* 命名参数：预填关键词 & 是否只显示搜索结果 */}}
-{{- $searchKeyword := .Get "keyword" | default "" -}}
-{{- $searchOnly := .Get "searchOnly" | default "false" -}}
 
 
 {{/* ========== 1. 构建标准化模组切片（BM000-BM999） ========== */}}
@@ -83,8 +79,6 @@
 
 {{/* 数据桥：不再内嵌大 JSON，改为通过 data-src 提供独立 URL 给 JS fetch（CF Cache-Tag 支持浏览器 304 缓存） */}}
 <script id="mods-data" type="application/json"
-        data-search-only="{{ $searchOnly }}"
-        data-search-keyword="{{ $searchKeyword }}"
         data-current-date="{{ $currentDate }}"
         data-src="{{ $dataAsset.RelPermalink }}"></script>
 

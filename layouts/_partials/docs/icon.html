@@ -1,0 +1,24 @@
+{{- /*
+  项目级覆盖主题的 docs/icon partial：返回图标 URL
+  解析顺序：
+  1. "bs/xxx" → assets/bs/xxx.*（项目 assets 下的 bootstrap 图标全集）
+  2. 其他名字 → icons/<name>.*（主题 assets/icons 自带 UI 图标，如 chevron-right、menu、toc）
+  3. ds_icon / dst_icon → static/img/icons/*.png（直接拼 URL，随站点部署）
+     新增静态 PNG 图标时，把名字加进下方 $staticIcons
+  注意：return <值> 只能出现在 partial 顶层，嵌套会被当内置函数报错，
+        因此先计算 $url，最后统一 return
+*/ -}}
+{{- $url := "" -}}
+{{- $icon := resources.GetMatch (printf "%s.*" .) -}}
+{{- if not $icon -}}
+{{- $icon = resources.GetMatch (printf "icons/%s.*" .) -}}
+{{- end -}}
+{{- $staticIcons := slice "ds_icon" "dst_icon" -}}
+{{- if $icon -}}
+{{- $url = $icon.RelPermalink -}}
+{{- else if in $staticIcons . -}}
+{{- $url = printf "img/icons/%s.png" . | relURL -}}
+{{- else -}}
+{{- warnf "docs/icon: 未找到图标 %q，返回空" . -}}
+{{- end -}}
+{{- return $url -}}

@@ -1,0 +1,27 @@
+{{/*
+  icon shortcode：内联使用本地 Bootstrap Icons SVG
+  图标源：assets/bs/（项目 assets 下的 bootstrap 图标全集）
+  用法（位置参数）：
+    {{< icon "bs/book" >}}
+    {{< icon "bs/gear-fill" size="1.5em" >}}
+  用法（命名参数，二选一，勿混用）：
+    {{< icon name="bs/book" >}}
+  说明：
+  - SVG 直接内联进 HTML，fill="currentColor" 自动继承文字颜色，深浅色主题无需额外处理
+  - size 控制图标尺寸，默认 1em（跟随正文字号）
+  - 路径不带扩展名，经 resources.GetMatch 挂载解析，不受 --source/工作目录影响
+*/}}
+{{- $name := .Get "name" | default (.Get 0) -}}
+{{- $size := .Get "size" | default "1em" -}}
+{{- if not $name -}}
+  {{ warnf "icon shortcode: 缺少图标名，渲染为占位符 ?" }}
+<span class="bs-icon" style="width: {{ $size }}; height: {{ $size }};" role="img" aria-hidden="true">?</span>
+{{- else -}}
+  {{- $icon := resources.GetMatch (printf "%s.*" $name) -}}
+  {{- if $icon -}}
+<span class="bs-icon" style="width: {{ $size }}; height: {{ $size }};" role="img" aria-hidden="true">{{ $icon.Content | safeHTML }}</span>
+  {{- else -}}
+    {{ warnf "icon shortcode: 未找到图标 %q，渲染为占位符 ?" $name }}
+<span class="bs-icon" style="width: {{ $size }}; height: {{ $size }};" role="img" aria-hidden="true">?</span>
+  {{- end -}}
+{{- end -}}

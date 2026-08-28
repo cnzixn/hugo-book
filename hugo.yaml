@@ -2,6 +2,10 @@ baseURL: https://b.225228.xyz/
 title: 饥荒模组手册
 theme: hugo-book
 
+# 站点默认语言：中文（影响 <html lang>、界面文案、搜索索引语言）
+defaultContentLanguage: zh
+languageCode: zh-cn
+
 copyright: "© 2026 - [Hugo Book Theme](https://github.com/alex-shpak/hugo-book/)"
 
 # Book configuration
@@ -51,28 +55,31 @@ menu:
     - name: "联机"
       pageRef: "/dst-book/"
       weight: 10
-    - name: "联系"
-      url: "mailto:contact@225228.xyz"
+    - name: "文章"
+      pageRef: "/posts/"
+      weight: 15
+    - name: "关于"
+      pageRef: "/about/"
       weight: 20
 
   # before: 
   #   - name: "联系我们"
   #     url: "mailto:contact@example.com"
   #     weight: 10
-  # after:
-  #   - name: "联系我们"
-  #     url: "mailto:contact@example.com"
-  #     weight: 10
+  after:
+    - name: "全部文章"
+      pageRef: "/posts/"
+      weight: 5
+      params:
+        bookIcon: "bs/book"
 
 # taxonomies:
 #   tag: tags
 
 params:
-  # (Optional, default light) Sets color theme: light, dark or auto.
-  # （可选，默认 light）设置颜色主题：light、dark 或 auto
-  # Theme 'auto' switches between dark and light modes based on browser/os preferences
-  # 主题 'auto' 根据浏览器/系统偏好自动切换深色和浅色模式
-  BookTheme: "github-auto"
+  # (Optional, default light) Sets color theme: light or dark.
+  # （可选，默认 light）设置颜色主题：light 或 dark
+  BookTheme: "github-light"
 
   # (Optional, default none) Controls table of contents visibility on right side of pages.
   # （可选，默认 none）控制页面右侧目录可见性
@@ -86,13 +93,13 @@ params:
   # （可选，默认 favicon.png）设置网站图标路径
   # If the favicon is /static/favicon.png then the path would be favicon.png
   # 如果图标路径为 /static/favicon.png，则路径写为 favicon.png
-  # BookFavicon: "favicon.png"
+  # BookFavicon: "favicon.svg"
 
   # (Optional, default none) Set the path to a logo for the book.
   # （可选，默认 none）设置书籍 logo 路径
   # If the logo is /static/logo.png then the path would be logo.png
   # 如果 logo 路径为 /static/logo.png，则路径写为 logo.png
-  # BookLogo: /logo.png
+  # BookLogo: "favicon.svg"
 
   # (Optional, default docs) Specify root page to render child pages as menu.
   # （可选，默认 docs）指定根页面以将子页面渲染为菜单
@@ -100,7 +107,7 @@ params:
   # 页面可通过 .GetPage 函数解析：https://gohugo.io/functions/getpage/
   # For backward compatibility you can set '*' to render all sections to menu. Acts same as '/'
   # 为向后兼容，可设置 '*' 将所有 section 渲染为菜单，等同于 '/'
-  BookSection: "/"
+  BookSection: "docs"
 
   # (Optional, default none) Set template for commit link for the page. Requires enableGitInfo.
   # （可选，默认 none）设置页面提交链接模板，需启用 enableGitInfo

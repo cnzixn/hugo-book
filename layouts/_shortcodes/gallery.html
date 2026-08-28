@@ -1,0 +1,43 @@
+{{/*
+  gallery shortcode：横向滑动的截图墙轮播组件（仿应用商店样式）
+  用法（inner 内容每行一个图片路径；caption/href 均可选）：
+    {{< gallery caption="A multiplayer spooky survival" href="https://example.com" >}}
+      /img/dst/shot1.jpg
+      /img/dst/shot2.jpg
+    {{< /gallery >}}
+  说明：
+  - 图片按原始比例展示，最高 260px，横向滑动（scroll-snap 吸附）
+  - 移动端手势滑动；桌面端左右箭头翻页，滑到边缘对应箭头自动隐藏
+  - 提供 href 时，底部 caption 变为可点击链接（新标签页打开，rel=noopener）
+  - 图片全部 loading="lazy" 懒加载
+  - 底部说明文字带手柄图标（assets/bs/gamepad.svg），caption 省略则不显示
+*/ -}}
+{{- $caption := .Get "caption" -}}
+{{- $href := .Get "href" -}}
+<figure class="book-gallery">
+  <div class="gallery-viewport">
+    <button type="button" class="gallery-nav gallery-prev" aria-label="上一张">&#8249;</button>
+    <div class="gallery-track" tabindex="0" aria-label="图片列表，可左右滑动">
+      {{- range split .Inner "\n" -}}
+        {{- $src := trim . " \t\r" -}}
+        {{- with $src -}}
+      <img src="{{ . }}" alt="{{ $caption | default "截图" }}" loading="lazy">
+        {{- end -}}
+      {{- end -}}
+    </div>
+    <button type="button" class="gallery-nav gallery-next" aria-label="下一张">&#8250;</button>
+  </div>
+  {{- with $caption -}}
+    {{- $icon := resources.GetMatch "bs/gamepad.svg" -}}
+    <figcaption class="gallery-caption">
+      {{- with $icon -}}<span class="gallery-caption-icon">{{ .Content | safeHTML }}</span>{{- end -}}
+      {{- if $href -}}
+      <a href="{{ $href }}" target="_blank" rel="noopener">{{ . }}</a>
+      {{- else -}}
+      <span>{{ . }}</span>
+      {{- end -}}
+    </figcaption>
+  {{- end -}}
+</figure>
+{{- $js := resources.Get "js/gallery.js" | resources.Minify | resources.Fingerprint "sha256" -}}
+<script src="{{ $js.RelPermalink }}" defer></script>

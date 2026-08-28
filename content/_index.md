@@ -10,26 +10,27 @@ layout: landing
 
 {{% columns %}}
 
-- ## 🛠️安装 Installation
-  - 饥荒手游模组安装全流程教学。
-  - 跟着步骤完成配置，妥善解决闪退、模组不生效、版本兼容等各类难题。
+- {{< icon "bs/journal" >}} **安装教程**
+  - 单机版 / 联机版模组安装全流程
+  - 闪退、模组不生效等常见问题排查
 
-- ## 📚️资源 Resources
-  - 收集移动端可用饥荒模组。
-  - 全新角色、创新玩法、便捷辅助......应有尽有，重塑你的荒野冒险。
+- {{< icon "bs/download" >}} **资源分享**
+  - 单机版模组（BM 系列）
+  - 联机版模组（WS 系列）
+  - 网盘直链，持续更新
 
-- ## 💻开发 Modding
-  - 饥荒模组 Lua 开发系列教程。
-  - 读懂模组架构，自制道具、角色与游戏规则，创造属于你的荒野内容。
+- {{< icon "bs/code-slash" >}} **模组开发**
+  - Lua 模组开发系列教程
+  - 从读懂架构到自制内容
 
 {{% /columns %}}
 
 -----
 
-<div style="display: flex; gap: 12px; padding: 8px; justify-content: center;">
-{{<button href="/ds-book/">}} <img src="/icons/ds_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
+<div class="btn-row">
+{{<button href="/docs/ds-book/">}} <img src="/img/icons/ds_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
 {{</button>}}
-{{<button href="/dst-book/">}} <img src="/icons/dst_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
+{{<button href="/docs/dst-book/">}} <img src="/img/icons/dst_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
 {{</button>}}
 </div>
 

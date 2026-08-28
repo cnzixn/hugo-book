@@ -38,7 +38,7 @@
           searchKeyword: dataEl.dataset.searchKeyword || '',
           currentDate: dataEl.dataset.currentDate || '',
           imgBase: dataEl.dataset.imgBase || '/img/bm/',
-          imgFallback: dataEl.dataset.imgFallback || '/img/bm/BM000.png'
+          imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png'
         });
       }
 
@@ -164,6 +164,11 @@
         while (tempDiv.firstChild) modsList.appendChild(tempDiv.firstChild);
       }
       currentPage = pageIndex + 1;
+
+      // 不足一页（没有“更多”数据）时隐藏哨兵，避免单条/少量数据仍显示“加载更多”
+      if (Math.ceil(filteredMods.length / PAGE_SIZE) <= 1) {
+        sentinel.style.display = 'none';
+      }
     }
 
     function reload() {
