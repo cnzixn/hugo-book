@@ -814,3 +814,70 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
     pointer-events: none;
   }
 }
+
+/* ===== C 档：性能急救（秒开无动画 + 砍合成层） =====
+ * 目标：10 分钟立刻把「卡顿感」降到接近 PaperMod（旧设备体感提升最大）
+ *  1) 关 will-change：释放 transform/margin/opacity 3 层 GPU 合成层，避免低内存 iOS 纹理回收抖动
+ *  2) 关 transition/animation：菜单 / 遮罩 / TOC 全部秒切，旧设备不做任何过渡动画最丝滑
+ *  3) 移动端（896px）砍全屏 opacity 混合：比阴影更贵，每帧全屏幕素做 GPU 混合，旧 iOS 直接掉帧
+ *  4) 移动端砍菜单 box-shadow：transform 变化时阴影每帧要重栅格化，旧设备明显卡
+ *  5) 移动端弃用 transform 合成层路径：改由「容器 margin 归零」实现菜单位移
+ *     关闭时靠主题默认 .book-menu { margin-inline-start: calc(-1*--menu-width) } 在屏外
+ *     打开时把容器 margin-inline-start 归零 → 内容自然到屏内，内容 transform:none 不建合成层
+ *     （旧 WebKit 的合成层实现有内存泄漏与掉帧 bug，走盒模型 margin 反而更稳）
+ */
+.book-menu-content,
+.book-toc-content {
+  /* 释放 3 层 GPU 合成层：transform / margin / opacity */
+  will-change: auto !important;
+  /* 过渡全部清零：秒开秒关，不再走 0.2s 4 属性同时动画 */
+  transition: none !important;
+  -webkit-transition: none !important;
+  transition-property: none !important;
+  -webkit-transition-property: none !important;
+  transition-duration: 0s !important;
+  -webkit-transition-duration: 0s !important;
+  animation: none !important;
+}
+.book-menu-overlay {
+  /* 遮罩层同步关过渡，与菜单秒开保持视觉一致，减少淡入淡出额外帧 */
+  transition: none !important;
+  -webkit-transition: none !important;
+  will-change: auto !important;
+  animation: none !important;
+}
+
+@media screen and (max-width: 896px) {
+  /* —— 3. 砍全屏 opacity 混合 —— */
+  #menu-control:checked ~ main .book-page {
+    opacity: 1 !important;
+    -webkit-filter: none !important;
+            filter: none !important;
+  }
+  /* —— 4. 砍菜单 box-shadow（每帧重栅格化，旧 iOS 掉帧主因之一） —— */
+  #menu-control:checked ~ main .book-menu .book-menu-content {
+    -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+  }
+  /* —— 5. 关闭时：容器 margin 负一屏宽（沿用主题默认，不写）
+        打开时：容器 margin 归零把菜单拉进屏内 + 内容 transform 全关
+        彻底不再走 GPU 合成层（translateX / translate3d 都不写） —— */
+  #menu-control:checked ~ main .book-menu {
+    -webkit-margin-start: 0 !important;
+            margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+  }
+  body[dir="rtl"] #menu-control:checked ~ main .book-menu {
+    -webkit-margin-start: 0 !important;
+            margin-inline-start: 0 !important;
+    margin-right: 0 !important;
+  }
+  #menu-control:checked ~ main .book-menu .book-menu-content {
+    -webkit-transform: none !important;
+            transform: none !important;
+  }
+  body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
+    -webkit-transform: none !important;
+            transform: none !important;
+  }
+}
