@@ -157,7 +157,9 @@
     switchTheme.id = 'theme-switcher';
     switchTheme.onclick = toggleTheme;
 
-    setStyles(switchTheme.style, {
+    /* 注意：传元素本身而非 switchTheme.style——setStyles 内部会取 el.style，
+       误传 style 对象会导致 Object.assign(undefined) 抛错、按钮创建中断 */
+    setStyles(switchTheme, {
       position: 'fixed',
       bottom: '120px',
       right: '20px',

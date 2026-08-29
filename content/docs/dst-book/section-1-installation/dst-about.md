@@ -1,9 +1,9 @@
 ---
-title: "关于 klump.zip 文件"
+title: "关于 apk/ipa 文件"
 bookHidden: true
 weight: 100
 aliases:
-  - "/p/klump"
+  - "/p/dst-about"
 ---
 
 ## 文件结构
@@ -38,10 +38,10 @@ xxx.ipa
 klump.zip
 └── mods/
     ├── modsettings.lua           ← 配置文件
-    ├── workshop-mpatch           ← 模组A
+    ├── mod-test                  ← 模组A
     │   ├── modinfo.lua
     │   └── ...
-    └── workshop-376333686        ← 模组B
+    └── workshop-12345678        ← 模组B
         ├── modinfo.lua
         └── ...
 ```
@@ -52,6 +52,6 @@ klump.zip
 ### 3. 配置文件
 
 ```lua  {{filename="modsettings.lua", copy="false"}}
-  Add("workshop-mpatch")      -- 模组A
-  Add("workshop-376333686")   -- 模组B
+  Add("mod-test")             -- 模组A
+  Add("workshop-12345678")    -- 模组B
 ```

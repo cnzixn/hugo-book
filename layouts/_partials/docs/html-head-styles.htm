@@ -1,0 +1,15 @@
+{{- /*
+  项目级覆写（原文件：themes/hugo-book/layouts/_partials/docs/html-head-styles.htm）
+  变更原因：新版 hugo-book 的 book.css 源码使用「原生 CSS 嵌套」语法，
+  原 partial 只做 Concat → Minify，嵌套规则原样上线；
+  旧 WebKit（Safari <17.2 / Chrome <120 / Firefox <117，不支持原生嵌套）
+  解析到嵌套块即断掉，导致 .book-menu 整段规则失效：
+  菜单无缩进、折叠失效（全部展开）、链接变蓝色默认样式。
+  修复：Concat 后追加 css.Sass 转译，把嵌套 CSS 展开为扁平 CSS（全浏览器兼容）。
+*/ -}}
+{{- $styles := slice -}}
+{{- range resources.Get "styles/index.yaml" | transform.Unmarshal -}}
+  {{- $styles = $styles | append (resources.Get (printf "styles/%s" .)) -}}
+{{- end -}}
+{{- $styles := $styles | resources.Concat "book.scss" | css.Sass | resources.Minify | resources.Fingerprint -}}
+<link rel="stylesheet" href="{{ partial "docs/links/resource-precache" $styles }}" {{ template "integrity" $styles }}>

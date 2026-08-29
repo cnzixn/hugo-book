@@ -672,10 +672,11 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   justify-content: center;
   border: none;
   border-radius: 50%;
-  /* color-mix 兼容性：旧版 Safari 不支持，先用 rgba 实色兜底
-     兜底方案：亮/暗主题通用的半透明灰色 */
+  /* color-mix 兼容性：兜底用亮/暗主题通用的半透明灰色
+     注意：不能用「rgba + color-mix(var) 双声明」兜底——含 var() 的声明运行时才求值，
+     「支持 var 但不支持 color-mix」的浏览器（Chrome 49-110 等）会整条 background
+     按初始值变透明，rgba 兜底失效；必须用 @supports 隔离（见下方规则） */
   background: rgba(128, 128, 128, 0.7);
-  background: color-mix(in srgb, var(--gray-100) 80%, transparent);
   color: var(--body-font-color);
   font-size: 20px;
   line-height: 1;
@@ -685,6 +686,12 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   transition: opacity 0.2s ease;
   -webkit-appearance: none;
   appearance: none;
+}
+/* 支持 color-mix 的浏览器才启用主题灰色变体（检测值用字面色，避开 var() 求值陷阱） */
+@supports (background: color-mix(in srgb, #000 50%, transparent)) {
+  .gallery-nav {
+    background: color-mix(in srgb, var(--gray-100) 80%, transparent);
+  }
 }
 .gallery-prev {
   left: 8px;
@@ -756,6 +763,16 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
     background: var(--body-background) !important;
     background-color: var(--body-background) !important;
     position: relative !important;
+    /* 面板高度固定为一屏、内容过多时在面板内部滚动；
+       sticky 顶住视口顶部：页面滚动中打开菜单（手势）面板也可见 */
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    /* 动态视口高：现代浏览器扣除地址栏，旧浏览器不认 dvh 回退 100vh */
+    height: 100dvh !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
     z-index: 25 !important;
   }
   body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
@@ -782,12 +799,6 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
     background-color: rgba(0, 0, 0, 0.45) !important; /* color-mix() 回退色 */
     background-color: color-mix(in srgb, #000 45%, transparent) !important;
     cursor: pointer;
-  }
-  /* —— TOC 面板同步补层级兜底 —— */
-  #toc-control:checked ~ main .book-toc {
-    visibility: visible !important;
-    display: block !important;
-    z-index: 25 !important;
   }
   .book-header label[for="menu-control"],
   .book-header label[for="toc-control"] {
