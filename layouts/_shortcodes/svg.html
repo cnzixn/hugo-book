@@ -1,0 +1,24 @@
+{{/*
+  svg shortcode（PaperMod 风格）：站内图标查表输出
+  数据源：layouts/_partials/docs/bs-icons.html（图标名 → 完整 svg 标签）
+  用法（位置参数 / 命名参数二选一，勿混用）：
+    {{< svg "bs/envelope" >}}
+    {{< svg name="bs/chat" size="1.5em" >}}
+  维护：新图标往 partials/docs/bs-icons.html 的 dict 里加一行
+*/}}
+{{- $icons := partial "docs/bs-icons" . -}}
+{{- $name := strings.TrimPrefix "bs/" (.Get "name" | default (.Get 0)) -}}
+{{- $size := .Get "size" | default "1em" -}}
+{{- $svg := index $icons $name -}}
+{{- if not $svg -}}
+  {{- /* 兼容不带 bi- 前缀的调用：globe2 → bi-globe2 */ -}}
+  {{- $svg = index $icons (printf "bi-%s" $name) -}}
+{{- end -}}
+{{- if $svg -}}
+<span class="bs-icon" style="width: {{ $size }}; height: {{ $size }};"
+  role="img" aria-hidden="true">{{ $svg | safeHTML }}</span>
+{{- else -}}
+  {{- warnf "svg shortcode: 图标 %q 不在数据表里，渲染为占位符 ?" $name -}}
+<span class="bs-icon" style="width: {{ $size }}; height: {{ $size }};"
+  role="img" aria-hidden="true">?</span>
+{{- end -}}

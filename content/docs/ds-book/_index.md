@@ -2,7 +2,7 @@
 title: 饥荒 - 手游单机版
 weight: 1
 bookCollapseSection: true
-bookIcon: ds_icon
+bookIcon: ds_icon.png
 ---
 
 {{< gallery caption="" href="" >}}
@@ -11,7 +11,7 @@ bookIcon: ds_icon
   /img/ds/4E31FB73E8A68FE4287A8A47D890859B.jpg
 {{< /gallery >}}
 
-{{<button href="https://www.klei.com/games/dont-starve/" class="btn-block">}}{{< icon "bs/globe2" >}} klei.com{{</button>}}
+{{<button href="https://www.klei.com/games/dont-starve/" class="btn-block">}}{{< svg "bi-globe2" >}} klei.com{{</button>}}
 
 ## 购买正版
 -----
@@ -22,8 +22,8 @@ bookIcon: ds_icon
 -----
 
 <div class="btn-row">
-  {{<button href="https://apps.apple.com/us/app/dont-starve-shipwrecked/id1147297267">}}{{< icon "bs/apple" >}} AppStore{{</button>}}
-  {{<button href="https://play.google.com/store/apps/details?id=com.kleientertainment.doNotStarveShipwrecked&hl=en_CA">}}{{< icon "bs/android2" >}} GooglePlay{{</button>}}
+  {{<button href="https://apps.apple.com/us/app/dont-starve-shipwrecked/id1147297267">}}{{< svg "bi-apple" >}} AppStore{{</button>}}
+  {{<button href="https://play.google.com/store/apps/details?id=com.kleientertainment.doNotStarveShipwrecked&hl=en_CA">}}{{< svg "bi-android2" >}} GooglePlay{{</button>}}
 </div>
 
 注：安装模组使用的是网盘下载的“试玩版”。 

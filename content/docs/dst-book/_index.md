@@ -2,7 +2,7 @@
 title: 饥荒 - 手游联机版
 weight: 2
 bookCollapseSection: true
-bookIcon: dst_icon
+bookIcon: dst_icon.png
 ---
 
 
@@ -12,7 +12,7 @@ bookIcon: dst_icon
   /img/dst/D45E08AF1612836D55F8CFBA7E623BB2.jpg
 {{< /gallery >}}
 
-{{<button href="https://playdigious.com/games/dont-starve-together" class="btn-block">}}{{< icon "bs/globe2" >}} Playdigious{{</button>}}
+{{<button href="https://playdigious.com/games/dont-starve-together" class="btn-block">}}{{< svg "bi-globe2" >}} Playdigious{{</button>}}
 
 ## 购买正版
 -----
@@ -23,8 +23,8 @@ bookIcon: dst_icon
 -----
 
 <div class="btn-row">
-  {{<button href="https://apps.apple.com/us/app/dont-starve-together/id6474194438">}}{{< icon "bs/apple" >}} AppStore{{</button>}}
-  {{<button href="https://play.google.com/store/apps/details?id=com.playdigious.dst">}}{{< icon "bs/android2" >}} GooglePlay{{</button>}}
+  {{<button href="https://apps.apple.com/us/app/dont-starve-together/id6474194438">}}{{< svg "bi-apple" >}} AppStore{{</button>}}
+  {{<button href="https://play.google.com/store/apps/details?id=com.playdigious.dst">}}{{< svg "bi-android2" >}} GooglePlay{{</button>}}
 </div>
 
 注：安装模组使用的是网盘下载的“试玩版”。 

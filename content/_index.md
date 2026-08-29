@@ -10,16 +10,16 @@ layout: landing
 
 {{% columns %}}
 
-- {{< icon "bs/journal" >}} **安装教程**
+- {{< svg "bi-journal" >}} **安装教程**
   - 单机版 / 联机版模组安装全流程
   - 闪退、模组不生效等常见问题排查
 
-- {{< icon "bs/download" >}} **资源分享**
+- {{< svg "bi-download" >}} **资源分享**
   - 单机版模组（BM 系列）
   - 联机版模组（WS 系列）
   - 网盘直链，持续更新
 
-- {{< icon "bs/code-slash" >}} **模组开发**
+- {{< svg "bi-code-slash" >}} **模组开发**
   - Lua 模组开发系列教程
   - 从读懂架构到自制内容
 

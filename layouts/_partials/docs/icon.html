@@ -1,24 +1,30 @@
 {{- /*
-  项目级覆盖主题的 docs/icon partial：返回图标 URL
-  解析顺序：
-  1. "bs/xxx" → assets/bs/xxx.*（项目 assets 下的 bootstrap 图标全集）
-  2. 其他名字 → icons/<name>.*（主题 assets/icons 自带 UI 图标，如 chevron-right、menu、toc）
-  3. ds_icon / dst_icon → static/img/icons/*.png（直接拼 URL，随站点部署）
-     新增静态 PNG 图标时，把名字加进下方 $staticIcons
-  注意：return <值> 只能出现在 partial 顶层，嵌套会被当内置函数报错，
-        因此先计算 $url，最后统一 return
+  项目级覆盖主题的 docs/icon partial：返回图标 URL（供 <img src> 使用）
+  规则：
+  1. 名字带 "/" → 当完整路径（relURL）
+  2. 名字带 "."（后缀）→ img/icons/ 下的静态文件（如 "ds_icon.png" → /img/icons/ds_icon.png）
+  3. 其他（如 "bi-book"）→ bs-icons 数据表 → resources.FromString 发布为 /icons/<名>.svg
+     表里没有的（主题 UI 图标 menu/toc 等）→ 主题 assets/icons/ 自带文件兜底
+  注意：return 只能出现在 partial 顶层，因此先算 $url 最后统一 return
 */ -}}
 {{- $url := "" -}}
-{{- $icon := resources.GetMatch (printf "%s.*" .) -}}
-{{- if not $icon -}}
-{{- $icon = resources.GetMatch (printf "icons/%s.*" .) -}}
-{{- end -}}
-{{- $staticIcons := slice "ds_icon" "dst_icon" -}}
-{{- if $icon -}}
-{{- $url = $icon.RelPermalink -}}
-{{- else if in $staticIcons . -}}
-{{- $url = printf "img/icons/%s.png" . | relURL -}}
+{{- if strings.Contains . "/" -}}
+{{- $url = . | relURL -}}
+{{- else if strings.Contains . "." -}}
+{{- $url = printf "img/icons/%s" . | relURL -}}
 {{- else -}}
-{{- warnf "docs/icon: 未找到图标 %q，返回空" . -}}
+{{- $svg := index (partial "docs/bs-icons" .) . -}}
+{{- if $svg -}}
+{{- /* 独立 .svg 文件供 <img> 加载，必须是带 xmlns 的合法 XML；字典里省略了该属性，发布前统一补上 */ -}}
+{{- $svg = strings.Replace $svg `<svg ` `<svg xmlns="http://www.w3.org/2000/svg" ` 1 -}}
+{{- $res := resources.FromString (printf "icons/%s.svg" .) $svg -}}
+{{- $url = $res.RelPermalink -}}
+{{- else -}}
+{{- with resources.GetMatch (printf "icons/%s.*" .) -}}
+{{- $url = .RelPermalink -}}
+{{- else -}}
+{{- warnf "docs/icon: 未找到图标 %q" . -}}
+{{- end -}}
+{{- end -}}
 {{- end -}}
 {{- return $url -}}

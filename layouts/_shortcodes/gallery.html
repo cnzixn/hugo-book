@@ -10,7 +10,7 @@
   - 移动端手势滑动；桌面端左右箭头翻页，滑到边缘对应箭头自动隐藏
   - 提供 href 时，底部 caption 变为可点击链接（新标签页打开，rel=noopener）
   - 图片全部 loading="lazy" 懒加载
-  - 底部说明文字带手柄图标（assets/bs/gamepad.svg），caption 省略则不显示
+  - 底部说明文字带手柄图标（sprite 里的 bi-controller），caption 省略则不显示
 */ -}}
 {{- $caption := .Get "caption" -}}
 {{- $href := .Get "href" -}}
@@ -28,9 +28,9 @@
     <button type="button" class="gallery-nav gallery-next" aria-label="下一张">&#8250;</button>
   </div>
   {{- with $caption -}}
-    {{- $icon := resources.GetMatch "bs/gamepad.svg" -}}
     <figcaption class="gallery-caption">
-      {{- with $icon -}}<span class="gallery-caption-icon">{{ .Content | safeHTML }}</span>{{- end -}}
+      {{- /* 手柄图标：走 sprite（bi-controller），首次调用自动内联 sprite */ -}}
+      {{- partial "docs/svg" (dict "name" "bi-controller" "size" "18px" "page" .Page) -}}
       {{- if $href -}}
       <a href="{{ $href }}" target="_blank" rel="noopener">{{ . }}</a>
       {{- else -}}

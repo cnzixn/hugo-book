@@ -383,7 +383,7 @@ a img.book-icon[src$=".png"] {
   --body-font-color: #1f2328;
   --icon-filter: none;
 
-  --color-link: #0969da;
+  --color-link: #4184c4;
   --color-visited-link: #8250df;
 
   --gray-100: #f6f8fa;
@@ -407,7 +407,7 @@ a img.book-icon[src$=".png"] {
   --body-font-color: #c9d1d9;
   --icon-filter: brightness(0) invert(1);
 
-  --color-link: #58a6ff;
+  --color-link: #79aede;
   --color-visited-link: #a371f7;
 
   --gray-100: #161b22;
@@ -563,6 +563,8 @@ a.book-btn.btn-block[href] {
   justify-content: center;
   gap: 6px;
   width: 100%;
+  /* 垂直间距：多个 btn-block 连续书写时在同一 <p> 内堆叠，用后 margin 撑开间隔 */
+  margin: 0 0 8px 0;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }

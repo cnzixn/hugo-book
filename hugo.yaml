@@ -71,7 +71,14 @@ menu:
       pageRef: "/posts/"
       weight: 5
       params:
-        bookIcon: "bs/book"
+        bookIcon: "bi-book"
+    - name: "关于本站"
+      pageRef: "/about/"
+      weight: 20
+      params:
+        bookIcon: "bi-info-square"
+
+
 
 # taxonomies:
 #   tag: tags
