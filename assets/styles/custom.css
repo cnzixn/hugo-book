@@ -569,16 +569,18 @@ a.book-btn.btn-block[href] {
 a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
 
 /* ========== 按钮并排容器（外层 div 加 class="btn-row"） ========== */
-/* 宽屏并排均分，窄屏（不够 200px 时）自动换行为整行铺满 */
+/* 宽屏并排均分，窄屏（不够 200px 时）自动换行为整行铺满；
+   间距统一用子项 margin（兼容不支持 flex gap 的旧 Safari）：
+   不能 gap + margin 双轨并用——现代浏览器会 16px 双倍间距，
+   且 margin-top 只加在后续项上，同行出现 8px 阶梯（一大一小） */
 .btn-row {
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
   -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
-  gap: 8px;
 }
-.btn-row > * + * { margin-left: 8px; margin-top: 8px; }
+.btn-row > * { margin: 0 8px 8px 0; }
 .btn-row a.book-btn[href] {
   -webkit-box-flex: 1;
   -webkit-flex: 1 1 200px;
@@ -762,11 +764,10 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
             box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
     background: var(--body-background) !important;
     background-color: var(--body-background) !important;
-    position: relative !important;
-    /* 面板高度固定为一屏、内容过多时在面板内部滚动；
-       sticky 顶住视口顶部：页面滚动中打开菜单（手势）面板也可见 */
-    position: -webkit-sticky !important;
-    position: sticky !important;
+    /* 面板固定悬浮左侧：fixed 不随页面滚动；
+       （sticky 会被祖先的 overflow:hidden 等滚动容器破坏，面板跟着页面滑走）
+       高度固定一屏、内容过多时面板内部滚动 */
+    position: fixed !important;
     top: 0 !important;
     height: 100vh !important;
     /* 动态视口高：现代浏览器扣除地址栏，旧浏览器不认 dvh 回退 100vh */

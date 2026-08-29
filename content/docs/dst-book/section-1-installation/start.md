@@ -29,3 +29,11 @@ weight: 101
 
 {{% /steps %}}
 
+
+## 相关资料
+-----
+
+- [[TrollStore]](https://github.com/opa334/TrollStore)
+- [[LiveContainer]](https://livecontainer.github.io/zh-CN/docs/installation)
+
+

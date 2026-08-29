@@ -17,10 +17,12 @@
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
     {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
     {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
+    {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
     {{- $wsItems = $wsItems | append (dict
       "id"       $id
       "name"     $name
       "size"     $size
+      "tags"     $tags
       "baiduUrl" $baiduUrl
       "quarkUrl" $quarkUrl
     ) -}}

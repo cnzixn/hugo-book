@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-合并 dst-baidu.txt + dst-quark.txt 到 dst_pan.yml
---------------------------------------------
+通用 pan yml 合并脚本（自动扫描 ds / dst 等前缀）
+--------------------------------------------------
+自动扫描脚本所在目录下所有 `{prefix}-{source}.txt`，
+按 prefix 分组后分别合并到 `{prefix}_pan.yml`。
+
+命名约定：
+    ds-baidu.txt + ds-quark.txt  →  ds_pan.yml   （单机版）
+    dst-baidu.txt + dst-quark.txt →  dst_pan.yml  （联机版）
+    也支持自定义前缀，只要文件名符合 `{prefix}-{source}.txt` 格式。
+
 原始 txt 格式（每个条目 3 行一组）：
-    第1行: WS{id}.{中文名}.zip\t{文件大小}\t   （tab 分隔，末尾 tab 可选）
+    第1行: {MOD_ID}.{中文名}.zip\t{文件大小}\t   （tab 分隔，末尾 tab 可选）
     第2行: https://pan.baidu.com/s/xxx?pwd=xxxx  或  https://pan.quark.cn/s/xxx
     第3行: {提取码}\t分享成功
 
-输出 dst_pan.yml 格式（同目录下已有示例为参照）：
-    WS{id}:
+输出 {prefix}_pan.yml 格式（同目录下已有示例为参照）：
+    {MOD_ID}:
     - name: {中文名}
+    - tags: {可选标签，非空才输出}
     - url1: {百度网盘链接（已带?pwd）}
     - url2: https://pan.xunlei.com   （迅雷暂无数据，写占位URL）
     - url3: {夸克网盘链接（自动补?pwd=提取码）}
@@ -28,14 +37,35 @@ import sys
 from collections import OrderedDict
 
 # ---------- 路径配置 ----------
-# 脚本、原料 txt、输出 yml 均放在 hugo-book/data_src/ 同一目录，
-# 生成的 dst_pan.yml 由用户确认后，再自行合并到 data/ 目录。
+# 脚本、原料 txt、输出 yml 均放在 hugo-book/data_src/ 同一目录
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BAIDU_TXT = os.path.join(BASE_DIR, "dst-baidu.txt")
-QUARK_TXT = os.path.join(BASE_DIR, "dst-quark.txt")
-OUT_YML = os.path.join(BASE_DIR, "dst_pan.yml")
 
 XUNLEI_PLACEHOLDER = "https://pan.xunlei.com"
+
+# 支持的 txt 来源后缀（{prefix}-{SOURCE}.txt）
+KNOWN_SOURCES = ("baidu", "quark")
+
+
+def discover_prefixes():
+    """
+    扫描 BASE_DIR，按前缀分组返回 { prefix: { source: filepath } }。
+    例如：{ "ds": {"baidu": ".../ds-baidu.txt", "quark": ".../ds-quark.txt"} }
+    """
+    groups = {}
+    for fname in os.listdir(BASE_DIR):
+        if not fname.endswith(".txt"):
+            continue
+        # 匹配 {prefix}-{source}.txt
+        m = re.match(r"^(.+)-([a-zA-Z]+)\.txt$", fname)
+        if not m:
+            continue
+        prefix = m.group(1).lower()
+        source = m.group(2).lower()
+        if source not in KNOWN_SOURCES:
+            continue
+        fpath = os.path.join(BASE_DIR, fname)
+        groups.setdefault(prefix, {})[source] = fpath
+    return groups
 
 
 def parse_pan_txt(txt_path):
@@ -121,8 +151,8 @@ def parse_existing_yml(yml_path):
 
     # 匹配 key 行：行首无缩进 + 以 ":" 结尾（key 本身不含 ":"，避免把 "http:" 当 key）
     key_re = re.compile(r"^(?P<key>[^:\s-][^:]*):\s*$")
-    # 匹配字段行：- field: value
-    field_re = re.compile(r"^\s*-\s*(?P<k>name|url1|url2|url3|size):\s*(?P<v>.*?)\s*$")
+    # 匹配字段行：- field: value（支持 name/url1/url2/url3/size/tags）
+    field_re = re.compile(r"^\s*-\s*(?P<k>name|url1|url2|url3|size|tags):\s*(?P<v>.*?)\s*$")
 
     cur_key = None
     cur_item = None
@@ -130,8 +160,8 @@ def parse_existing_yml(yml_path):
     def flush():
         """把当前累积的条目写入 result"""
         if cur_key is not None and cur_item is not None:
-            # 缺失的字段补空
-            for f2 in ("name", "url1", "url2", "url3", "size"):
+            # 缺失的字段补空（tags 也补空，确保后续 merge 不会 KeyError）
+            for f2 in ("name", "url1", "url2", "url3", "size", "tags"):
                 if f2 not in cur_item:
                     cur_item[f2] = ""
             result[cur_key] = cur_item
@@ -152,7 +182,7 @@ def parse_existing_yml(yml_path):
     # 文件结束时 flush 最后一条
     flush()
 
-    print("[INFO] dst_pan.yml 已存在条目 %d 条" % len(result))
+    print("[INFO] %s 已存在条目 %d 条" % (os.path.basename(yml_path), len(result)))
     return result
 
 
@@ -213,12 +243,15 @@ def merge_data(baidu_map, quark_map, existing_map):
                 changed = True
 
             if changed:
+                # 保留旧条目里的 tags（merge 不覆盖 tags，tag 由用户手动维护）
+                new_tags = old.get("tags", "")
                 merged[ws] = {
                     "name": new_name,
                     "url1": new_url1,
                     "url2": new_url2,
                     "url3": new_url3,
                     "size": new_size,
+                    "tags": new_tags,
                 }
                 updated += 1
             # else：没有任何变化，完全保留原 dict，保证写回字节级一致
@@ -237,6 +270,7 @@ def merge_data(baidu_map, quark_map, existing_map):
                 "url2": url2,
                 "url3": url3,
                 "size": size,
+                "tags": "",  # 新条目无 tag，后续由用户手动维护或由 migrate_tags.py 补充
             }
             added += 1
 
@@ -246,7 +280,8 @@ def merge_data(baidu_map, quark_map, existing_map):
 
 def write_yml(yml_path, merged_map):
     """
-    按固定格式写回 yml（WS编号 + 5 行字段），条目之间空一行分隔。
+    按固定格式写回 yml（key + 字段行），条目之间空一行分隔。
+    可选字段：tags 非空时输出，空则省略。
     不使用 PyYAML，避免用户装依赖。
     """
     lines = []
@@ -254,6 +289,10 @@ def write_yml(yml_path, merged_map):
     for idx, (ws, info) in enumerate(items):
         lines.append(ws + ":")
         lines.append("- name: " + info.get("name", ""))
+        # tags 插在 name 之后、url1 之前（保持逻辑分组：元信息 → 网盘链接）
+        tags_val = info.get("tags", "")
+        if tags_val:
+            lines.append("- tags: " + tags_val)
         lines.append("- url1: " + info.get("url1", ""))
         lines.append("- url2: " + info.get("url2", ""))
         lines.append("- url3: " + info.get("url3", ""))
@@ -271,15 +310,35 @@ def write_yml(yml_path, merged_map):
     print("[OK] 写入完成: " + yml_path)
 
 
-def main():
-    """函数级入口：解析 → 合并 → 写回"""
-    print("========== 合并 dst_pan 数据 ==========")
-    baidu_map = parse_pan_txt(BAIDU_TXT)
-    quark_map = parse_pan_txt(QUARK_TXT)
-    existing = parse_existing_yml(OUT_YML)
+def process_prefix(prefix, sources):
+    """
+    处理单个前缀组：读取 txt → 读已有 yml → 合并 → 写回
+    sources 示例：{"baidu": ".../dst-baidu.txt", "quark": ".../dst-quark.txt"}
+    """
+    out_yml = os.path.join(BASE_DIR, prefix + "_pan.yml")
+    print("\n========== 合并 %s ==========" % os.path.basename(out_yml))
+
+    baidu_map = parse_pan_txt(sources.get("baidu", ""))
+    quark_map = parse_pan_txt(sources.get("quark", ""))
+    existing = parse_existing_yml(out_yml)
     merged = merge_data(baidu_map, quark_map, existing)
-    write_yml(OUT_YML, merged)
-    print("========== 完成 ==========")
+    write_yml(out_yml, merged)
+
+
+def main():
+    """
+    函数级入口：自动扫描所有前缀 → 逐个合并
+    """
+    groups = discover_prefixes()
+    if not groups:
+        print("[INFO] 未发现任何 txt 原料（命名需符合 {prefix}-baidu.txt / {prefix}-quark.txt）")
+        return
+
+    print("发现 %d 个前缀组: %s" % (len(groups), ", ".join(sorted(groups.keys()))))
+    for prefix in sorted(groups.keys()):
+        process_prefix(prefix, groups[prefix])
+
+    print("\n========== 全部完成 ==========")
 
 
 if __name__ == "__main__":

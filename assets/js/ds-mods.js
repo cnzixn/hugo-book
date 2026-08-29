@@ -107,6 +107,27 @@
   }
 
   /**
+   * 构造标签 HTML（支持数组或逗号分隔字符串）
+   */
+  function buildTagsHtml(tags) {
+    if (!tags) return '';
+    var list;
+    if (typeof tags === 'string') {
+      list = tags.split(/[,，、]/);
+    } else if (Array.isArray(tags)) {
+      list = tags;
+    } else {
+      return '';
+    }
+    var parts = [];
+    for (var i = 0; i < list.length; i++) {
+      var t = (list[i] || '').trim();
+      if (t) parts.push('<span class="mod-tag">' + t + '</span>');
+    }
+    return parts.length ? '<span class="mod-tags">' + parts.join('') + '</span>' : '';
+  }
+
+  /**
    * 构造单条模组 HTML
    */
   function buildModItem(mod, cfg) {
@@ -115,6 +136,7 @@
     var baiduUrl = mod.baiduUrl ? mod.baiduUrl + '&t=' + cfg.currentDate : null;
     var quarkUrl = mod.quarkUrl ? mod.quarkUrl + '&t=' + cfg.currentDate : null;
     var site = getSiteOrigin();
+    var tagsHtml = buildTagsHtml(mod.tags);
 
     return (
       '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '">' +
@@ -123,9 +145,12 @@
             '<button onclick="window.location.href=\'' + site + '/p/' + mod.id + '\'" class="action-btn" data-href="/p/' + mod.id + '">' +
               '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
             '</button>' +
-            '<span class="mod-name">' +
-              mod.id + ' ' + mod.name + (mod.size ? '(' + mod.size + ')' : '') +
-            '</span>' +
+            '<div class="mod-name">' +
+              '<div class="mod-name-top">' +
+                mod.id + (mod.size ? ' (' + mod.size + ')' : '') + tagsHtml +
+              '</div>' +
+              '<div class="mod-name-sub">' + mod.name + '</div>' +
+            '</div>' +
           '</div>' +
           '<div class="item-actions">' +
             buildActionBtn('baidu', '百度网盘下载', baiduUrl) +
@@ -225,8 +250,22 @@
         filteredMods = cfg.searchOnly ? [] : cfg.allMods.slice();
       } else {
         filteredMods = cfg.allMods.filter(function (m) {
-          return (m.id || '').toLowerCase().indexOf(kw) !== -1 ||
-                 (m.name || '').toLowerCase().indexOf(kw) !== -1;
+          // 双向子串匹配：字段包含搜索词，或搜索词包含字段
+          var idLower = (m.id || '').toLowerCase();
+          var nameLower = (m.name || '').toLowerCase();
+          if (idLower.indexOf(kw) !== -1 || kw.indexOf(idLower) !== -1) return true;
+          if (nameLower.indexOf(kw) !== -1 || kw.indexOf(nameLower) !== -1) return true;
+          // 匹配标签（双向子串 + 支持数组或顿号/逗号分隔字符串）
+          var tags = m.tags;
+          if (tags) {
+            var tagList = typeof tags === 'string' ? tags.split(/[,，、]/) : tags;
+            for (var ti = 0; ti < tagList.length; ti++) {
+              var tagLower = (tagList[ti] || '').trim().toLowerCase();
+              if (!tagLower) continue;
+              if (tagLower.indexOf(kw) !== -1 || kw.indexOf(tagLower) !== -1) return true;
+            }
+          }
+          return false;
         });
       }
       applySort();
