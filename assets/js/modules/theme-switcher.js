@@ -157,8 +157,10 @@
    * 创建切换按钮
    */
   function createButton() {
-    switchTheme = document.createElement('button');
+    switchTheme = document.createElement('div');
     switchTheme.id = 'theme-switcher';
+    switchTheme.setAttribute('role', 'button');
+    switchTheme.setAttribute('tabindex', '0');
     switchTheme.onclick = toggleTheme;
 
     /* 注意：传元素本身而非 switchTheme.style——setStyles 内部会取 el.style，

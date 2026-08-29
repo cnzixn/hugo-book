@@ -1,4 +1,4 @@
-/*
+﻿/*
   You can add custom styles and css variables here.
 */
 
@@ -268,12 +268,12 @@ a img.book-icon[src$=".png"] {
 }
 
 /* ========== 浮动按钮：亮/暗模式写死实色，hover 全锁色 ==========
-   选择器用 button#id（元素+ID）比纯 #id 特异性更高，碾压浏览器 UA/任何主题样式
+   选择器用 #id（元素+ID）比纯 #id 特异性更高，碾压浏览器 UA/任何主题样式
    配色方案：亮模式白底深字，暗模式深灰底白字，带 1px 细描边，不突兀 */
 
 /* --- 亮色主题（light）：白底 #fff + 深灰字 #111827 + 浅灰描边 #d1d5db --- */
-:root[data-theme*="light"] button#theme-switcher,
-:root[data-theme*="light"] button#back-to-top {
+:root[data-theme*="light"] #theme-switcher,
+:root[data-theme*="light"] #back-to-top {
   background: #ffffff !important;
   background-color: #ffffff !important;
   background-image: none !important;
@@ -294,8 +294,8 @@ a img.book-icon[src$=".png"] {
 }
 
 /* --- 暗色主题（dark）：深灰 #3f3f46 + 白字 #fafafa + 描边 #52525b --- */
-:root[data-theme*="dark"] button#theme-switcher,
-:root[data-theme*="dark"] button#back-to-top {
+:root[data-theme*="dark"] #theme-switcher,
+:root[data-theme*="dark"] #back-to-top {
   background: #3f3f46 !important;
   background-color: #3f3f46 !important;
   background-image: none !important;
@@ -319,14 +319,14 @@ a img.book-icon[src$=".png"] {
    选择器用最高特异性，亮/暗模式分别写具体实色，不用 inherit（inherit 会偷父级背景色） */
 
 /* 亮色主题下的 hover/focus/active：与默认态亮配色完全一致 */
-:root[data-theme*="light"] button#theme-switcher:hover,
-:root[data-theme*="light"] button#theme-switcher:active,
-:root[data-theme*="light"] button#theme-switcher:focus,
-:root[data-theme*="light"] button#theme-switcher:focus-visible,
-:root[data-theme*="light"] button#back-to-top:hover,
-:root[data-theme*="light"] button#back-to-top:active,
-:root[data-theme*="light"] button#back-to-top:focus,
-:root[data-theme*="light"] button#back-to-top:focus-visible {
+:root[data-theme*="light"] #theme-switcher:hover,
+:root[data-theme*="light"] #theme-switcher:active,
+:root[data-theme*="light"] #theme-switcher:focus,
+:root[data-theme*="light"] #theme-switcher:focus-visible,
+:root[data-theme*="light"] #back-to-top:hover,
+:root[data-theme*="light"] #back-to-top:active,
+:root[data-theme*="light"] #back-to-top:focus,
+:root[data-theme*="light"] #back-to-top:focus-visible {
   background: #ffffff !important;
   background-color: #ffffff !important;
   background-image: none !important;
@@ -345,14 +345,14 @@ a img.book-icon[src$=".png"] {
 }
 
 /* 暗色主题下的 hover/focus/active：与默认态暗配色完全一致 */
-:root[data-theme*="dark"] button#theme-switcher:hover,
-:root[data-theme*="dark"] button#theme-switcher:active,
-:root[data-theme*="dark"] button#theme-switcher:focus,
-:root[data-theme*="dark"] button#theme-switcher:focus-visible,
-:root[data-theme*="dark"] button#back-to-top:hover,
-:root[data-theme*="dark"] button#back-to-top:active,
-:root[data-theme*="dark"] button#back-to-top:focus,
-:root[data-theme*="dark"] button#back-to-top:focus-visible {
+:root[data-theme*="dark"] #theme-switcher:hover,
+:root[data-theme*="dark"] #theme-switcher:active,
+:root[data-theme*="dark"] #theme-switcher:focus,
+:root[data-theme*="dark"] #theme-switcher:focus-visible,
+:root[data-theme*="dark"] #back-to-top:hover,
+:root[data-theme*="dark"] #back-to-top:active,
+:root[data-theme*="dark"] #back-to-top:focus,
+:root[data-theme*="dark"] #back-to-top:focus-visible {
   background: #3f3f46 !important;
   background-color: #3f3f46 !important;
   background-image: none !important;
@@ -750,13 +750,21 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
  *  4) label 内的 img/book-icon pointer-events:none 保证点击永远命中 label 本身不被子元素吞掉
  */
 @media screen and (max-width: 896px) {
-  /* —— 菜单容器 —— */
+  /* —— 菜单容器（aside）：外层负责 fixed 定位 + 定高，
+     与内层滚动职责分离，避免 iOS Safari 上 fixed + overflow 同一元素时定位失效 —— */
   #menu-control:checked ~ main .book-menu {
     visibility: visible !important;
     display: block !important;
     z-index: 25 !important;
+    /* 外层固定悬浮左侧，定高一屏 */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
   }
-  /* —— 菜单面板：滑出前缀 + 硬背景 + z-index + 定位（面板必须在遮罩之上） —— */
+  /* —— 菜单面板内层：只负责滚动 + 背景 + 滑入 transform，
+     不再设 fixed/height，这些由父容器 aside 承担 —— */
   #menu-control:checked ~ main .book-menu .book-menu-content {
     -webkit-transform: translateX(var(--menu-width));
             transform: translateX(var(--menu-width));
@@ -764,17 +772,10 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
             box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
     background: var(--body-background) !important;
     background-color: var(--body-background) !important;
-    /* 面板固定悬浮左侧：fixed 不随页面滚动；
-       （sticky 会被祖先的 overflow:hidden 等滚动容器破坏，面板跟着页面滑走）
-       高度固定一屏、内容过多时面板内部滚动 */
-    position: fixed !important;
-    top: 0 !important;
-    height: 100vh !important;
-    /* 动态视口高：现代浏览器扣除地址栏，旧浏览器不认 dvh 回退 100vh */
-    height: 100dvh !important;
+    /* 高度跟随父容器，内部滚动 */
+    height: 100% !important;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
-    z-index: 25 !important;
   }
   body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
     -webkit-transform: translateX(calc(-1 * var(--menu-width)));
@@ -800,6 +801,14 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
     background-color: rgba(0, 0, 0, 0.45) !important; /* color-mix() 回退色 */
     background-color: color-mix(in srgb, #000 45%, transparent) !important;
     cursor: pointer;
+  }
+  /* —— 菜单打开时，隐藏汉堡按钮和 TOC 按钮，避免层级竞争（菜单面板 z-index:25，
+     按钮原 z-index:30 比面板还高，会盖在面板上）—— */
+  #menu-control:checked ~ main .book-header label[for="menu-control"],
+  #menu-control:checked ~ main .book-header label[for="toc-control"] {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
   .book-header label[for="menu-control"],
   .book-header label[for="toc-control"] {

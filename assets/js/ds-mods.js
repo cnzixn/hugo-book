@@ -146,10 +146,10 @@
               '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
             '</button>' +
             '<div class="mod-name">' +
+              '<div class="mod-name-sub">' + mod.name + '</div>' +
               '<div class="mod-name-top">' +
                 mod.id + (mod.size ? ' (' + mod.size + ')' : '') + tagsHtml +
               '</div>' +
-              '<div class="mod-name-sub">' + mod.name + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="item-actions">' +
