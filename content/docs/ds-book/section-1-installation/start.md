@@ -33,6 +33,5 @@ weight: 101
 -----
 
 - [[TrollStore]](https://github.com/opa334/TrollStore)
-- [[LiveContainer]](https://github.com/LiveContainer/LiveContainer)
-
+- [[LiveContainer]](https://livecontainer.github.io/zh-CN/docs/installation)
 
