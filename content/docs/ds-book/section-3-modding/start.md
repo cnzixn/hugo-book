@@ -3,6 +3,18 @@ title: "3.1 制作一个模组"
 weight: 301
 ---
 
+
+## 天才程序员
+
+> [!CAUTION]
+> 模型请求失败，点击右侧箭头展开模型服务商错误信息进行排查。
+>   
+> Insufficient Balance (Model Provider Error Code: invalid_request_error, HTTP Status: 402) (4028)
+
+看到这个错误信息，说明你该充值了，[点击这里](https://platform.deepseek.com/) 成为天才程序员。（有条件可以用 claude 或 codex 等模型）
+
+
+
 ## 模组的组成
 
 - 代码，游戏使用的是 `Lua` 脚本语言，可以让 AI 教你，或者帮你写代码。  
@@ -13,7 +25,7 @@ weight: 301
   
 - 音效，安卓 1.23 版本可以直接使用电脑版的音效文件，后续 1.28+ 版本更换了音效格式。 
 
-## 制作一个模组
+## 制作新模组
 
 - 暂时没空写详细的教程，等有时间再补上。
 
