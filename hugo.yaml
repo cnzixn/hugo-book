@@ -67,16 +67,23 @@ menu:
   #     url: "mailto:contact@example.com"
   #     weight: 10
   after:
+    - name: "更新日志"
+      pageRef: "/changelog/"
+      weight: 11
+      params:
+        bookIcon: "bi-list-nested"
     - name: "全部文章"
       pageRef: "/posts/"
-      weight: 5
+      weight: 22
       params:
         bookIcon: "bi-book"
     - name: "关于本站"
       pageRef: "/about/"
-      weight: 20
+      weight: 99
       params:
         bookIcon: "bi-info-square"
+
+
 
 
 

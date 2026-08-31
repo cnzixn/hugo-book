@@ -33,6 +33,7 @@
 
 import os
 import re
+import shutil
 import sys
 from collections import OrderedDict
 
@@ -310,14 +311,30 @@ def write_yml(yml_path, merged_map):
     print("[OK] 写入完成: " + yml_path)
 
 
+def sync_from_data(prefix):
+    """
+    合并前从 ../data/ 同步最新 {prefix}_pan.yml 到本目录（data_src/）。
+    data/ 是 Hugo 实际读取、用户手工维护的版本（含 tags、LocalSend 等手工条目），
+    以其为基准合并可避免在过时的 data_src/ 版本上丢失手工维护的数据。
+    """
+    src = os.path.join(BASE_DIR, "..", "data", prefix + "_pan.yml")
+    dst = os.path.join(BASE_DIR, prefix + "_pan.yml")
+    if os.path.exists(src):
+        shutil.copy2(src, dst)
+        print("[INFO] 已从 data/ 同步: " + os.path.basename(dst))
+    else:
+        print("[WARN] data/ 下不存在 %s，跳过同步" % os.path.basename(src))
+
+
 def process_prefix(prefix, sources):
     """
-    处理单个前缀组：读取 txt → 读已有 yml → 合并 → 写回
+    处理单个前缀组：同步 data/ 最新 yml → 读取 txt → 读已有 yml → 合并 → 写回
     sources 示例：{"baidu": ".../dst-baidu.txt", "quark": ".../dst-quark.txt"}
     """
     out_yml = os.path.join(BASE_DIR, prefix + "_pan.yml")
     print("\n========== 合并 %s ==========" % os.path.basename(out_yml))
 
+    sync_from_data(prefix)  # 先同步 data/ 最新版本再合并
     baidu_map = parse_pan_txt(sources.get("baidu", ""))
     quark_map = parse_pan_txt(sources.get("quark", ""))
     existing = parse_existing_yml(out_yml)

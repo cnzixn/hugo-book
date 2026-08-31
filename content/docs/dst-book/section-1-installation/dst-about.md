@@ -29,6 +29,7 @@ xxx.ipa
                 └── ... 
 ```
 
+注：安卓版每次启动游戏，都会将安装包里的 `assets/databundles` 目录下的所有文件解压到 `/storage/emulated/0/Android/data/com.playdigious.dst.mods/files/databundles/` 目录下。（修改）
 
 
 

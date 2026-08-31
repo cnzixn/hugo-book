@@ -7,6 +7,7 @@
 """
 import os
 import re
+import shutil
 import sys
 
 
@@ -109,11 +110,21 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # data_dir = os.path.normpath(os.path.join(script_dir, '..', 'data'))
     data_dir = os.path.normpath(os.path.join(script_dir))
+    data_root = os.path.normpath(os.path.join(script_dir, '..', 'data'))  # 同步源：Hugo 实际读取的 data/ 目录
 
     files = [
         os.path.join(data_dir, 'ds_pan.yml'),
         os.path.join(data_dir, 'dst_pan.yml'),
     ]
+
+    # 执行前先从 data/ 复制最新 yml 过来，避免在过时的 data_src/ 版本上迁移
+    for fp in files:
+        src = os.path.join(data_root, os.path.basename(fp))
+        if os.path.exists(src):
+            shutil.copy2(src, fp)
+            print(f"[同步] 已从 data/ 复制: {os.path.basename(fp)}")
+        else:
+            print(f"[跳过] data/ 下不存在 {os.path.basename(fp)}")
 
     total_modified = 0
     for fp in files:
