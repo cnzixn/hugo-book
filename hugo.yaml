@@ -165,6 +165,11 @@ params:
   # 索引配置可在 i18n 文件夹中按语言调整
   BookSearch: true
 
+  # (Optional, default true) 全局 PV 统计总开关
+  # 设为 false 时整站关闭浏览/访客统计（页脚不再渲染统计内容与脚本）
+  # 置为 true 或删除本行即恢复统计
+  BookPV: false
+
   # (Optional, default true) Enables comments template on pages
   # （可选，默认 true）启用页面评论模板
   # By default partals/docs/comments.html includes Disqus template

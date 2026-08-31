@@ -1,8 +1,10 @@
 {{- /* 禁用 PV 的几种方式（任一命中即跳过）：
+        0) 全局总开关 site params `BookPV: false`
         1) front matter `no_pv: true`
         2) front matter `pv: false`
 */}}
 {{- $noPV := false }}
+{{- if eq (.Site.Params.BookPV | default true) false }}{{- $noPV = true }}{{- end }}
 {{- if .Param "no_pv" }}{{- $noPV = true }}{{- end }}
 {{- if and (isset .Params "pv") (eq (.Param "pv") false) }}{{- $noPV = true }}{{- end }}
 {{- if not $noPV }}
