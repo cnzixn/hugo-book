@@ -14,13 +14,15 @@ LocalSend:
 
 WS000000:
 - name: MPatch-手游优化
-- url1: https://pan.baidu.com/s/1dpYd4IMuDcmPsPuWBXHHHQ?pwd=iw9f
+- tags: 优化
+- url1: https://pan.baidu.com/s/1OJmyMQ2TUqkTUdure0V8qg?pwd=61h8
 - url2: https://pan.xunlei.com
-- url3: https://pan.quark.cn/s/980a41f0a40b?pwd=s39d
-- size: 49.12KB
+- url3: https://pan.quark.cn/s/c8adf00b67f3?pwd=rj25
+- size: 21.75KB
 
 WS1185229307:
 - name: 史诗血条EpicHealthbar
+- tags: 辅助、血条
 - url1: https://pan.baidu.com/s/1LxrhQj2ma9Mlu59FFfiQ9w?pwd=une4
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/86879240bdb0?pwd=1xjg
@@ -28,6 +30,7 @@ WS1185229307:
 
 WS2398672953:
 - name: 精灵公主Musha
+- tags: 人物、玩法
 - url1: https://pan.baidu.com/s/14N-MijNmfHEuG6XFC37tFw?pwd=hxlm
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/9b48bb6edeb2?pwd=03uo
@@ -35,6 +38,7 @@ WS2398672953:
 
 WS2675609101:
 - name: 泰拉棱镜
+- tags: 武器、装备
 - url1: https://pan.baidu.com/s/1ajNIlUyPzB7N--QhJzZWLw?pwd=ph83
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/13bf85c6b029?pwd=u56i
@@ -42,13 +46,15 @@ WS2675609101:
 
 WS2987343164:
 - name: 防卡两招RR
+- tags: 优化
 - url1: https://pan.baidu.com/s/1dVkuFxCpwm6uIjs7pr0VCQ?pwd=vs9u
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/9be27ef01597?pwd=9il1
 - size: 25.88KB
 
-WS3597024951:
+.WS3597024951:
 - name: 景熹家居
+- tags: 建筑、玩法、美化
 - url1: https://pan.baidu.com/s/1aSnvmvDA55NfQrpwPkp9lQ?pwd=4ro6
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/0a2f4a9d5709?pwd=8pz3
@@ -56,27 +62,31 @@ WS3597024951:
 
 WS3638290455:
 - name: 刷物菜单TooManyItemsRearranged
-- url1: https://pan.baidu.com/s/1Cr7R4JDTGoWHsjsrPKgJPA?pwd=ry5v
+- tags: 测试、TMI
+- url1: https://pan.baidu.com/s/1ClJhEkrqT-uv1cIHa5N97g?pwd=fmbe
 - url2: https://pan.xunlei.com
-- url3: https://pan.quark.cn/s/b352eb3de784?pwd=6bac
-- size: 17.44MB
+- url3: https://pan.quark.cn/s/7bc61b06c84e?pwd=nsfn
+- size: 7.72MB
 
 WS3759757365:
-- name: 简易血条重构版
-- url1: https://pan.baidu.com/s/1mLBG8YnjmZ9pIuGi0bqNzA?pwd=01ue
+- name: 简易血条(重构版)
+- tags: 辅助、血条
+- url1: https://pan.baidu.com/s/1CN_swoxalf9Uocp3SIf5DQ?pwd=zibc
 - url2: https://pan.xunlei.com
-- url3: https://pan.quark.cn/s/b2b527b04b14?pwd=zmbp
-- size: 306.94KB
+- url3: https://pan.quark.cn/s/164ae92278db?pwd=xlvl
+- size: 118.92KB
 
 WS376333686:
 - name: 综合状态CombinedStatus
+- tags: 辅助、状态
 - url1: https://pan.baidu.com/s/1JErsQRh3x6ObxjDBtzk17g?pwd=7ei0
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/de6f3587e1a4?pwd=ctos
 - size: 357.32KB
 
-WS3322803908:
+.WS3322803908:
 - name: 云霄国度AbovetheClouds
+- tags: 玩法、猪镇、HAM
 - url1: https://pan.baidu.com/s/1sA2a1-9A8LtFIfbTZZdDHg?pwd=vax9
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/1852febf6b9c?pwd=smql
@@ -84,7 +94,22 @@ WS3322803908:
 
 WS3664017907:
 - name: 造房子
+- tags: 建筑、玩法
 - url1: https://pan.baidu.com/s/1SYc4G0Cip0-uGl3TGPMSTQ?pwd=ft6r
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/947423542f1b?pwd=4nu2
 - size: 3.15MB
+
+WS3322803908:
+- name: 云霄国度AbovetheClouds
+- url1: https://pan.baidu.com/s/1VvqRdRq2SBCMrL_28FvgPQ?pwd=c79f
+- url2: https://pan.xunlei.com
+- url3: https://pan.quark.cn/s/a3be27bc2956?pwd=9d1t
+- size: 375.62MB
+
+WS3597024951:
+- name: 景熹家居
+- url1: https://pan.baidu.com/s/1h9aejP-xjsyvLp84oHIFlw?pwd=5rdt
+- url2: https://pan.xunlei.com
+- url3: https://pan.quark.cn/s/0f5f70e03e05?pwd=93k1
+- size: 89.98MB
