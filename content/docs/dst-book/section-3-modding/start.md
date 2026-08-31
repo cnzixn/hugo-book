@@ -11,7 +11,7 @@ weight: 301
 >   
 > Insufficient Balance (Model Provider Error Code: invalid_request_error, HTTP Status: 402) (4028)
 
-看到这个错误信息，说明你该充值了，[点击这里](https://deepseek-harness.github.io/deepseek-harness/guide/quickstart) 成为天才程序员。（有条件可以用 claude 或 codex 等模型）
+看到这个错误信息，说明你该充值了，[点击这里](https://platform.deepseek.com/) 成为天才程序员。（有条件可以用 claude 或 codex 等模型）
 
 
 
