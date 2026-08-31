@@ -5,7 +5,7 @@ aliases:
   - "/p/dst-apps"
 ---
 
-{{< figure src="/img/dst/97F15F8FCA9B74085ED4A309ABAD84FE.jpg" >}}
+{{< figure src="/img/dst/97F15F8FCA9B74085ED4A309ABAD84FE.webp" >}}
 
 ## 游戏文件
 -----

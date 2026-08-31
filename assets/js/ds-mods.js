@@ -139,10 +139,11 @@
     var tagsHtml = buildTagsHtml(mod.tags);
 
     return (
-      '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '">' +
+      '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '" ' +
+        'onclick="window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
         '<div class="item-main">' +
           '<div class="item-info">' +
-            '<button onclick="window.location.href=\'' + site + '/p/' + mod.id + '\'" class="action-btn" data-href="/p/' + mod.id + '">' +
+            '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '">' +
               '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
             '</button>' +
             '<div class="mod-name">' +
@@ -164,7 +165,7 @@
   function buildActionBtn(cls, title, url) {
     if (url) {
       return (
-        '<button onclick="window.open(\'' + url + '\',\'_blank\')" class="action-btn ' + cls + '" title="' + title + '">' +
+        '<button onclick="event.stopPropagation();window.open(\'' + url + '\',\'_blank\')" class="action-btn ' + cls + '" title="' + title + '">' +
           '<img src="/img/icons/pan_' + cls + '.webp" alt="' + title + '" loading="lazy">' +
         '</button>'
       );

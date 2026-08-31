@@ -4,7 +4,7 @@ weight: 101
 ---
 
 {{< gallery caption="" href="" >}}
-  /img/ds/D4F323F3876EBF86B9282335AACFB775.jpg
+  /img/ds/D4F323F3876EBF86B9282335AACFB775.webp
 {{< /gallery >}}
 
 ## 安装步骤

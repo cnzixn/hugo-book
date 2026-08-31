@@ -3,17 +3,6 @@ title: "3.1 制作一个模组"
 weight: 301
 ---
 
-## 天才程序员
-
-
-> [!CAUTION]
-> 模型请求失败，点击右侧箭头展开模型服务商错误信息进行排查。
->   
-> Insufficient Balance (Model Provider Error Code: invalid_request_error, HTTP Status: 402) (4028)
-
-看到这个错误信息，说明你该充值了，[点击这里](https://platform.deepseek.com/) 成为天才程序员。（有条件可以用 claude 或 codex 等模型）
-
-
 
 ## 模组的组成
 

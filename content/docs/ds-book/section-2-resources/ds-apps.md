@@ -5,7 +5,7 @@ aliases:
   - "/p/ds-apps"
 ---
 
-{{< figure src="/img/ds/6944A8D57DE6DB512CFD3ADB9702A04D.jpg" >}}
+{{< figure src="/img/ds/6944A8D57DE6DB512CFD3ADB9702A04D.webp" >}}
 
 ## 游戏文件
 -----

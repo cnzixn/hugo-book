@@ -2,13 +2,13 @@
 title: 饥荒 - 手游单机版
 weight: 1
 bookCollapseSection: true
-bookIcon: ds_icon.png
+bookIcon: ds_icon.webp
 ---
 
 {{< gallery caption="" href="" >}}
-  /img/ds/6944A8D57DE6DB512CFD3ADB9702A04D.jpg
-  /img/ds/D4F323F3876EBF86B9282335AACFB775.jpg
-  /img/ds/4E31FB73E8A68FE4287A8A47D890859B.jpg
+  /img/ds/6944A8D57DE6DB512CFD3ADB9702A04D.webp
+  /img/ds/D4F323F3876EBF86B9282335AACFB775.webp
+  /img/ds/4E31FB73E8A68FE4287A8A47D890859B.webp
 {{< /gallery >}}
 
 {{<button href="https://www.klei.com/games/dont-starve/" class="btn-block">}}{{< svg "bi-globe2" >}} klei.com{{</button>}}
@@ -30,8 +30,8 @@ bookIcon: ds_icon.png
 
 
 
-<!-- {{< figure src="/img/ds/4E31FB73E8A68FE4287A8A47D890859B.jpg" caption="" >}} -->
-<!-- {{< figure src="/img/ds/D4F323F3876EBF86B9282335AACFB775.jpg" caption="" >}} -->
+<!-- {{< figure src="/img/ds/4E31FB73E8A68FE4287A8A47D890859B.webp" caption="" >}} -->
+<!-- {{< figure src="/img/ds/D4F323F3876EBF86B9282335AACFB775.webp" caption="" >}} -->
 
 -----
 

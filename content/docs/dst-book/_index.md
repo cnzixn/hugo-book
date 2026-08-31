@@ -2,14 +2,14 @@
 title: 饥荒 - 手游联机版
 weight: 2
 bookCollapseSection: true
-bookIcon: dst_icon.png
+bookIcon: dst_icon.webp
 ---
 
 
 {{< gallery caption="" href="" >}}
-  /img/dst/97F15F8FCA9B74085ED4A309ABAD84FE.jpg
-  /img/dst/49AC483F2482238446724C7AAD9353B6.jpg
-  /img/dst/D45E08AF1612836D55F8CFBA7E623BB2.jpg
+  /img/dst/97F15F8FCA9B74085ED4A309ABAD84FE.webp
+  /img/dst/49AC483F2482238446724C7AAD9353B6.webp
+  /img/dst/D45E08AF1612836D55F8CFBA7E623BB2.webp
 {{< /gallery >}}
 
 {{<button href="https://playdigious.com/games/dont-starve-together" class="btn-block">}}{{< svg "bi-globe2" >}} Playdigious{{</button>}}
@@ -31,7 +31,7 @@ bookIcon: dst_icon.png
 
 
 
-<!-- {{< figure src="/img/dst/D45E08AF1612836D55F8CFBA7E623BB2.jpg" caption="" >}} -->
-<!-- {{< figure src="/img/dst/49AC483F2482238446724C7AAD9353B6.jpg" caption="" >}} -->
+<!-- {{< figure src="/img/dst/D45E08AF1612836D55F8CFBA7E623BB2.webp" caption="" >}} -->
+<!-- {{< figure src="/img/dst/49AC483F2482238446724C7AAD9353B6.webp" caption="" >}} -->
 
 -----

@@ -52,31 +52,39 @@ menu:
     - name: "单机"
       pageRef: "/ds-book/"
       weight: 10
+      params:
+        bookIcon: "bi-controller"
     - name: "联机"
       pageRef: "/dst-book/"
       weight: 10
+      params:
+        bookIcon: "bi-globe2"
     - name: "文章"
       pageRef: "/posts/"
       weight: 15
+      params:
+        bookIcon: "bi-journal"
     - name: "关于"
       pageRef: "/about/"
       weight: 20
+      params:
+        bookIcon: "bi-info-square"
 
   # before: 
   #   - name: "联系我们"
   #     url: "mailto:contact@example.com"
   #     weight: 10
   after:
-    - name: "更新日志"
-      pageRef: "/changelog/"
-      weight: 11
-      params:
-        bookIcon: "bi-list-nested"
     - name: "全部文章"
       pageRef: "/posts/"
-      weight: 22
+      weight: 10
       params:
         bookIcon: "bi-book"
+    - name: "更新日志"
+      pageRef: "/changelog/"
+      weight: 10
+      params:
+        bookIcon: "bi-hourglass"
     - name: "关于本站"
       pageRef: "/about/"
       weight: 99
@@ -107,7 +115,7 @@ params:
   # （可选，默认 favicon.png）设置网站图标路径
   # If the favicon is /static/favicon.png then the path would be favicon.png
   # 如果图标路径为 /static/favicon.png，则路径写为 favicon.png
-  # BookFavicon: "favicon.svg"
+  BookFavicon: "favicon.svg"
 
   # (Optional, default none) Set the path to a logo for the book.
   # （可选，默认 none）设置书籍 logo 路径

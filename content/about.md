@@ -3,9 +3,9 @@ title: 关于本站
 bookHidden: true
 ---
 
-{{< svg "bi-journal-bookmark" >}} **饥荒模组手册**是一个非官方的《饥荒》手游资源站，收集整理移动端可用的模组，配套完整的安装教程与模组开发资料。
+{{< svg "bi-journal-bookmark" >}} **饥荒模组手册**，是一个非官方的《饥荒》手游资源站，收集整理移动端可用的模组，配套完整的安装教程与模组开发资料。
 
-## 联系我们
+## 联系
 
 发现失效链接、内容错误，或者想投稿模组，欢迎通过以下方式与我们联系：
 
@@ -13,9 +13,22 @@ bookHidden: true
 {{< button href="https://qm.qq.com/q/3xoKf5H4EM" class="btn-block" >}}{{< svg "bi-tencent-qq" >}} 安卓 Q 群 696529613{{< /button >}}
 {{< button href="https://qm.qq.com/q/88L6QyUQVi" class="btn-block" >}}{{< svg "bi-tencent-qq" >}} 苹果 Q 群 905142474 {{< /button >}}
 
+## 赞助
+
+
+> [!CAUTION]
+> 模型请求失败，点击右侧箭头展开模型服务商错误信息进行排查。  
+> Insufficient Balance (Model Provider Error Code: invalid_request_error, HTTP Status: 402) (4028)
+
+{{< details "点击这里，为“天才程序员”助力🙏" >}}
+  <hr>
+  {{< gallery caption="" href="" >}}
+    /img/icons/pay-qrcode.webp
+  {{< /gallery >}}
+{{< /details >}}
+
 
 ## 致谢
 
 - 本站由 [Hugo](https://gohugo.io/) 构建，主题基于 [Hugo Book](https://github.com/alex-shpak/hugo-book/) 定制
-- 图标来自 [Bootstrap Icons](https://icons.getbootstrap.com/)
 - 《饥荒：口袋版》《饥荒联机版》及相关素材版权归 [Klei Entertainment](https://www.klei.com/) 所有，本站为 fan-made 性质，与官方无关

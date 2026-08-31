@@ -28,9 +28,9 @@ layout: landing
 -----
 
 <div class="btn-row">
-{{<button href="/docs/ds-book/">}} <img src="/img/icons/ds_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
+{{<button href="/docs/ds-book/">}} <img src="/img/icons/ds_icon.webp" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
 {{</button>}}
-{{<button href="/docs/dst-book/">}} <img src="/img/icons/dst_icon.png" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
+{{<button href="/docs/dst-book/">}} <img src="/img/icons/dst_icon.webp" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
 {{</button>}}
 </div>
 
