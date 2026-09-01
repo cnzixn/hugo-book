@@ -49,21 +49,21 @@ markup:
 
 menu:
   home:
-    - name: "单机"
-      pageRef: "/ds-book/"
-      weight: 10
-      params:
-        bookIcon: "bi-controller"
-    - name: "联机"
-      pageRef: "/dst-book/"
-      weight: 10
-      params:
-        bookIcon: "bi-globe2"
+    # - name: "手册"
+    #   pageRef: "/docs/ds-book/"
+    #   weight: 10
+    #   params:
+    #     bookIcon: "bi-journal"
     - name: "文章"
       pageRef: "/posts/"
       weight: 15
       params:
-        bookIcon: "bi-journal"
+        bookIcon: "bi-book"
+    - name: "日志"
+      pageRef: "/changelog/"
+      weight: 15
+      params:
+        bookIcon: "bi-hourglass"
     - name: "关于"
       pageRef: "/about/"
       weight: 20
