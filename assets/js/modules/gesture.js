@@ -55,6 +55,16 @@
   }
 
   /**
+   * 判断当前页面是否存在左侧菜单
+   * 主页使用 landing 布局，其 menu-container 被覆盖为空，不会渲染 aside.book-menu，
+   * 此时右滑手势不应尝试打开一个不存在的菜单（否则只会弹出遮罩层）
+   * @returns {boolean} 存在左侧菜单返回 true
+   */
+  function hasMenu() {
+    return !!document.querySelector('.book-menu');
+  }
+
+  /**
    * 判断触摸目标是否位于可横向滑动的区域内
    * 用途：图片轮播、横向滚动表格等区域自身需要消费横向手势，
    *       在这些区域内右滑不应拉出菜单
@@ -139,6 +149,7 @@
    * 打开菜单（三路径同步：.checked / .defaultChecked / force reflow）
    */
   function openMenu() {
+    if (!hasMenu()) return; // 页面无左菜单（如主页 landing 布局），右滑不尝试打开
     var ctrl = getMenuControl();
     if (ctrl && !ctrl.checked) {
       syncCheckbox(ctrl, true);
