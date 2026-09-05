@@ -1,4 +1,4 @@
-﻿﻿/*
+﻿/*
   You can add custom styles and css variables here.
 */
 
@@ -902,5 +902,78 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
     -webkit-transform: none !important;
             transform: none !important;
+  }
+}
+
+/* ===== 移动端目录（TOC）下拉面板 =====
+ * 桌面端 .book-toc 固定在右侧；移动端隐藏 .book-toc，改为 header 内注入的
+ * .book-toc-mobile 面板，点击目录按钮下拉展开。
+ * 原版只是裸列表，这里做成带标题、卡片背景、圆角、阴影、可滚动的好看面板。
+ */
+@media screen and (max-width: 896px) {
+  .book-toc-mobile {
+    margin-top: var(--space-8);
+    overflow: hidden;
+    border: var(--space-1) solid var(--gray-200);
+    border-radius: var(--border-radius);
+    background: var(--body-background);
+    box-shadow: 0 var(--space-8) var(--space-16) rgba(0, 0, 0, 0.08);
+    animation: book-toc-slide 0.18s ease;
+  }
+
+  .book-toc-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-8) var(--space-16);
+    font-size: var(--font-size-smaller);
+    font-weight: 600;
+    color: var(--body-font-color);
+    background: var(--gray-100);
+    border-bottom: var(--space-1) solid var(--gray-200);
+  }
+
+  .book-toc-mobile-body {
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-8);
+  }
+
+  .book-toc-mobile-body nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .book-toc-mobile-body nav ul ul {
+    padding-inline-start: 1.25em;
+  }
+
+  .book-toc-mobile-body nav a {
+    display: block;
+    padding: var(--space-8);
+    border-radius: var(--border-radius);
+    color: var(--body-font-color);
+    text-decoration: none;
+    line-height: 1.4;
+  }
+
+  .book-toc-mobile-body nav a:hover,
+  .book-toc-mobile-body nav a:active {
+    opacity: 1;
+    background: var(--gray-100);
+    color: var(--color-link);
+  }
+}
+
+@keyframes book-toc-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

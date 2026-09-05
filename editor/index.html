@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hugo 文章编辑器</title>
+<style>
+:root {
+  --bg: #f5f6f8;
+  --panel: #ffffff;
+  --border: #e1e4e8;
+  --text: #1f2328;
+  --muted: #656d76;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --danger: #dc2626;
+  --ok: #16a34a;
+  --radius: 8px;
+  --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-weight: 700; font-size: 16px; }
+.actions { display: flex; align-items: center; gap: 8px; }
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+}
+button:hover { background: #eef1f4; }
+button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+button.primary:hover { background: var(--primary-dark); }
+#status { font-size: 13px; margin-left: 4px; }
+#status.ok { color: var(--ok); }
+#status.err { color: var(--danger); }
+
+.layout { flex: 1; display: flex; min-height: 0; }
+aside {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.side-title { padding: 12px 16px; font-size: 13px; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); }
+#post-list { list-style: none; margin: 0; padding: 8px; overflow-y: auto; }
+#post-list li {
+  padding: 9px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#post-list li:hover { background: #eef1f4; }
+#post-list li.active { background: #dbeafe; }
+#post-list .p-title { font-size: 14px; }
+#post-list .p-date { font-size: 12px; color: var(--muted); }
+
+main { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+.field input, .field textarea {
+  width: 100%;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+  background: #fff;
+  color: var(--text);
+}
+.field input:focus, .field textarea:focus { outline: 2px solid #bfdbfe; border-color: var(--primary); }
+.field input { height: 38px; }
+.field textarea#body { min-height: 46vh; resize: vertical; font-family: var(--mono); font-size: 14px; line-height: 1.6; }
+.field input.mono { font-family: var(--mono); }
+.row { display: flex; gap: 14px; }
+.row .field { flex: 1; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.toolbar { display: flex; gap: 10px; margin: 6px 0 18px; }
+.preview {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 16px 20px;
+  margin-top: 4px;
+}
+.preview h1, .preview h2, .preview h3 { margin-top: 1.2em; }
+.preview pre { background: #f6f8fa; padding: 10px; border-radius: 6px; overflow-x: auto; }
+.preview code { font-family: var(--mono); }
+.preview img { max-width: 100%; }
+.preview blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--border); color: var(--muted); }
+.preview .warn { color: #b45309; }
+.hidden { display: none !important; }
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  aside { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 180px; }
+  .row { flex-direction: column; gap: 0; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Hugo 文章编辑器</div>
+  <div class="actions">
+    <button id="btn-new">＋ 新建</button>
+    <button id="btn-build">构建</button>
+    <span id="status"></span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="side-title">文章列表</div>
+    <ul id="post-list"></ul>
+  </aside>
+
+  <main>
+    <div class="field">
+      <label for="title">标题</label>
+      <input id="title" placeholder="文章标题">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="slug">文件名（slug）</label>
+        <input id="slug" class="mono" placeholder="如 site-intro">
+        <div class="hint">留空则由标题自动生成；仅限中英文、数字、-、_</div>
+      </div>
+      <div class="field">
+        <label for="date">日期</label>
+        <input id="date" type="date">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="categories">分类（逗号分隔）</label>
+        <input id="categories" placeholder="公告">
+      </div>
+      <div class="field">
+        <label for="tags">标签（逗号分隔）</label>
+        <input id="tags" placeholder="站点介绍, 使用指南">
+      </div>
+    </div>
+    <div class="field">
+      <label for="description">描述</label>
+      <input id="description" placeholder="一句话简介（用于列表摘要）">
+    </div>
+    <div class="field">
+      <label for="body">正文（Markdown）</label>
+      <textarea id="body" spellcheck="false" placeholder="在此编写 Markdown 正文……"></textarea>
+    </div>
+
+    <div class="toolbar">
+      <button id="btn-save" class="primary">保存</button>
+      <button id="btn-preview">预览</button>
+      <button id="btn-hugo">在 Hugo 预览</button>
+    </div>
+
+    <div id="preview" class="preview hidden"></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function isAllowed(ch) {
+    var c = ch.charCodeAt(0);
+    if (c >= 0x4e00 && c <= 0x9fff) return true; // 中文
+    if (c >= 0x30 && c <= 0x39) return true;     // 0-9
+    if (c >= 0x41 && c <= 0x5a) return true;     // A-Z
+    if (c >= 0x61 && c <= 0x7a) return true;     // a-z
+    if (c === 0x5f || c === 0x2d) return true;   // _ -
+    return false;
+  }
+
+  function jsSlugify(t) {
+    var out = '';
+    var s = (t || '').trim();
+    for (var i = 0; i < s.length; i++) {
+      out += isAllowed(s[i]) ? s[i] : '-';
+    }
+    out = out.replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+    return out || 'untitled';
+  }
+
+  function todayStr() {
+    var d = new Date();
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function splitList(s) {
+    return String(s || '').split(/[,，]/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
+
+  function showStatus(msg, isErr) {
+    var el = $('#status');
+    el.textContent = msg;
+    el.className = isErr ? 'err' : 'ok';
+    clearTimeout(showStatus._t);
+    showStatus._t = setTimeout(function () { el.textContent = ''; el.className = ''; }, 4000);
+  }
+
+  function api(path, opts) {
+    return fetch(path, opts).then(function (r) { return r.json(); });
+  }
+
+  var currentSlug = null;
+  var slugTouched = false;
+
+  function loadList() {
+    return api('/api/posts').then(function (res) {
+      var ul = $('#post-list');
+      ul.innerHTML = '';
+      (res.posts || []).forEach(function (p) {
+        var li = document.createElement('li');
+        li.innerHTML = '<span class="p-title">' + escapeHtml(p.title) + '</span><span class="p-date">' + escapeHtml(p.date || '') + '</span>';
+        li.onclick = function () { loadPost(p.slug); };
+        if (p.slug === currentSlug) li.className = 'active';
+        ul.appendChild(li);
+      });
+    });
+  }
+
+  function loadPost(slug) {
+    api('/api/post?slug=' + encodeURIComponent(slug)).then(function (p) {
+      if (p.error) { showStatus('加载失败: ' + p.error, true); return; }
+      currentSlug = p.slug;
+      slugTouched = true;
+      $('#title').value = p.title || '';
+      $('#slug').value = p.slug || '';
+      $('#date').value = p.date || todayStr();
+      $('#categories').value = (p.categories || []).join(', ');
+      $('#tags').value = (p.tags || []).join(', ');
+      $('#description').value = p.description || '';
+      $('#body').value = p.body || '';
+      hidePreview();
+      loadList();
+    });
+  }
+
+  function newPost() {
+    currentSlug = null;
+    slugTouched = false;
+    $('#title').value = '';
+    $('#slug').value = '';
+    $('#date').value = todayStr();
+    $('#categories').value = '';
+    $('#tags').value = '';
+    $('#description').value = '';
+    $('#body').value = '';
+    hidePreview();
+    loadList();
+    $('#title').focus();
+  }
+
+  function save() {
+    var payload = {
+      slug: $('#slug').value.trim(),
+      title: $('#title').value.trim(),
+      date: $('#date').value.trim(),
+      categories: splitList($('#categories').value),
+      tags: splitList($('#tags').value),
+      description: $('#description').value.trim(),
+      body: $('#body').value
+    };
+    api('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      if (r.ok) {
+        currentSlug = r.slug;
+        slugTouched = true;
+        $('#slug').value = r.slug;
+        showStatus('已保存: ' + r.slug, false);
+        loadList();
+      } else {
+        showStatus('保存失败: ' + (r.error || ''), true);
+      }
+    });
+  }
+
+  function build() {
+    showStatus('正在构建……', false);
+    api('/api/build', { method: 'POST' }).then(function (r) {
+      if (r.ok) showStatus('构建成功', false);
+      else showStatus('构建失败: ' + (r.error || r.stderr || ''), true);
+    });
+  }
+
+  function preview() {
+    var el = $('#preview');
+    el.classList.remove('hidden');
+    var body = $('#body').value;
+    if (window.marked) {
+      el.innerHTML = marked.parse(body);
+    } else {
+      el.innerHTML = '<p class="warn">marked 未加载（离线？），以下为纯文本：</p><pre>' + escapeHtml(body) + '</pre>';
+    }
+  }
+
+  function hidePreview() { $('#preview').classList.add('hidden'); }
+
+  $('#btn-new').onclick = newPost;
+  $('#btn-save').onclick = save;
+  $('#btn-build').onclick = build;
+  $('#btn-hugo').onclick = function () {
+    var slug = $('#slug').value.trim();
+    if (!slug) { showStatus('请先填写文件名', true); return; }
+    window.open('http://localhost:1313/posts/' + encodeURIComponent(slug) + '/', '_blank');
+  };
+  $('#btn-preview').onclick = function () {
+    if ($('#preview').classList.contains('hidden')) preview(); else hidePreview();
+  };
+
+  $('#title').addEventListener('input', function () {
+    if (!slugTouched) $('#slug').value = jsSlugify($('#title').value);
+  });
+  $('#slug').addEventListener('input', function () { slugTouched = true; });
+
+  // 快捷键：Ctrl/Cmd + S 保存
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); save(); }
+  });
+
+  loadList();
+  newPost();
+})();
+</script>
+</body>
+</html>

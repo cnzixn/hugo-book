@@ -1,5 +1,5 @@
 ---
-title: "框架日志"
+title: "日志"
 weight: 40
 bookIcon: "bi-list-nested"
 aliases:

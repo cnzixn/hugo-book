@@ -6,7 +6,7 @@ theme: hugo-book
 defaultContentLanguage: zh
 languageCode: zh-cn
 
-copyright: "© 2026 - [Hugo Book Theme](https://github.com/alex-shpak/hugo-book/)"
+copyright: "[Hugo Book Theme](https://github.com/alex-shpak/hugo-book/)"
 
 # Book configuration
 # 书籍配置

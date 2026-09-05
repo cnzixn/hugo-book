@@ -53,8 +53,13 @@
   {{ partial "docs/header" . }}
 
   {{ if partial "docs/toc-show" . }}
-  <aside class="hidden">
-    {{ template "toc" . }}
+  <aside class="hidden book-toc-mobile">
+    <div class="book-toc-mobile-header">
+      <span class="book-toc-mobile-title">{{ partial "docs/text/i18n" "Table of Contents" }}</span>
+    </div>
+    <div class="book-toc-mobile-body">
+      {{ template "toc" . }}
+    </div>
   </aside>
   {{ end }}
 {{ end }}
