@@ -24,8 +24,7 @@ weight: 101
 
 
 4. ## 签名&安装
-   - 玩家需要自学 `apk/ipa` 文件签名并安装的方法。  
-   - 安卓玩家使用 `MT管理器` 签名；苹果玩家请搜索“TrollStore ”、“LiveContainer”相关教程。
+   - 安卓玩家使用 `MT管理器` 签名并安装；苹果玩家请搜索“TrollStore ”、“LiveContainer”相关教程。
 
 {{% /steps %}}
 

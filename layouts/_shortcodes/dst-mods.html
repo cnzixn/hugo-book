@@ -43,7 +43,7 @@
 {{/* ========== 3. 输出 ========== */}}
 <link rel="stylesheet" href="{{ $cssAsset.RelPermalink }}" integrity="{{ $cssAsset.Data.Integrity }}">
 
-<div class="header-bar">
+<div class="header-bar" id="mods-header">
   <div class="sort-controls">
     <div class="sort-header">
       <div class="sort-info">
@@ -68,7 +68,7 @@
 </div>
 
 <div id="mods-list" class="mods-list"></div>
-<div id="scroll-sentinel" class="scroll-sentinel">加载更多...</div>
+<div id="mods-pager" class="mods-pager"></div>
 
 {{/* DST：imgBase=/img/ws/，缺图兜底用 /img/ws/none.png
        数据也改为独立 data-src URL fetch（不内嵌大 JSON 到 HTML） */}}

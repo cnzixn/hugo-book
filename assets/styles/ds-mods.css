@@ -288,10 +288,82 @@
   border-color: var(--color-accent-note);
 }
 
-/* ---------- 加载哨兵 ---------- */
-.scroll-sentinel {
+/* ---------- 分页 ---------- */
+.mods-pager {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1.25rem 0 0.25rem;
+  color: var(--gray-500);
+  font-size: var(--font-size-smaller);
+}
+.mods-pager > * + * { margin-left: 0.4rem; }
+
+.pager-info {
+  margin-right: 0.2rem;
+  white-space: nowrap;
+}
+
+.pager-btn {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.6rem;
+  background: var(--body-background);
+  border: 1px solid var(--gray-200);
+  border-radius: calc(var(--border-radius) * 1.5);
+  color: var(--body-font-color);
+  font-size: var(--font-size-smaller);
+  cursor: pointer;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
+}
+.pager-btn:hover:not(:disabled):not(.is-active) {
+  border-color: var(--color-accent-note);
+  background: var(--gray-100);
+}
+.pager-btn.is-active {
+  border-color: var(--color-accent-note);
+  background: var(--color-accent-note);
+  color: var(--body-background);
+  cursor: default;
+}
+.pager-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pager-ellipsis {
+  color: var(--gray-500);
+  padding: 0 0.1rem;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 空列表提示（无匹配 / 加载失败） */
+.mods-empty {
   text-align: center;
-  padding: 1rem;
+  padding: 2rem 1rem;
   color: var(--gray-500);
   font-size: var(--font-size-smaller);
 }
@@ -317,4 +389,11 @@
   .mod-name-top { font-size: 0.6875rem; }
   .mod-name-sub { font-size: 0.875rem; }
   .action-btn { width: 32px; height: 32px; }
+  .mods-pager { gap: 0.3rem; }
+  .mods-pager > * + * { margin-left: 0.3rem; }
+  .pager-btn {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    padding: 0 0.4rem;
+  }
 }

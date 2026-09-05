@@ -52,7 +52,7 @@
 {{/* ========== 3. 输出：HTML 骨架 + 外链资源 + 短数据桥（<script id> 里不再内嵌大 JSON，仅放 URL） ========== */}}
 <link rel="stylesheet" href="{{ $cssAsset.RelPermalink }}" integrity="{{ $cssAsset.Data.Integrity }}">
 
-<div class="header-bar">
+<div class="header-bar" id="mods-header">
   <div class="sort-controls">
     <div class="sort-header">
       <div class="sort-info">
@@ -77,7 +77,7 @@
 </div>
 
 <div id="mods-list" class="mods-list"></div>
-<div id="scroll-sentinel" class="scroll-sentinel">加载更多...</div>
+<div id="mods-pager" class="mods-pager"></div>
 
 {{/* 数据桥：不再内嵌大 JSON，改为通过 data-src 提供独立 URL 给 JS fetch（CF Cache-Tag 支持浏览器 304 缓存） */}}
 <script id="mods-data" type="application/json"

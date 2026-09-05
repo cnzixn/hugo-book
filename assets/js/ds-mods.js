@@ -2,12 +2,14 @@
  * 模组列表页逻辑（从 shortcode 内嵌 JS 抽离）
  * 通过 DOM 上 #mods-data.dataset 获取数据链接 / 搜索配置
  * 模块化避免每个包含 shortcode 的页面重复序列化 300+ 行脚本
+ *
+ * 分页渲染：每次只渲染当前页数据，底部提供页码导航；
+ * 不再使用“瀑布流”（滚动到哨兵自动追加加载）。
  */
 (function (global) {
   'use strict';
 
-  var PAGE_SIZE = 50;
-  var PRELOAD_ROOT = '200px';
+  var PAGE_SIZE = 20;
   var SEARCH_DEBOUNCE_MS = 200;
   var STORAGE_SORT_KEY = 'mods-sort-preference';
 
@@ -187,62 +189,143 @@
       .then(function (cfg) { bootstrap(cfg); })
       .catch(function (err) {
         console.error('[mods-list] init failed', err);
-        var sentinel = document.getElementById('scroll-sentinel');
-        if (sentinel) sentinel.textContent = '模组数据加载失败，请刷新重试';
+        var list = document.getElementById('mods-list');
+        if (list) {
+          list.innerHTML = '<div class="mods-empty">模组数据加载失败，请刷新重试</div>';
+        }
       });
   }
 
   function bootstrap(cfg) {
     var modsList = document.getElementById('mods-list');
-    var sentinel = document.getElementById('scroll-sentinel');
+    var pager = document.getElementById('mods-pager');
+    var header = document.getElementById('mods-header');
     var searchInput = document.getElementById('mod-search');
     var showCountEl = document.getElementById('show-count');
     var sortToggleBtn = document.getElementById('sort-toggle');
-    if (!modsList || !sentinel || !searchInput || !sortToggleBtn) return;
+    if (!modsList || !pager || !searchInput || !showCountEl || !sortToggleBtn) return;
 
     var filteredMods = cfg.searchOnly && !cfg.searchKeyword ? [] : cfg.allMods.slice();
     var currentSort = getStorageItem(STORAGE_SORT_KEY) || 'asc';
-    var currentPage = 0;
-    var isLoading = false;
+    var currentPage = 1;   // 1-based
 
     if (cfg.searchKeyword) searchInput.value = cfg.searchKeyword;
 
     updateSortButtons();
     applyFilter();
 
-    /* ---------- 渲染 ---------- */
-    function renderPage(pageIndex) {
-      var start = pageIndex * PAGE_SIZE;
-      var end = Math.min(start + PAGE_SIZE, filteredMods.length);
-      var pageMods = filteredMods.slice(start, end);
+    /* ---------- 工具 ---------- */
+    function totalPages() {
+      if (filteredMods.length === 0) return 0;
+      return Math.ceil(filteredMods.length / PAGE_SIZE);
+    }
 
-      if (pageMods.length === 0 && start >= filteredMods.length) {
-        sentinel.style.display = 'none';
+    function updateShowCount() {
+      showCountEl.textContent = filteredMods.length;
+    }
+
+    function clampPage(page) {
+      var pages = totalPages();
+      if (pages === 0) return 1;
+      if (page < 1) return 1;
+      if (page > pages) return pages;
+      return page;
+    }
+
+    /* ---------- 渲染 ---------- */
+    function renderList() {
+      var pages = totalPages();
+      if (pages === 0) {
+        modsList.innerHTML = '<div class="mods-empty">未找到匹配的模组，试试其他关键词</div>';
+        renderPager();
         return;
       }
-      sentinel.style.display = 'block';
+      currentPage = clampPage(currentPage);
 
-      if (pageIndex === 0) {
-        modsList.innerHTML = mapJoin(pageMods, function (m) { return buildModItem(m, cfg); });
-      } else {
-        var tempDiv = document.createElement('div');
-        tempDiv.innerHTML = mapJoin(pageMods, function (m) { return buildModItem(m, cfg); });
-        while (tempDiv.firstChild) modsList.appendChild(tempDiv.firstChild);
-      }
-      currentPage = pageIndex + 1;
-
-      // 不足一页（没有“更多”数据）时隐藏哨兵，避免单条/少量数据仍显示“加载更多”
-      if (Math.ceil(filteredMods.length / PAGE_SIZE) <= 1) {
-        sentinel.style.display = 'none';
-      }
+      var start = (currentPage - 1) * PAGE_SIZE;
+      var pageMods = filteredMods.slice(start, start + PAGE_SIZE);
+      modsList.innerHTML = mapJoin(pageMods, function (m) { return buildModItem(m, cfg); });
+      renderPager();
     }
 
     function reload() {
-      currentPage = 0;
-      modsList.innerHTML = '';
-      renderPage(0);
-      showCountEl.textContent = filteredMods.length;
+      currentPage = 1;
+      renderList();
+      updateShowCount();
     }
+
+    /* ---------- 分页器 ---------- */
+    function pagerItems(current, pages) {
+      var items = [];
+      var i;
+      if (pages <= 7) {
+        for (i = 1; i <= pages; i++) items.push(i);
+        return items;
+      }
+      items.push(1);
+      var lo = Math.max(2, current - 2);
+      var hi = Math.min(pages - 1, current + 2);
+      if (lo > 2) items.push('…');
+      for (i = lo; i <= hi; i++) items.push(i);
+      if (hi < pages - 1) items.push('…');
+      items.push(pages);
+      return items;
+    }
+
+    function pagerButtonHtml(item, isCurrent) {
+      var cls = 'pager-btn' + (isCurrent ? ' is-active' : '');
+      var currentAttr = isCurrent ? ' aria-current="page"' : '';
+      return '<button type="button" class="' + cls + '" data-page="' + item + '"' + currentAttr + '>' + item + '</button>';
+    }
+
+    function renderPager() {
+      var pages = totalPages();
+      if (pages <= 1) {
+        pager.innerHTML = '';
+        pager.style.display = 'none';
+        return;
+      }
+      var html = '<span class="pager-info">第 ' + currentPage + ' / ' + pages + ' 页</span>';
+
+      html += '<button type="button" class="pager-btn pager-prev" data-page="' + (currentPage - 1) + '"' +
+        (currentPage <= 1 ? ' disabled' : '') + '>‹ 上一页</button>';
+
+      var items = pagerItems(currentPage, pages);
+      for (var i = 0; i < items.length; i++) {
+        if (items[i] === '…') {
+          html += '<span class="pager-ellipsis">…</span>';
+        } else {
+          html += pagerButtonHtml(items[i], items[i] === currentPage);
+        }
+      }
+
+      html += '<button type="button" class="pager-btn pager-next" data-page="' + (currentPage + 1) + '"' +
+        (currentPage >= pages ? ' disabled' : '') + '>下一页 ›</button>';
+
+      pager.innerHTML = html;
+      pager.style.display = '';
+    }
+
+    function goToPage(page) {
+      page = clampPage(page);
+      if (page === currentPage) return;
+      currentPage = page;
+      renderList();
+      // 切页后回到列表/搜索区顶部，避免停留在长列表中间
+      var anchor = header || modsList;
+      if (anchor && anchor.scrollIntoView) {
+        try { anchor.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        catch (e) { anchor.scrollIntoView(); }
+      }
+    }
+
+    pager.addEventListener('click', function (e) {
+      var node = e.target;
+      while (node && node !== pager && node.tagName !== 'BUTTON') node = node.parentNode;
+      if (!node || node === pager || node.disabled) return;
+      var page = parseInt(node.getAttribute('data-page'), 10);
+      if (!isNaN(page)) goToPage(page);
+    });
 
     /* ---------- 搜索 & 排序 ---------- */
     function applyFilter() {
@@ -294,51 +377,6 @@
         if (iconDesc) iconDesc.style.display = 'inline-block';
         if (label) label.textContent = '倒序';
       }
-    }
-
-    /* ---------- 无限滚动（IntersectionObserver 优先，降级为滚动监听） ---------- */
-    function tryLoadMore() {
-      if (isLoading) return;
-      var totalPages = Math.ceil(filteredMods.length / PAGE_SIZE);
-      if (currentPage >= totalPages) {
-        sentinel.textContent = '已加载全部';
-        sentinel.style.display = 'none';
-        return;
-      }
-      isLoading = true;
-      sentinel.textContent = '加载中...';
-      setTimeout(function () {
-        renderPage(currentPage);
-        isLoading = false;
-        var newTotalPages = Math.ceil(filteredMods.length / PAGE_SIZE);
-        sentinel.textContent = currentPage >= newTotalPages ? '已加载全部' : '加载更多...';
-        if (currentPage >= newTotalPages) sentinel.style.display = 'none';
-      }, 50);
-    }
-
-    if (global.IntersectionObserver) {
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) tryLoadMore();
-        });
-      }, { rootMargin: PRELOAD_ROOT, threshold: 0 });
-      observer.observe(sentinel);
-    } else {
-      // 降级：滚动到底部自动加载
-      var scrollTimer = null;
-      var scrollHandler = function () {
-        if (scrollTimer) return;
-        scrollTimer = setTimeout(function () {
-          scrollTimer = null;
-          var sentinelRect;
-          try { sentinelRect = sentinel.getBoundingClientRect(); } catch (e) { return; }
-          var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-          // 哨兵进入视口下方 200px 内就触发
-          if (sentinelRect.top - viewportHeight < 200) tryLoadMore();
-        }, 100);
-      };
-      window.addEventListener('scroll', scrollHandler, false);
-      window.addEventListener('resize', scrollHandler, false);
     }
 
     /* ---------- 事件 ---------- */
