@@ -91,14 +91,42 @@
   }, true);
 
   /* 首次渲染时初始化所有 gallery 的箭头显隐状态 */
-  function initAll() {
+  function refreshAll() {
     // NodeList.forEach 兼容：转数组再 for
     var list = document.querySelectorAll('.gallery-viewport');
     for (var i = 0; i < list.length; i++) updateNavs(list[i]);
   }
+
+  /* 图片是 loading="lazy" 且没有 width/height：脚本执行时图片多半还没下载/解码，
+     此刻轨道量不到溢出（scrollWidth==clientWidth，max=0），会被同时标成
+     at-start + at-end，左右箭头一起被 CSS 隐藏；等图片加载完成、轨道变宽后又
+     不会触发 scroll 事件，箭头就再也不出现。所以要在图片 load、窗口 resize、
+     页面 load 时重新计算一次箭头状态。 */
+  var raf = window.requestAnimationFrame ||
+    function (cb) { return setTimeout(cb, 120); };
+  var resizePending = null;
+  window.addEventListener('resize', function () {
+    if (resizePending) return;
+    resizePending = raf(function () {
+      resizePending = null;
+      refreshAll();
+    });
+  });
+  // img 的 load 事件不冒泡，但会经过捕获阶段，用 capture 委托统一监听即可
+  document.addEventListener('load', function (e) {
+    var el = e.target;
+    if (!el || el.tagName !== 'IMG') return;
+    var viewport = (el.closest && el.closest('.gallery-viewport')) || findParent(el, 'gallery-viewport');
+    if (viewport) updateNavs(viewport);
+  }, true);
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll);
+    document.addEventListener('DOMContentLoaded', refreshAll);
   } else {
-    initAll();
+    refreshAll();
+  }
+  if (document.readyState === 'complete') {
+    refreshAll();
+  } else {
+    window.addEventListener('load', refreshAll);
   }
 })();
