@@ -187,6 +187,30 @@
   overflow: visible;
 }
 
+/* WS 数字 ID：可点击跳转 Steam 创意工坊（标题下方小字，仅 ID 文本可点） */
+.mod-name-top .workshop-id-link {
+  color: var(--gray-600);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  -webkit-text-decoration-color: var(--gray-400);
+  text-decoration-color: var(--gray-400);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 2px;
+}
+.mod-name-top .workshop-id-link:hover,
+.mod-name-top .workshop-id-link:focus-visible {
+  color: var(--color-accent-note);
+  text-decoration-style: solid;
+  -webkit-text-decoration-color: currentColor;
+  text-decoration-color: currentColor;
+}
+.mod-name-top .workshop-id-link:focus-visible {
+  outline: 2px solid var(--color-accent-note);
+  outline-offset: 1px;
+}
+
 /* ---------- 标签 ---------- */
 .mod-tags {
   display: -webkit-inline-box;

@@ -130,6 +130,24 @@
   }
 
   /**
+   * WS 前缀数字 ID → Steam 创意工坊链接；其余本地 ID（BM…等）原样返回纯文本
+   * 例：WS123456 → https://steamcommunity.com/sharedfiles/filedetails/?id=123456
+   * （WS000000 之类无有效数字的 ID 不生成链接）
+   */
+  function buildWorkshopIdLink(id) {
+    var raw = id || '';
+    var m = /^WS(\d+)$/i.exec(raw);
+    var digits = (m && m[1]) ? m[1].replace(/^0+/, '') : '';
+    if (!digits) return raw;
+    return (
+      '<a class="workshop-id-link" href="https://steamcommunity.com/sharedfiles/filedetails/?id=' + digits + '"' +
+        ' target="_blank" rel="noopener noreferrer"' +
+        ' title="在 Steam 创意工坊中查看 ' + digits + '"' +
+        ' onclick="event.stopPropagation()">' + raw + '</a>'
+    );
+  }
+
+  /**
    * 构造单条模组 HTML
    */
   function buildModItem(mod, cfg) {
@@ -151,7 +169,7 @@
             '<div class="mod-name">' +
               '<div class="mod-name-sub">' + mod.name + '</div>' +
               '<div class="mod-name-top">' +
-                mod.id + (mod.size ? ' (' + mod.size + ')' : '') + tagsHtml +
+                buildWorkshopIdLink(mod.id) + (mod.size ? ' (' + mod.size + ')' : '') + tagsHtml +
               '</div>' +
             '</div>' +
           '</div>' +
