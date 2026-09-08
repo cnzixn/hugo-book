@@ -7,8 +7,8 @@ bookHidden: true
 
 ## 本站内容
 
-- {{< svg "bi-controller" >}} [手游单机版](/docs/ds-book/) —— 《饥荒：海难》的安装、模组与开发资料
-- {{< svg "bi-controller" >}} [手游联机版](/docs/dst-book/) —— 《饥荒联机版》的安装、模组与开发资料
+- {{< svg "bi-controller" >}} [单机](/docs/ds-book/) —— 《饥荒：海难》的安装、模组与开发资料
+- {{< svg "bi-controller" >}} [联机](/docs/dst-book/) —— 《饥荒联机版》的安装、模组与开发资料
 - {{< svg "bi-book" >}} [文章](/posts/) —— 站点公告与使用指南
 - {{< svg "bi-hourglass" >}} [日志](/changelog/) —— 框架与模组的更新记录
 
