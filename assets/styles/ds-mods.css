@@ -531,6 +531,8 @@ html.pd-lock { overflow: hidden; }
 .pd-hint { font-size: var(--font-size-smaller); color: var(--gray-500); margin: 0.6rem 0 0.9rem; line-height: 1.6; }
 
 .pd-field { display: block; font-size: var(--font-size-smaller); color: var(--gray-500); margin: 0.2rem 0 0.4rem; }
+.pd-field-mid { margin-top: 1rem; }
+.pd-tip { font-size: var(--font-size-smaller); color: var(--gray-500); margin: 0.4rem 0 0; line-height: 1.55; }
 .pd-input {
   width: 100%;
   padding: 0.65rem 0.8rem;
