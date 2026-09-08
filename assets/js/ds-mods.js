@@ -50,7 +50,9 @@
           searchKeyword: dataEl.dataset.searchKeyword || '',
           currentDate: dataEl.dataset.currentDate || '',
           imgBase: dataEl.dataset.imgBase || '/img/bm/',
-          imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png'
+          imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png',
+          // 网盘直链策略：modal=点击在当前页弹框校验邮箱后新标签打开（页面不内嵌直链）；direct=直接输出直链
+          panMode: dataEl.dataset.panMode || 'direct'
         });
       }
 
@@ -148,13 +150,24 @@
   }
 
   /**
+   * 构造某网盘的直链下载 URL（仅 direct 模式使用）
+   * 返回真实直链（旧行为，带 &t= 时间戳防缓存）
+   */
+  function buildDownloadTarget(mod, cfg, disk) {
+    var url = disk === 'baidu' ? mod.baiduUrl : mod.quarkUrl;
+    return url ? url + '&t=' + cfg.currentDate : null;
+  }
+
+  /**
    * 构造单条模组 HTML
+   * panMode:
+   *   modal  → 下载按钮在当前页打开网盘弹框（不内嵌/不暴露真实直链，后端校验后新标签打开）
+   *   direct → 下载按钮直接新标签打开真实直链（旧行为）
    */
   function buildModItem(mod, cfg) {
     var idLower = (mod.id || '').toLowerCase();
     var nameLower = (mod.name || '').toLowerCase();
-    var baiduUrl = mod.baiduUrl ? mod.baiduUrl + '&t=' + cfg.currentDate : null;
-    var quarkUrl = mod.quarkUrl ? mod.quarkUrl + '&t=' + cfg.currentDate : null;
+    var isModal = (cfg.panMode === 'modal' || cfg.panMode === 'jump'); // jump 为旧别名，视同 modal
     var site = getSiteOrigin();
     var tagsHtml = buildTagsHtml(mod.tags);
 
@@ -174,15 +187,19 @@
             '</div>' +
           '</div>' +
           '<div class="item-actions">' +
-            buildActionBtn('baidu', '百度网盘下载', baiduUrl) +
-            buildActionBtn('quark', '夸克网盘下载', quarkUrl) +
+            (isModal
+              ? buildModalBtn('baidu', '百度网盘下载', mod.id) +
+                buildModalBtn('quark', '夸克网盘下载', mod.id)
+              : buildDirectBtn('baidu', '百度网盘下载', buildDownloadTarget(mod, cfg, 'baidu')) +
+                buildDirectBtn('quark', '夸克网盘下载', buildDownloadTarget(mod, cfg, 'quark'))) +
           '</div>' +
         '</div>' +
       '</div>'
     );
   }
 
-  function buildActionBtn(cls, title, url) {
+  /** direct 模式：新标签打开直链 */
+  function buildDirectBtn(cls, title, url) {
     if (url) {
       return (
         '<button onclick="event.stopPropagation();window.open(\'' + url + '\',\'_blank\')" class="action-btn ' + cls + '" title="' + title + '">' +
@@ -196,6 +213,330 @@
       '</button>'
     );
   }
+
+  /** modal 模式：打开当前页网盘弹框（不暴露直链） */
+  function buildModalBtn(cls, title, fileId) {
+    return (
+      '<button class="action-btn ' + cls + '" title="' + title + '" ' +
+        'onclick="event.stopPropagation();window.ModsList&&window.ModsList.PanDialog&&window.ModsList.PanDialog.open({p:\'' + fileId + '\',disk:\'' + cls + '\'})">' +
+        '<img src="/img/icons/pan_' + cls + '.webp" alt="' + title + '" loading="lazy">' +
+      '</button>'
+    );
+  }
+
+  /* =============================================================
+   * 网盘下载弹框（当前页面操作，不开跳转页/不离开本页）
+   * 流程：点击下载按钮 → 弹框 → 输入/校验注册邮箱(记 localStorage)
+   *      → 通过后新标签页打开真实网盘直链；失败则留在弹框内提示
+   * ============================================================= */
+  // 网盘 API 地址（可配置）
+  // 本地联调：http://127.0.0.1:8787/ds/api/pan
+  // 【上线前】请改为线上真实地址：同源 /ds/api/pan 或 https://<域名>/ds/api/pan
+  var PAN_API = 'https://d1.225228.xyz/ds/api/pan';
+  var PAN_EMAIL_KEY = 'pan-email';
+  var DISK_LABEL = { baidu: '百度网盘', xunlei: '迅雷网盘', quark: '夸克网盘' };
+  var DISK_ICON = {
+    baidu: '/img/icons/pan_baidu.webp',
+    xunlei: '/img/icons/pan_xunlei.webp',
+    quark: '/img/icons/pan_quark.webp'
+  };
+
+  function isEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
+  }
+
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  var PanDialog = (function () {
+    var overlay, body, fileIdEl, fileNameEl;
+    var cur = null;   // 当前会话状态
+    var busy = false;
+    var session = 0;  // 会话代数：关闭/重开后将“在途”的异步回调判为过期
+
+    function esc(v) { return escHtml(v); }
+
+    function ensureBuilt() {
+      if (overlay) return;
+      overlay = document.createElement('div');
+      overlay.className = 'pd-overlay';
+      overlay.hidden = true;
+      overlay.innerHTML =
+        '<div class="pd-card" role="dialog" aria-modal="true" aria-label="网盘下载">' +
+          '<div class="pd-head">' +
+            '<div class="pd-title">网盘下载</div>' +
+            '<button type="button" class="pd-close" data-act="close" aria-label="关闭">×</button>' +
+          '</div>' +
+          '<div class="pd-file">' +
+            '<span class="pd-file-label">文件</span>' +
+            '<b class="pd-file-id"></b>' +
+            '<span class="pd-file-name"></span>' +
+          '</div>' +
+          '<div class="pd-body"></div>' +
+          '<div class="pd-foot">From ' + escHtml(PAN_API) + ' ...</div>' +
+        '</div>';
+      body = overlay.querySelector('.pd-body');
+      fileIdEl = overlay.querySelector('.pd-file-id');
+      fileNameEl = overlay.querySelector('.pd-file-name');
+      document.body.appendChild(overlay);
+
+      // 事件：关闭 / 下载网盘 / 更换邮箱 / 重试
+      overlay.addEventListener('click', function (e) {
+        var node = e.target;
+        while (node && node !== overlay) {
+          if (node.getAttribute && node.getAttribute('data-act')) break;
+          node = node.parentNode;
+        }
+        if (!node || node === overlay) return;
+        var act = node.getAttribute('data-act');
+        if (act === 'close') { close(); return; }
+        if (act === 'disk') {
+          var k = node.getAttribute('data-disk');
+          var url = cur && cur.links && cur.links[k];
+          if (url) window.open(url, '_blank', 'noopener');
+          return;
+        }
+        if (act === 'change-email') { cur.email = ''; viewEmail(''); return; }
+        if (act === 'retry') { openBlankForAuto(); startVerify(); }
+      });
+      // Esc / 遮罩点击关闭
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+      overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
+    }
+
+    function setFile(p, name) {
+      fileIdEl.textContent = p || '—';
+      fileNameEl.textContent = name ? '· ' + name : '';
+    }
+
+    function closeWinIfUnused() {
+      if (cur && cur.win && !cur.winUsed) {
+        try { cur.win.close(); } catch (e) { /* ignore */ }
+      }
+      if (cur) cur.win = null;
+    }
+
+    function openBlankForAuto() {
+      // 必须在用户手势（点击下载/提交）同步阶段调用，才能绕过弹窗拦截
+      if (!cur || cur.win) return;
+      try {
+        var w = window.open('about:blank', '_blank');
+        if (w) {
+          try { w.document.title = '正在打开网盘…'; } catch (e) { /* ignore */ }
+          cur.win = w;
+        }
+      } catch (e) { cur.win = null; }
+    }
+
+    function openNewTab(url) {
+      // 优先使用手势阶段已开好的空白标签页，其次退回 window.open（可能被拦）
+      if (cur && cur.win && !cur.winUsed) {
+        try {
+          cur.win.location.href = url;
+          cur.winUsed = true;
+          try { cur.win.focus(); } catch (e) { /* ignore */ }
+          return true;
+        } catch (e) { /* 跨域等异常，走 fallback */ }
+      }
+      try {
+        var w = window.open(url, '_blank', 'noopener');
+        return !!w;
+      } catch (e) { return false; }
+    }
+
+    /* ---------- 视图渲染 ---------- */
+    function render(html) { body.innerHTML = html; }
+
+    function viewLoading(text) {
+      render(
+        '<div class="pd-center">' +
+          '<span class="pd-spinner"></span>' +
+          '<p class="pd-hint">' + esc(text || '正在校验邮箱并获取网盘链接…') + '</p>' +
+        '</div>'
+      );
+    }
+
+    function viewEmail(errorMsg) {
+      render(
+        '<div class="pd-sub"></div>' +
+        (errorMsg ? '<div class="pd-msg pd-err">' + esc(errorMsg) + '</div>' : '') +
+        '<label class="pd-field" for="pd-email">邮箱</label>' +
+        '<input type="email" class="pd-input" id="pd-email" placeholder="you@example.com" autocomplete="email" spellcheck="false">' +
+        '<button type="button" class="pd-btn" id="pd-submit">验证并下载</button>'
+      );
+      var input = document.getElementById('pd-email');
+      input.value = (cur && cur.email) || '';
+      input.focus();
+      document.getElementById('pd-submit').addEventListener('click', submitEmail);
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') submitEmail(); });
+    }
+
+    function diskButtonsHtml(links, activeDisk, big) {
+      var order = [];
+      if (activeDisk) order.push(activeDisk);
+      ['baidu', 'xunlei', 'quark'].forEach(function (k) {
+        if (k !== activeDisk) order.push(k);
+      });
+      var out = [];
+      order.forEach(function (k) {
+        if (!links[k]) return;
+        var active = k === activeDisk ? ' is-active' : '';
+        out.push(
+          '<button type="button" class="pd-disk' + (big && k === activeDisk ? ' pd-big' : '') + active + '" data-act="disk" data-disk="' + k + '">' +
+            '<img src="' + DISK_ICON[k] + '" alt="">' +
+            '<span class="pd-disk-label">' + DISK_LABEL[k] + '</span>' +
+            '<span class="pd-arrow">↗</span>' +
+          '</button>'
+        );
+      });
+      return out.join('');
+    }
+
+    function viewResult(data) {
+      cur.links = {
+        baidu: data.baidu || '',
+        xunlei: data.xunlei || '',
+        quark: data.quark || ''
+      };
+
+      if (cur.disk && cur.links[cur.disk]) {
+        var label = DISK_LABEL[cur.disk];
+        var opened = openNewTab(cur.links[cur.disk]);
+        render(
+          (opened
+            ? '<p class="pd-hint">已在新标签页打开「' + label + '」；若未弹出请点击下方按钮。</p>'
+            : '<p class="pd-hint">浏览器拦截了自动打开，请点击下方按钮手动打开「' + label + '」。</p>') +
+          diskButtonsHtml(cur.links, cur.disk, true) +
+          '<button type="button" class="pd-linkbtn" data-act="change-email">更换邮箱</button>'
+        );
+      } else {
+        render(
+          '<p class="pd-hint">请选择要使用的网盘：</p>' +
+          diskButtonsHtml(cur.links, '', false) +
+          '<button type="button" class="pd-linkbtn" data-act="change-email">更换邮箱</button>'
+        );
+      }
+    }
+
+    function viewError(msg) {
+      render(
+        '<div class="pd-msg pd-err">' + esc(msg) + '</div>' +
+        '<div class="pd-actions">' +
+          '<button type="button" class="pd-btn pd-ghost" data-act="close">关闭</button>' +
+          '<button type="button" class="pd-btn" data-act="retry">重试</button>' +
+        '</div>'
+      );
+    }
+
+    /* ---------- API ---------- */
+    function apiQuery(email, cb) {
+      var url = PAN_API + '?u=' + encodeURIComponent(email) + '&p=' + encodeURIComponent(cur.p);
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.timeout = 12000;
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState !== 4) return;
+        var body = null;
+        try { body = JSON.parse(xhr.responseText || '{}'); } catch (e) { body = null; }
+        cb({ status: xhr.status, ok: body && body.code === 0, data: body && body.data, msg: (body && body.msg) || '请求失败' });
+      };
+      xhr.onerror = function () { cb({ status: 0, ok: false, data: null, msg: '网络异常，请稍后重试' }); };
+      xhr.ontimeout = function () { cb({ status: 0, ok: false, data: null, msg: '请求超时，请稍后重试' }); };
+      xhr.send();
+    }
+
+    function startVerify() {
+      if (busy || !cur) return;
+      busy = true;
+      var my = cur.sess;
+      viewLoading('正在校验邮箱并获取网盘链接…');
+      apiQuery(cur.email, function (res) {
+        busy = false;
+        // 弹框已关闭或本次会话已过期（用户关闭后重开）→ 丢弃结果
+        if (!cur || cur.sess !== my || overlay.hidden) { closeWinIfUnused(); return; }
+        if (res.ok) {
+          setStorageItem(PAN_EMAIL_KEY, cur.email);
+          setFile(res.data.id, res.data.name);
+          viewResult(res.data);
+          return;
+        }
+
+        // 依据后端 msg 精确分流：
+        //   404 "用户不存在或未注册"        → 邮箱未注册（停留邮箱表单让用户换邮箱）
+        //   400 "参数错误：缺少有效的邮箱(u)或网盘文件id(p)" → 邮箱无效/格式错误
+        //   404 "未找到对应的网盘文件"      → 文件不存在（文件 id 有误/已下架）
+        var msg = res.msg || '';
+        var userIssue = /用户|未注册/.test(msg);
+        var fileIssue = /未找到对应的网盘文件/.test(msg);
+        if (userIssue) {
+          closeWinIfUnused();
+          viewEmail('该邮箱未通过校验（未注册或格式错误），请更换为已注册邮箱后重试。');
+        } else if (res.status === 400) {
+          closeWinIfUnused();
+          viewEmail('该邮箱未通过校验（未注册或格式错误），请检查后重试。');
+        } else if (fileIssue || res.status === 404) {
+          closeWinIfUnused();
+          viewError('未找到文件「' + cur.p + '」对应的网盘记录，可能已下架或 ID 有误。');
+        } else {
+          closeWinIfUnused();
+          viewError(msg || '网络异常，请稍后重试。');
+        }
+      });
+    }
+
+    function submitEmail() {
+      var input = document.getElementById('pd-email');
+      if (busy || !input) return;
+      var v = (input.value || '').trim();
+      if (!isEmail(v)) { viewEmail('请输入正确的邮箱地址。'); return; }
+      cur.email = v;
+      openBlankForAuto();
+      startVerify();
+    }
+
+    /* ---------- 对外 ---------- */
+    function open(opts) {
+      ensureBuilt();
+      closeWinIfUnused();
+      session += 1;
+      cur = {
+        sess: session,
+        p: opts.p || '',
+        disk: (opts.disk || '').toLowerCase(),
+        email: getStorageItem(PAN_EMAIL_KEY) || '',
+        links: null,
+        win: null,
+        winUsed: false
+      };
+      setFile(cur.p, '');
+      overlay.hidden = false;
+      document.documentElement.classList.add('pd-lock');
+
+      var saved = cur.email;
+      if (saved && isEmail(saved)) {
+        // 已记住邮箱：预开空白标签（用户手势内），校验通过后导航过去
+        openBlankForAuto();
+        startVerify();
+      } else {
+        viewEmail('');
+      }
+    }
+
+    function close() {
+      if (!overlay) return;
+      session += 1;             // 使在途异步回调过期
+      closeWinIfUnused();
+      cur = null;
+      busy = false;
+      overlay.hidden = true;
+      document.documentElement.classList.remove('pd-lock');
+    }
+
+    return { open: open, close: close };
+  })();
 
   /**
    * 初始化列表逻辑（Promise 版：先解析配置，再拉 JSON，再绑定 UI）
@@ -425,5 +766,5 @@
 
   ready(init);
 
-  global.ModsList = { init: init };
+  global.ModsList = { init: init, PanDialog: PanDialog };
 })(window);

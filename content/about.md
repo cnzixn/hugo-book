@@ -1,11 +1,11 @@
 ---
-title: 关于本站
+title: "关于"
 bookHidden: true
 ---
 
 {{< svg "bi-journal-bookmark" >}} **饥荒模组手册**，是一个面向《饥荒》手游玩家的**非官方资源站**，专注收集、整理移动端可用的模组，并配套完整的安装教程与模组开发资料。
 
-## 本站内容
+## 导航
 
 - {{< svg "bi-controller" >}} [单机](/docs/ds-book/) —— 《饥荒：海难》的安装、模组与开发资料
 - {{< svg "bi-controller" >}} [联机](/docs/dst-book/) —— 《饥荒联机版》的安装、模组与开发资料
@@ -31,6 +31,11 @@ bookHidden: true
 {{< /gallery >}}
 
 {{< /details >}}
+
+## 域名
+
+- 主 b.bxq.me
+- 备 b.225228.xyz
 
 ## 致谢
 

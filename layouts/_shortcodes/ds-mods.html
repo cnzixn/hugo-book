@@ -11,6 +11,9 @@
 
 {{- $panData := index hugo.Data "ds_pan" -}}
 {{- $currentDate := now.Format "20060102" -}}
+{{- /* 网盘链接策略：modal(默认)=不内嵌直链，点击下载在当前页弹框校验邮箱后新标签打开；direct=旧行为直链
+       后端已收录单机版 BM…/WS_… 记录，dsPanMode 默认 modal；切回直链时把 dsPanMode 改 direct */ -}}
+{{- $panMode := $.Site.Params.dsPanMode | default "modal" -}}
 
 
 {{/* ========== 1. 构建标准化模组切片（BM000-BM999） ========== */}}
@@ -21,17 +24,15 @@
     {{- $bmCount = add $bmCount 1 -}}
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
-    {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
-    {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
     {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
-    {{- $bmItems = $bmItems | append (dict
-      "id"       $id
-      "name"     $name
-      "size"     $size
-      "tags"     $tags
-      "baiduUrl" $baiduUrl
-      "quarkUrl" $quarkUrl
-    ) -}}
+    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags -}}
+    {{- if eq $panMode "direct" -}}
+      {{- /* 直链模式才把真实 url 写进 JSON（原代码保留） */ -}}
+      {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
+      {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
+      {{- $item = merge $item (dict "baiduUrl" $baiduUrl "quarkUrl" $quarkUrl) -}}
+    {{- end -}}
+    {{- $bmItems = $bmItems | append $item -}}
   {{- end -}}
 {{- end -}}
 
@@ -82,6 +83,7 @@
 {{/* 数据桥：不再内嵌大 JSON，改为通过 data-src 提供独立 URL 给 JS fetch（CF Cache-Tag 支持浏览器 304 缓存） */}}
 <script id="mods-data" type="application/json"
         data-current-date="{{ $currentDate }}"
+        data-pan-mode="{{ $panMode }}"
         data-src="{{ $dataAsset.RelPermalink }}"></script>
 
 <script defer src="{{ $jsAsset.RelPermalink }}" integrity="{{ $jsAsset.Data.Integrity }}"></script>

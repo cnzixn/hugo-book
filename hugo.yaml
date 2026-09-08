@@ -99,6 +99,16 @@ menu:
 #   tag: tags
 
 params:
+  # ------- 网盘直链策略（下载入口模式） -------
+  # modal  = 模组列表点击「下载」在当前页面弹框：输入/校验注册邮箱(记 localStorage)，
+  #          通过后用新标签页打开真实网盘直链。静态页/JSON 不内嵌真实直链（防抓取）。
+  # direct = 旧行为：直接把网盘直链写进页面/JSON，点击新标签打开。
+  # 注意：后端 /ds/api/pan 已同时收录「联机版(dst)」与「单机版(ds)」的记录
+  #       （dst: WS…/游戏/LocalSend；ds: BM…/WS_…），故两版模组列表均走 modal。
+  #       游戏下载页(ds-pans/dst-pans)固定为直链展示，不在弹框范围内。
+  dstPanMode: "modal"     # 联机版：模组列表(dst-mods) 走当前页邮箱弹框
+  dsPanMode: "modal"      # 单机版：后端已补齐 ds 记录，改为与 dst 一致走邮箱弹框
+
   # (Optional, default light) Sets color theme: light or dark.
   # （可选，默认 light）设置颜色主题：light 或 dark
   BookTheme: "github-light"

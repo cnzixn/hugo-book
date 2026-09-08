@@ -5,6 +5,8 @@
 
 {{- $panData := index hugo.Data "dst_pan" -}}
 {{- $currentDate := now.Format "20060102" -}}
+{{- /* 网盘链接策略：modal(默认)=不内嵌直链，点击下载在当前页弹框校验邮箱后新标签打开；direct=旧行为直链 */ -}}
+{{- $panMode := $.Site.Params.dstPanMode | default "modal" -}}
 
 
 {{/* ========== 1. 构建 WS000000-WSxxxxxxxxxxxx 切片 ========== */}}
@@ -15,17 +17,15 @@
     {{- $wsCount = add $wsCount 1 -}}
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
-    {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
-    {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
     {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
-    {{- $wsItems = $wsItems | append (dict
-      "id"       $id
-      "name"     $name
-      "size"     $size
-      "tags"     $tags
-      "baiduUrl" $baiduUrl
-      "quarkUrl" $quarkUrl
-    ) -}}
+    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags -}}
+    {{- if eq $panMode "direct" -}}
+      {{- /* 直链模式才把真实 url 写进 JSON（原代码保留，切回 direct 即恢复） */ -}}
+      {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
+      {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
+      {{- $item = merge $item (dict "baiduUrl" $baiduUrl "quarkUrl" $quarkUrl) -}}
+    {{- end -}}
+    {{- $wsItems = $wsItems | append $item -}}
   {{- end -}}
 {{- end -}}
 
@@ -74,6 +74,7 @@
        数据也改为独立 data-src URL fetch（不内嵌大 JSON 到 HTML） */}}
 <script id="mods-data" type="application/json"
         data-current-date="{{ $currentDate }}"
+        data-pan-mode="{{ $panMode }}"
         data-img-base="/img/ws/"
         data-img-fallback="/img/ws/none.png"
         data-src="{{ $dataAsset.RelPermalink }}"></script>
