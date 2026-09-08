@@ -19,9 +19,20 @@
     <button type="button" class="gallery-nav gallery-prev" aria-label="上一张">&#8249;</button>
     <div class="gallery-track" tabindex="0" aria-label="图片列表，可左右滑动">
       {{- range split .Inner "\n" -}}
-        {{- $src := trim . " \t\r" -}}
-        {{- with $src -}}
+        {{- $raw := trim . " \t\r" -}}
+        {{- /* 空行直接跳过（避免被归一化补成 "/" 而渲染成破图） */ -}}
+        {{- if $raw -}}
+          {{- /* 路径归一化：兼容 Windows 反斜杠路径（如 static\img\dst-mods\x.png）
+                 1) \ → /；2) 去掉开头的 static/（Hugo 把 static 挂到站点根 /）；
+                 3) 非绝对 URL 且不以 / 开头时补前导 /  */ -}}
+          {{- $src := replace $raw "\\" "/" -}}
+          {{- $src = strings.TrimPrefix "static/" $src -}}
+          {{- if not (or (hasPrefix $src "/") (findRE `^[a-zA-Z][a-zA-Z0-9+.\-]*://` $src 1)) -}}
+            {{- $src = printf "/%s" $src -}}
+          {{- end -}}
+          {{- with $src -}}
       <img src="{{ . }}" alt="{{ $caption | default "截图" }}" loading="lazy">
+          {{- end -}}
         {{- end -}}
       {{- end -}}
     </div>

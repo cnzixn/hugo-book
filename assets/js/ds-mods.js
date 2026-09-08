@@ -473,10 +473,10 @@
         var fileIssue = /未找到对应的网盘文件/.test(msg);
         if (userIssue) {
           closeWinIfUnused();
-          viewEmail('该邮箱未通过校验（未注册或格式错误），请更换为已注册邮箱后重试。');
+          viewEmail('该邮箱未通过校验。');
         } else if (res.status === 400) {
           closeWinIfUnused();
-          viewEmail('该邮箱未通过校验（未注册或格式错误），请检查后重试。');
+          viewEmail('该邮箱未通过校验。');
         } else if (fileIssue || res.status === 404) {
           closeWinIfUnused();
           viewError('未找到文件「' + cur.p + '」对应的网盘记录，可能已下架或 ID 有误。');
