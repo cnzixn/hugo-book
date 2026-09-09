@@ -8,6 +8,7 @@
   ============================================================ */ -}}
 {{- with .Site.Params.googleAdsense -}}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ . }}" crossorigin="anonymous"></script>
+<meta name="google-adsense-account" content="{{ . }}">
 {{- end -}}
 {{- with .Site.Params.googleSiteVerification -}}
 <meta name="google-site-verification" content="{{ . }}">
