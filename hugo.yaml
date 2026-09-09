@@ -104,7 +104,7 @@ params:
   # 审核通过拿到发布商 ID 后填 "ca-pub-XXXXXXXXXXXXXXXX"，自动启用：
   #   - <head> 里的 AdSense 自动广告脚本（layouts/_partials/docs/adsense-head.html）
   # 上线前还需同步 static/ads.txt 里的发布商 ID（文件里已有注释说明）
-  googleAdsense: ""
+  googleAdsense: "ca-pub-6868015956555057"
 
   # (可选) Google AdSense / Search Console 所有权验证 meta（注册阶段用）：
   # 非空时输出 <meta name="google-site-verification" content="..."> 到 <head>
