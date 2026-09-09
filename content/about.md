@@ -3,16 +3,13 @@ title: "关于"
 bookHidden: true
 ---
 
-{{< svg "bi-journal-bookmark" >}} **饥荒模组手册**，是一个面向《饥荒》手游玩家的**非官方资源站**，专注收集、整理移动端可用的模组，并配套完整的安装教程与模组开发资料。
+{{< svg "bi-journal-bookmark" >}} **饥荒模组手册**，是一个面向《饥荒》手游玩家的 **非官方** 资源站。
 
-## 导航
+-----
 
-- {{< svg "bi-controller" >}} [单机](/docs/ds-book/) —— 《饥荒：海难》的安装、模组与开发资料
-- {{< svg "bi-controller" >}} [联机](/docs/dst-book/) —— 《饥荒联机版》的安装、模组与开发资料
-- {{< svg "bi-book" >}} [文章](/posts/) —— 站点公告与使用指南
-- {{< svg "bi-hourglass" >}} [日志](/changelog/) —— 框架与模组的更新记录
 
 ## 联系
+-----
 
 发现失效链接、内容错误，或者想投稿模组，欢迎通过以下方式与我们联系：
 
@@ -21,6 +18,7 @@ bookHidden: true
 {{< button href="https://qm.qq.com/q/88L6QyUQVi" class="btn-block" >}}{{< svg "bi-tencent-qq" >}} 苹果 Q 群 905142474{{< /button >}}
 
 ## 赞助
+-----
 
 如果你觉得这里的内容对你有帮助，欢迎赞助支持:
 
@@ -35,16 +33,19 @@ bookHidden: true
 <!-- static\img\icons\C4E3762CFE91968B16582A5E51ED0A35.png -->
 
 ## 域名
+-----
 
 - 主 b.bxq.me
 - 备 b.225228.xyz
 
-## 致谢
-
-- 本站由 [Hugo](https://gohugo.io/) 静态站点生成器构建，主题基于 [Hugo Book](https://github.com/alex-shpak/hugo-book/) 定制
-- 感谢每一位投稿、反馈与赞助的朋友，是你们的支持让本站持续更新
-
 ## 版权
+-----
 
 - 《饥荒》相关素材版权归 [Klei Entertainment](https://www.klei.com/) 所有
 - 本站为 **fan-made** 性质，与 Klei Entertainment 及官方发行商无关
+
+## 致谢
+-----
+
+- 本站由 [Hugo](https://gohugo.io/) 构建，主题基于 [Hugo Book](https://github.com/alex-shpak/hugo-book/) 定制
+- 感谢每一位投稿、反馈与赞助的朋友，是你们的支持让本站持续更新

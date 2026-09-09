@@ -85,6 +85,11 @@ menu:
       weight: 10
       params:
         bookIcon: "bi-hourglass"
+    - name: "常见问题"
+      pageRef: "/qa/"
+      weight: 90
+      params:
+        bookIcon: "bi-chat"
     - name: "关于本站"
       pageRef: "/about/"
       weight: 99
