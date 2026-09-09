@@ -11,4 +11,7 @@ aliases:
 > - 模组代码已压缩（minify），避免后来人在“屎上雕花”。如有需要，请前往 [创意工坊](https://steamcommunity.com/app/219740/workshop/) 下载原模组。  
 
 
+> [!CAUTION]
+> 创意工坊中标有 `禁止一切搬运！禁止二次发布！` 等声明的模组，本站会主动“移除”。
+
 {{< ds-mods >}}

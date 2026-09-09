@@ -140,12 +140,13 @@
     var raw = id || '';
     var m = /^WS(\d+)$/i.exec(raw);
     var digits = (m && m[1]) ? m[1].replace(/^0+/, '') : '';
+    var name = 'workshop-'+ digits;
     if (!digits) return raw;
     return (
       '<a class="workshop-id-link" href="https://steamcommunity.com/sharedfiles/filedetails/?id=' + digits + '"' +
         ' target="_blank" rel="noopener noreferrer"' +
         ' title="在 Steam 创意工坊中查看 ' + digits + '"' +
-        ' onclick="event.stopPropagation()">' + raw + '</a>'
+        ' onclick="event.stopPropagation()">' + name + '</a>'
     );
   }
 
