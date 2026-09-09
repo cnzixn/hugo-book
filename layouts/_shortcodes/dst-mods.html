@@ -18,12 +18,19 @@
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
     {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
-    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags -}}
+    {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
+    {{- $xunleiUrl := index (where $itemData "url2" "ne" nil) 0 "url2" -}}
+    {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
+    {{- $hasBaidu := gt (len (findRE `^https://pan\.baidu\.com/s/` $baiduUrl)) 0 -}}
+    {{- $hasXunlei := gt (len (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl)) 0 -}}
+    {{- $hasQuark := gt (len (findRE `^https://pan\.quark\.cn/s/` $quarkUrl)) 0 -}}
+    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags "hasBaidu" $hasBaidu "hasXunlei" $hasXunlei "hasQuark" $hasQuark -}}
     {{- if eq $panMode "direct" -}}
       {{- /* 直链模式才把真实 url 写进 JSON（原代码保留，切回 direct 即恢复） */ -}}
-      {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
-      {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
-      {{- $item = merge $item (dict "baiduUrl" $baiduUrl "quarkUrl" $quarkUrl) -}}
+      {{- if not (findRE `^https://pan\.baidu\.com/s/` $baiduUrl) -}}{{- $baiduUrl = "" -}}{{- end -}}
+      {{- if not (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl) -}}{{- $xunleiUrl = "" -}}{{- end -}}
+      {{- if not (findRE `^https://pan\.quark\.cn/s/` $quarkUrl) -}}{{- $quarkUrl = "" -}}{{- end -}}
+      {{- $item = merge $item (dict "baiduUrl" $baiduUrl "xunleiUrl" $xunleiUrl "quarkUrl" $quarkUrl) -}}
     {{- end -}}
     {{- $wsItems = $wsItems | append $item -}}
   {{- end -}}

@@ -154,7 +154,7 @@
    * 返回真实直链（旧行为，带 &t= 时间戳防缓存）
    */
   function buildDownloadTarget(mod, cfg, disk) {
-    var url = disk === 'baidu' ? mod.baiduUrl : mod.quarkUrl;
+    var url = disk === 'baidu' ? mod.baiduUrl : (disk === 'xunlei' ? mod.xunleiUrl : mod.quarkUrl);
     return url ? url + '&t=' + cfg.currentDate : null;
   }
 
@@ -172,14 +172,13 @@
     var tagsHtml = buildTagsHtml(mod.tags);
 
     return (
-      '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '" ' +
-        'onclick="window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
+      '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '">' +
         '<div class="item-main">' +
           '<div class="item-info">' +
-            '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '">' +
+            '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
               '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
             '</button>' +
-            '<div class="mod-name">' +
+            '<div class="mod-name" role="link" tabindex="0" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=\'' + site + '/p/' + mod.id + '\'}">' +
               '<div class="mod-name-sub">' + mod.name + '</div>' +
               '<div class="mod-name-top">' +
                 buildWorkshopIdLink(mod.id) + (mod.size ? ' (' + mod.size + ')' : '') + tagsHtml +
@@ -188,10 +187,12 @@
           '</div>' +
           '<div class="item-actions">' +
             (isModal
-              ? buildModalBtn('baidu', '百度网盘下载', mod.id) +
-                buildModalBtn('quark', '夸克网盘下载', mod.id)
-              : buildDirectBtn('baidu', '百度网盘下载', buildDownloadTarget(mod, cfg, 'baidu')) +
-                buildDirectBtn('quark', '夸克网盘下载', buildDownloadTarget(mod, cfg, 'quark'))) +
+              ? buildModalBtn('baidu', '百度网盘下载', mod.id, mod.hasBaidu) +
+                buildModalBtn('xunlei', '迅雷网盘下载', mod.id, mod.hasXunlei) +
+                buildModalBtn('quark', '夸克网盘下载', mod.id, mod.hasQuark)
+              : buildDirectBtn('baidu', '百度网盘下载', mod.hasBaidu ? buildDownloadTarget(mod, cfg, 'baidu') : null) +
+                buildDirectBtn('xunlei', '迅雷网盘下载', mod.hasXunlei ? buildDownloadTarget(mod, cfg, 'xunlei') : null) +
+                buildDirectBtn('quark', '夸克网盘下载', mod.hasQuark ? buildDownloadTarget(mod, cfg, 'quark') : null)) +
           '</div>' +
         '</div>' +
       '</div>'
@@ -215,7 +216,14 @@
   }
 
   /** modal 模式：打开当前页网盘弹框（不暴露直链） */
-  function buildModalBtn(cls, title, fileId) {
+  function buildModalBtn(cls, title, fileId, available) {
+    if (!available) {
+      return (
+        '<button class="action-btn ' + cls + '" title="暂无' + title + '" disabled>' +
+          '<img src="/img/icons/pan_' + cls + '.webp" alt="' + title + '" loading="lazy">' +
+        '</button>'
+      );
+    }
     return (
       '<button class="action-btn ' + cls + '" title="' + title + '" ' +
         'onclick="event.stopPropagation();window.ModsList&&window.ModsList.PanDialog&&window.ModsList.PanDialog.open({p:\'' + fileId + '\',disk:\'' + cls + '\'})">' +
@@ -226,7 +234,7 @@
 
   /* =============================================================
    * 网盘下载弹框（当前页面操作，不开跳转页/不离开本页）
-   * 流程：点击下载按钮 → 弹框 → 输入注册邮箱 + 用户码(m)(均记 localStorage)
+   * 流程：点击下载按钮 → 弹框 → 输入/校验注册邮箱(记 localStorage)
    *      → 通过后新标签页打开真实网盘直链；失败则留在弹框内提示
    * ============================================================= */
   // 网盘 API 地址（可配置）
@@ -246,10 +254,18 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
   }
 
-  // 用户码格式（与后端 ALLOWED_MID_PATTERNS 保持一致）
-  //   OU_ + 15~25 位数字（联机版） / BU_ + 16 位小写十六进制（单机版）
   function isMid(v) {
-    return /^(?:OU_[0-9]{15,25}|BU_[0-9a-f]{16})$/.test(v || '');
+    return /^(?:OU_\d{15,25}|BU_[0-9a-f]{16})$/i.test((v || '').trim());
+  }
+
+  function usableDiskUrl(url) {
+    if (!url) return '';
+    try {
+      var parsed = new URL(url, window.location.href);
+      return /^\/s\//.test(parsed.pathname) ? url : '';
+    } catch (e) {
+      return '';
+    }
   }
 
   function escHtml(s) {
@@ -282,8 +298,8 @@
             '<b class="pd-file-id"></b>' +
             '<span class="pd-file-name"></span>' +
           '</div>' +
-          '<div class="pd-body"></div>' +
-          '<div class="pd-foot">From ' + escHtml(PAN_API) + ' ...</div>' +
+          '<div class="pd-body"></div>' + // 内容区：邮箱表单 / 加载中 / 结果 / 错误
+          '<div class="pd-foot">From d1.225228.xyz...</div>' +
         '</div>';
       body = overlay.querySelector('.pd-body');
       fileIdEl = overlay.querySelector('.pd-file-id');
@@ -372,23 +388,17 @@
         (errorMsg ? '<div class="pd-msg pd-err">' + esc(errorMsg) + '</div>' : '') +
         '<label class="pd-field" for="pd-email">邮箱</label>' +
         '<input type="email" class="pd-input" id="pd-email" placeholder="you@example.com" autocomplete="email" spellcheck="false">' +
-        '<label class="pd-field pd-field-mid" for="pd-mid">用户码</label>' +
-        '<input type="text" class="pd-input" id="pd-mid" placeholder="OU_… / BU_…" autocomplete="off" autocapitalize="off" spellcheck="false">' +
-        '<p class="pd-tip">用户码在你的邮箱的验证邮件中可以找到。</p>' +
+        '<label class="pd-field" for="pd-mid">用户码</label>' +
+        '<input type="text" class="pd-input" id="pd-mid" placeholder="OU_... 或 BU_..." autocomplete="off" spellcheck="false">' +
         '<button type="button" class="pd-btn" id="pd-submit">验证并下载</button>'
       );
-      var emailInput = document.getElementById('pd-email');
+      var input = document.getElementById('pd-email');
       var midInput = document.getElementById('pd-mid');
-      if (cur) {
-        emailInput.value = cur.email || '';
-        midInput.value = cur.mid || '';
-      }
-      // 已有邮箱但没有用户码 → 聚焦用户码；其余聚焦邮箱
-      var focusEl = emailInput;
-      if (cur && cur.email && !cur.mid) focusEl = midInput;
-      focusEl.focus();
+      input.value = (cur && cur.email) || '';
+      midInput.value = (cur && cur.mid) || '';
+      (isEmail(input.value) && !isMid(midInput.value) ? midInput : input).focus();
       document.getElementById('pd-submit').addEventListener('click', submitEmail);
-      emailInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') submitEmail(); });
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') submitEmail(); });
       midInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') submitEmail(); });
     }
 
@@ -415,9 +425,9 @@
 
     function viewResult(data) {
       cur.links = {
-        baidu: data.baidu || '',
-        xunlei: data.xunlei || '',
-        quark: data.quark || ''
+        baidu: usableDiskUrl(data.baidu),
+        xunlei: usableDiskUrl(data.xunlei),
+        quark: usableDiskUrl(data.quark)
       };
 
       if (cur.disk && cur.links[cur.disk]) {
@@ -428,13 +438,13 @@
             ? '<p class="pd-hint">已在新标签页打开「' + label + '」；若未弹出请点击下方按钮。</p>'
             : '<p class="pd-hint">浏览器拦截了自动打开，请点击下方按钮手动打开「' + label + '」。</p>') +
           diskButtonsHtml(cur.links, cur.disk, true) +
-          '<button type="button" class="pd-linkbtn" data-act="change-email">修改邮箱/用户码</button>'
+          '<button type="button" class="pd-linkbtn" data-act="change-email">更换邮箱</button>'
         );
       } else {
         render(
           '<p class="pd-hint">请选择要使用的网盘：</p>' +
           diskButtonsHtml(cur.links, '', false) +
-          '<button type="button" class="pd-linkbtn" data-act="change-email">修改邮箱/用户码</button>'
+          '<button type="button" class="pd-linkbtn" data-act="change-email">更换邮箱</button>'
         );
       }
     }
@@ -450,10 +460,8 @@
     }
 
     /* ---------- API ---------- */
-    function apiQuery(email, cb) {
-      var url = PAN_API + '?u=' + encodeURIComponent(email) +
-        '&m=' + encodeURIComponent(cur.mid || '') +
-        '&p=' + encodeURIComponent(cur.p);
+    function apiQuery(email, mid, cb) {
+      var url = PAN_API + '?u=' + encodeURIComponent(email) + '&m=' + encodeURIComponent(mid) + '&p=' + encodeURIComponent(cur.p);
       var xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
       xhr.timeout = 12000;
@@ -473,7 +481,7 @@
       busy = true;
       var my = cur.sess;
       viewLoading('正在校验邮箱并获取网盘链接…');
-      apiQuery(cur.email, function (res) {
+      apiQuery(cur.email, cur.mid, function (res) {
         busy = false;
         // 弹框已关闭或本次会话已过期（用户关闭后重开）→ 丢弃结果
         if (!cur || cur.sess !== my || overlay.hidden) { closeWinIfUnused(); return; }
@@ -486,23 +494,24 @@
         }
 
         // 依据后端 msg 精确分流：
-        //   400 "参数错误"                 → 邮箱或用户码缺失/格式不被支持
-        //   400 "用户不存在或未注册"        → 邮箱未注册（停留表单让用户换邮箱/注册）
-        //   409 "用户码不匹配"              → 邮箱已注册但用户码与邮箱不匹配
+        //   409 "用户码不匹配"              → 用户码错误（停留表单重新输入）
+        //   400 "参数错误：缺少有效的邮箱(u)、用户码(m)或网盘文件id(p)" → 参数无效
+        //   404 "用户不存在或未注册"        → 邮箱未注册（停留邮箱表单让用户换邮箱）
+        //   400 "参数错误：缺少有效的邮箱(u)或网盘文件id(p)" → 邮箱无效/格式错误
         //   404 "未找到对应的网盘文件"      → 文件不存在（文件 id 有误/已下架）
         var msg = res.msg || '';
-        var midIssue = /用户码不匹配/.test(msg);
-        var userIssue = /用户不存在|未注册/.test(msg);
+        var midIssue = res.status === 409 || /用户码不匹配/.test(msg);
+        var userIssue = /用户|未注册/.test(msg);
         var fileIssue = /未找到对应的网盘文件/.test(msg);
-        if (midIssue || res.status === 409) {
+        if (midIssue) {
           closeWinIfUnused();
-          viewEmail('用户码与该邮箱不匹配，请检查后重试。');
+          viewEmail('用户码不匹配，请检查用户码后重试。');
         } else if (userIssue) {
           closeWinIfUnused();
-          viewEmail('该邮箱未通过校验（尚未注册）。');
+          viewEmail('该邮箱未通过校验（未注册或格式错误），请更换为已注册邮箱后重试。');
         } else if (res.status === 400) {
           closeWinIfUnused();
-          viewEmail('邮箱或用户码格式不被支持，请检查后重试。');
+          viewEmail('该邮箱未通过校验（未注册或格式错误），请检查后重试。');
         } else if (fileIssue || res.status === 404) {
           closeWinIfUnused();
           viewError('未找到文件「' + cur.p + '」对应的网盘记录，可能已下架或 ID 有误。');
@@ -514,17 +523,15 @@
     }
 
     function submitEmail() {
-      var emailInput = document.getElementById('pd-email');
+      var input = document.getElementById('pd-email');
       var midInput = document.getElementById('pd-mid');
-      if (busy || !emailInput) return;
-      var em = (emailInput.value || '').trim();
-      var md = (midInput.value || '').trim();
-      // 先写入会话，失败重渲染时可保留已输入内容方便修改
-      if (cur) { cur.email = em; cur.mid = md; }
-      if (!isEmail(em)) { viewEmail('请输入正确的邮箱地址。'); return; }
-      if (!isMid(md)) { viewEmail('用户码格式不正确：OU_ + 15~25位数字，或 BU_ + 16位十六进制。'); return; }
-      setStorageItem(PAN_EMAIL_KEY, em);
-      setStorageItem(PAN_MID_KEY, md);
+      if (busy || !input) return;
+      var emailValue = (input.value || '').trim();
+      var midValue = (midInput && midInput.value || '').trim();
+      if (!isEmail(emailValue)) { viewEmail('请输入正确的邮箱地址。'); return; }
+      if (!isMid(midValue)) { viewEmail('请输入正确的用户码（OU_数字或 BU_十六进制）。'); return; }
+      cur.email = emailValue;
+      cur.mid = midValue;
       openBlankForAuto();
       startVerify();
     }
@@ -548,10 +555,9 @@
       overlay.hidden = false;
       document.documentElement.classList.add('pd-lock');
 
-      var savedEmail = cur.email;
-      var savedMid = cur.mid;
-      if (savedEmail && isEmail(savedEmail) && savedMid && isMid(savedMid)) {
-        // 已记住邮箱 + 用户码：预开空白标签（用户手势内），校验通过后导航过去
+      var saved = cur.email;
+      if (saved && isEmail(saved) && isMid(cur.mid)) {
+        // 已记住邮箱：预开空白标签（用户手势内），校验通过后导航过去
         openBlankForAuto();
         startVerify();
       } else {

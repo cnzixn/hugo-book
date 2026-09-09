@@ -125,8 +125,8 @@ params:
   # 注意：后端 /ds/api/pan 已同时收录「联机版(dst)」与「单机版(ds)」的记录
   #       （dst: WS…/游戏/LocalSend；ds: BM…/WS_…），故两版模组列表均走 modal。
   #       游戏下载页(ds-pans/dst-pans)固定为直链展示，不在弹框范围内。
+  dsPanMode: "modal"      # 单机版：模组列表(ds-mods) 走当前页邮箱弹框
   dstPanMode: "modal"     # 联机版：模组列表(dst-mods) 走当前页邮箱弹框
-  dsPanMode: "modal"      # 单机版：后端已补齐 ds 记录，改为与 dst 一致走邮箱弹框
 
   # (Optional, default light) Sets color theme: light or dark.
   # （可选，默认 light）设置颜色主题：light 或 dark

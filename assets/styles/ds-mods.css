@@ -150,6 +150,7 @@
 
 /* 文字区：垂直两行，整体一个横向滚动条 */
 .mod-name {
+  cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;

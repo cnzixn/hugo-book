@@ -7,6 +7,8 @@ categories: ["Example"]
 
 This is an example blog post demonstrating the Hugo Book blog layout.
 
+{{< bili BV1cNV56VEBd >}}  
+
 ## What This Demonstrates
 
 Blog posts in Hugo Book support standard Hugo content features:

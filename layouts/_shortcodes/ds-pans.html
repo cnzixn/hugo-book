@@ -9,11 +9,17 @@
   {{- $baiduUrl := index (where . "url1" "ne" nil) 0 "url1" -}}
   {{- $xunleiUrl := index (where . "url2" "ne" nil) 0 "url2" -}}
   {{- $quarkUrl := index (where . "url3" "ne" nil) 0 "url3" -}}
+  {{- if not (findRE `^https://pan\.baidu\.com/s/` $baiduUrl) -}}{{- $baiduUrl = "" -}}{{- end -}}
+  {{- if not (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl) -}}{{- $xunleiUrl = "" -}}{{- end -}}
+  {{- if not (findRE `^https://pan\.quark\.cn/s/` $quarkUrl) -}}{{- $quarkUrl = "" -}}{{- end -}}
+  {{- $firstDisk := "baidu" -}}
+  {{- if not $baiduUrl -}}{{- $firstDisk = "xunlei" -}}{{- end -}}
+  {{- if not $baiduUrl -}}{{- if not $xunleiUrl -}}{{- $firstDisk = "quark" -}}{{- end -}}{{- end -}}
   {{- $itemName := index (where . "name" "ne" nil) 0 "name" -}}
   {{- $itemSize := index (where . "size" "ne" nil) 0 "size" -}}
 
   <div class="book-tabs">
-    <input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-0" checked="checked" />
+    {{- if $baiduUrl -}}<input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-0"{{ if eq $firstDisk "baidu" }} checked="checked"{{ end }} />
     <label for="pan-{{ $name }}-0">百度网盘</label>
     <div class="book-tabs-content markdown-inner">
       <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
@@ -22,10 +28,21 @@
       {{- else -}}
         <div class="pan-link">暂无百度网盘下载</div>
       {{- end -}}
-    </div>
+    </div>{{- end -}}
 
-    <input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-1" />
-    <label for="pan-{{ $name }}-1">夸克网盘</label>
+    {{- if $xunleiUrl -}}<input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-1"{{ if eq $firstDisk "xunlei" }} checked="checked"{{ end }} />
+    <label for="pan-{{ $name }}-1">迅雷网盘</label>
+    <div class="book-tabs-content markdown-inner">
+      <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
+      {{- with $xunleiUrl -}}
+        <div class="pan-link"><a href="{{ . }}" target="_blank">{{ . }}</a></div>
+      {{- else -}}
+        <div class="pan-link">暂无迅雷网盘下载</div>
+      {{- end -}}
+    </div>{{- end -}}
+
+    {{- if $quarkUrl -}}<input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-2"{{ if eq $firstDisk "quark" }} checked="checked"{{ end }} />
+    <label for="pan-{{ $name }}-2">夸克网盘</label>
     <div class="book-tabs-content markdown-inner">
       <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
       {{- with $quarkUrl -}}
@@ -33,7 +50,7 @@
       {{- else -}}
         <div class="pan-link">暂无夸克网盘下载</div>
       {{- end -}}
-    </div>
+    </div>{{- end -}}
   </div>
 {{- else -}}
   <div class="pan-error">
