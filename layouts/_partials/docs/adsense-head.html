@@ -1,10 +1,13 @@
 {{- /* ============================================================
-  Google AdSense 头部注入（自动广告 + 所有权验证）
+  Google AdSense 头部注入（加载器脚本 + 所有权 meta）
 
   只在 hugo.yaml 里配置后才输出，未配置时本 partial 输出空字符串：
     params.googleAdsense           -> ca-pub-XXXXXXXXXXXXXXXX
     params.googleSiteVerification  -> 验证 token（注册阶段可选）
-  启用后请同步填写 static/ads.txt 中的发布商 ID。
+  说明：
+  - 这里的 adsbygoogle.js 是【加载器】，手动广告单元({{< adsense >}})同样需要它；
+    "自动广告"是 AdSense 后台的独立开关，不在本代码里控制（本方案不开启）。
+  - 启用后请同步 static/ads.txt 中的发布商 ID。
   ============================================================ */ -}}
 {{- with .Site.Params.googleAdsense -}}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ . }}" crossorigin="anonymous"></script>

@@ -1,4 +1,4 @@
-baseURL: https://bxq.me/
+﻿baseURL: https://bxq.me/
 title: 饥荒模组手册
 theme: hugo-book
 
@@ -102,9 +102,16 @@ params:
   # ------- Google AdSense（默认关闭，零影响） -------
   # 留空 "" = 整站不加载任何 Google 广告代码（当前状态）
   # 审核通过拿到发布商 ID 后填 "ca-pub-XXXXXXXXXXXXXXXX"，自动启用：
-  #   - <head> 里的 AdSense 自动广告脚本（layouts/_partials/docs/adsense-head.html）
-  # 上线前还需同步 static/ads.txt 里的发布商 ID（文件里已有注释说明）
+  #   - <head> 里的 AdSense 加载脚本（手动广告单元必需；本身不是"自动广告"）
+  #   - 全站 google-adsense-account 关联 meta
+  # 站点采用【手动广告位】模式：在内容里用 {{< adsense >}} shortcode 插固定广告单元，
+  # 不在 AdSense 后台开启"自动广告"就不会出现乱插的广告。
   googleAdsense: "ca-pub-6868015956555057"
+
+  # 手动广告单元的 slot ID（数字串）：审核通过后在 AdSense 后台
+  # 「广告 → 按广告单元 → 新建展示广告单元」创建后，把生成的 data-ad-slot 数字填这里。
+  # 留空时 {{< adsense >}} 输出虚线占位框（布局预览），不请求广告。
+  googleAdsenseSlot: ""
 
   # (可选) Google AdSense / Search Console 所有权验证 meta（注册阶段用）：
   # 非空时输出 <meta name="google-site-verification" content="..."> 到 <head>

@@ -1,0 +1,27 @@
+{{- /* ============================================================
+  AdSense 手动广告单元 shortcode
+  用法：
+    {{< adsense >}}                         // 使用 hugo.yaml 的 googleAdsenseSlot
+    {{< adsense slot="1234567890" >}}       // 或临时指定某个广告单元
+  行为：
+  - params.googleAdsense 为空            -> 什么都不输出（整站关闭广告时零影响）
+  - 已填 client 但未填 slot              -> 输出虚线占位框（布局预览用，非广告）
+  - client + slot 都齐                   -> 输出真实 AdSense 展示广告单元并请求填充
+  注意：本 shortcode 只插入固定广告位，不会触发"自动广告"。
+  ============================================================ */ -}}
+{{- $client := .Site.Params.googleAdsense -}}
+{{- $slot := (.Get "slot") | default .Site.Params.googleAdsenseSlot -}}
+{{- if not $client -}}
+{{- else if not $slot -}}
+<div style="border:2px dashed #b0b0b0;border-radius:8px;color:#888;text-align:center;padding:28px 12px;margin:16px 0;font-size:14px;">
+  广告位预留 · 审核通过后在 hugo.yaml 填入 <code>googleAdsenseSlot</code> 后此处显示真实广告
+</div>
+{{- else -}}
+<ins class="adsbygoogle"
+     style="display:block;text-align:center;"
+     data-ad-client="{{ $client }}"
+     data-ad-slot="{{ $slot }}"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+{{- end -}}
