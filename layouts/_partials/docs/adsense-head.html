@@ -1,0 +1,14 @@
+{{- /* ============================================================
+  Google AdSense 头部注入（自动广告 + 所有权验证）
+
+  只在 hugo.yaml 里配置后才输出，未配置时本 partial 输出空字符串：
+    params.googleAdsense           -> ca-pub-XXXXXXXXXXXXXXXX
+    params.googleSiteVerification  -> 验证 token（注册阶段可选）
+  启用后请同步填写 static/ads.txt 中的发布商 ID。
+  ============================================================ */ -}}
+{{- with .Site.Params.googleAdsense -}}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ . }}" crossorigin="anonymous"></script>
+{{- end -}}
+{{- with .Site.Params.googleSiteVerification -}}
+<meta name="google-site-verification" content="{{ . }}">
+{{- end -}}

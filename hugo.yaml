@@ -99,6 +99,18 @@ menu:
 #   tag: tags
 
 params:
+  # ------- Google AdSense（默认关闭，零影响） -------
+  # 留空 "" = 整站不加载任何 Google 广告代码（当前状态）
+  # 审核通过拿到发布商 ID 后填 "ca-pub-XXXXXXXXXXXXXXXX"，自动启用：
+  #   - <head> 里的 AdSense 自动广告脚本（layouts/_partials/docs/adsense-head.html）
+  # 上线前还需同步 static/ads.txt 里的发布商 ID（文件里已有注释说明）
+  googleAdsense: ""
+
+  # (可选) Google AdSense / Search Console 所有权验证 meta（注册阶段用）：
+  # 非空时输出 <meta name="google-site-verification" content="..."> 到 <head>
+  # 也可以用 DNS TXT 方式验证，那就无需填这里
+  googleSiteVerification: ""
+
   # ------- 网盘直链策略（下载入口模式） -------
   # modal  = 模组列表点击「下载」在当前页面弹框：输入/校验注册邮箱(记 localStorage)，
   #          通过后用新标签页打开真实网盘直链。静态页/JSON 不内嵌真实直链（防抓取）。

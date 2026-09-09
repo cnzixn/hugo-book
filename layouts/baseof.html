@@ -3,6 +3,7 @@
 <head>
   {{ partial "docs/html-head" . }}
   {{ partial "docs/inject/head" . }}
+  {{ partial "docs/adsense-head" . }}
 </head>
 <body dir="{{ default "ltr" .Site.Language.Direction }}" class="book-kind-{{ .Kind }} book-type-{{ .Type }}{{ with .Layout }} book-layout-{{ . }}{{ end }}">
   <input type="checkbox" class="hidden toggle" id="menu-control" />
