@@ -2,7 +2,7 @@
   项目级覆盖主题的 docs/icon partial：返回图标 URL（供 <img src> 使用）
   规则：
   1. 名字带 "/" → 当完整路径（relURL）
-  2. 名字带 "."（后缀）→ img/icons/ 下的静态文件（如 "ds_icon.png" → /img/icons/ds_icon.png）
+  2. 名字带 "."（后缀）→ img/icons/ 下的静态文件（如 "ds_icon.webp" → /img/icons/ds_icon.webp）
   3. 其他（如 "bi-book"）→ bs-icons 数据表 → resources.FromString 发布为 /icons/<名>.svg
      表里没有的（主题 UI 图标 menu/toc 等）→ 主题 assets/icons/ 自带文件兜底
   注意：return 只能出现在 partial 顶层，因此先算 $url 最后统一 return

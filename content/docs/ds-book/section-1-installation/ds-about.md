@@ -11,7 +11,7 @@ aliases:
 
 ### 1. 安卓安装包结构
 
-```plaintext  {{filename="xxx.apk", copy="false"}}
+```plaintext  {filename="xxx.apk", copy="false"}
 xxx.apk
 └─ assets
   └─ mods/
@@ -26,7 +26,7 @@ xxx.apk
 
 ### 2. 苹果安装包结构
 
-```plaintext  {{filename="xxx.ipa", copy="false"}}
+```plaintext  {filename="xxx.ipa", copy="false"}
 xxx.ipa
 └─ Payload/
   └─ dontstarve.app/
@@ -38,7 +38,7 @@ xxx.ipa
 
 ### 3. 配置文件
 
-```lua  {{filename="bmmods.lua", copy="false"}}
+```lua  {filename="bmmods.lua", copy="false"}
   -- BMXXX 模组无需添加，框架会自动加载
   Add("BM000")                -- 重复添加，没啥用
 

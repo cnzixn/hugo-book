@@ -19,9 +19,20 @@ KTEX 贴图转换工具，支持 DXT5 / ASTC8x8 / ASTC6x6 格式。
 
 from __future__ import annotations
 
+# ---- 通用 UTF-8 铁律（在 PowerShell / 中文 Windows 下运行也必须稳定） ----
+# 1) stdio 强制 UTF-8：避免控制台按 GBK 输出导致 UnicodeEncodeError 闪退 / 乱码；
+# 2) errors=replace：遇到当前环境无法编码的字符也绝不崩溃。
+import sys
+for _stream_name in ("stdin", "stdout", "stderr"):
+    _stream = getattr(sys, _stream_name, None)
+    if _stream is not None and hasattr(_stream, "reconfigure"):
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
 import argparse
 import struct
-import sys
 import zipfile
 import tempfile
 import shutil
@@ -332,7 +343,7 @@ def _infer_main_size_from_total(total_bytes: int, fmt: int) -> Tuple[int, int, i
 
 # ---------- 读取 / 写入 ----------
 
-def read_ktex(path: str) -> KtexFile:
+def read_ktex(path) -> KtexFile:
     """
     从磁盘读取 .tex 文件，自动识别头布局与 mip 结构。
     
@@ -343,7 +354,7 @@ def read_ktex(path: str) -> KtexFile:
     自动检测像素格式，如果文件声明的格式与数据大小不匹配会重新检测。
     
     Args:
-        path: .tex 文件路径
+        path: .tex 文件路径（也接受 bytes/bytearray/memoryview，直接按内存解析）
     
     Returns:
         KtexFile 对象，包含文件头和 mip 层数据
@@ -351,7 +362,10 @@ def read_ktex(path: str) -> KtexFile:
     Raises:
         ValueError: 文件格式无效或数据越界时抛出
     """
-    raw = Path(path).read_bytes()
+    if isinstance(path, (bytes, bytearray, memoryview)):
+        raw = bytes(path)
+    else:
+        raw = Path(path).read_bytes()
 
     if len(raw) >= 24:
         try:
@@ -369,7 +383,11 @@ def read_ktex(path: str) -> KtexFile:
     hdr_size = 8
     n = hdr.num_mips
     if n <= 0 or n > 32:
-        raise ValueError(f"num_mips={n} 超出合理范围")
+        word = struct.unpack_from("<I", raw, 4)[0]
+        raise ValueError(
+            f"无法识别的 KTEX 头: num_mips={n} "
+            f"(头字段 0x{word:08X})：文件可能损坏、不是贴图，或属于工具不支持的 KTEX 变体"
+        )
 
     desc_off = hdr_size
     data_start = hdr_size + n * 10
@@ -503,6 +521,16 @@ def write_ktex(path: str, ktex: KtexFile) -> None:
     """
     ktex.header.num_mips = len(ktex.mips)
     ktex.header.flags = 1 if len(ktex.mips) > 1 else 0
+    Path(path).write_bytes(_serialize_ktex(ktex))
+
+
+def _serialize_ktex(ktex: KtexFile) -> bytes:
+    """
+    把 KtexFile 序列化为字节（旧版 8 字节头 + 连续 mip 描述符 + 连续数据区）。
+    供磁盘写出与 zip 内存改写复用。
+    """
+    ktex.header.num_mips = len(ktex.mips)
+    ktex.header.flags = 1 if len(ktex.mips) > 1 else 0
     buf = bytearray()
     buf += ktex.header.pack_legacy()
     for mip in ktex.mips:
@@ -512,7 +540,7 @@ def write_ktex(path: str, ktex: KtexFile) -> None:
         buf += struct.pack("<HHHI", mip.width, mip.height, pitch, dsize)
     for mip in ktex.mips:
         buf += mip.data
-    Path(path).write_bytes(bytes(buf))
+    return bytes(buf)
 
 
 # ---------- 格式自动检测 ----------
@@ -570,6 +598,32 @@ def _detect_format(ktex: KtexFile) -> int:
 
 # ---------- 解码 ----------
 
+def _bc1_punch_alpha(data: bytes, w: int, h: int) -> np.ndarray:
+    """
+    计算 BC1(DXT1) 的 1-bit punch-through 透明蒙版（HxW，0/255）。
+
+    规则：块内 color0 <= color1 时启用 3色+透明 模式，索引==3 的像素透明；
+    color0 > color1 时整块不透明。
+    """
+    bw = (w + 3) // 4
+    bh = (h + 3) // 4
+    alpha = np.full((h, w), 255, dtype=np.uint8)
+    for by in range(bh):
+        for bx in range(bw):
+            off = (by * bw + bx) * 8
+            c0, c1 = struct.unpack_from("<HH", data, off)
+            if c0 <= c1:  # 3-color + 1-bit transparent
+                idx = data[off + 4: off + 8]
+                y0 = by * 4
+                x0 = bx * 4
+                for iy in range(4):
+                    for ix in range(4):
+                        p = (iy * 4 + ix) * 2
+                        if ((idx[p // 8] >> (p % 8)) & 3) == 3:
+                            alpha[y0 + iy, x0 + ix] = 0
+    return alpha
+
+
 def _decode_mip_to_rgba_bytes(data: bytes, w: int, h: int, fmt: int) -> bytes:
     """
     把任意格式的 mip 数据解码为 RGBA 原始字节（H*W*4）。
@@ -602,7 +656,13 @@ def _decode_mip_to_rgba_bytes(data: bytes, w: int, h: int, fmt: int) -> bytes:
             "缺少依赖 texture2ddecoder，请先执行: pip install texture2ddecoder"
         )
     if fmt == FMT_DXT1:
+        # BC1(DXT1) 需还原 1-bit punch-through 透明（color0<=color1 时索引3 透明），
+        # 否则原透明区域会以不透明黑(0,0,0,255)编码进 ASTC，手机上显示成全黑。
         bgra = _t2d.decode_bc1(data, w, h)
+        arr = np.frombuffer(bgra, dtype=np.uint8).reshape(h, w, 4).copy()
+        arr[:, :, 3] = _bc1_punch_alpha(data, w, h)
+        rgba = arr[:, :, [2, 1, 0, 3]].copy()
+        return rgba.tobytes()
     elif fmt == FMT_DXT5:
         bgra = _t2d.decode_bc3(data, w, h)
     elif fmt == FMT_ASTC8x8:
@@ -1059,6 +1119,212 @@ def convert_ktex(
     write_ktex(dst_tex, new_ktex)
 
 
+# ---------- 断点续传 / 原子 zip 转换 ----------
+
+def _tex_header_pixel_format(raw: bytes) -> Optional[int]:
+    """
+    尽量从 KTEX 头部字节读出声明的像素格式（读不出返回 None）。
+    新版 24 字节头取 [8:12]；旧版 8 字节压缩头取 bit4-8。
+    """
+    if len(raw) >= 24:
+        d0, d1 = struct.unpack("<II", raw[4:12])
+        d2 = struct.unpack("<I", raw[12:16])[0]
+        if 1 <= d0 <= 20 and d1 in BLOCK_SIZE and 1 <= (d2 & 0xFFFF) <= 16:
+            return d1
+    if len(raw) >= 8:
+        (v,) = struct.unpack("<I", raw[4:8])
+        fmt = (v >> 4) & 0x1F
+        if fmt in BLOCK_SIZE:
+            return fmt
+    return None
+
+
+def convert_tex_bytes(raw: bytes, dst_fmt: int, generate_mips: bool = True) -> bytes:
+    """把一段 KTEX 字节（内存）转换为目标格式，返回新字节。"""
+    ktex = read_ktex(raw)
+    if ktex.header.pixel_format == dst_fmt:
+        return raw
+    rgba = decode_ktex_to_rgba(ktex, level=0)
+    new_ktex = _encode_rgba_to_ktex(rgba, fmt=dst_fmt, generate_mips=generate_mips)
+    return _serialize_ktex(new_ktex)
+
+
+def _zip_all_tex_converted(zpath: Path, dst_fmt: int) -> bool:
+    """zip 内若没有 .tex 或所有 .tex 都已是目标格式 → True（无需转换）。"""
+    with zipfile.ZipFile(zpath, "r") as zf:
+        texs = [n for n in zf.namelist() if n.lower().endswith(".tex")]
+        if not texs:
+            return True
+        for n in texs:
+            if _tex_header_pixel_format(zf.read(n)[:24]) != dst_fmt:
+                return False
+    return True
+
+
+def _convert_zip_to_fmt(zpath: Path, dst_fmt: int, no_mips: bool = False) -> bool:
+    """
+    原子整包转换：把 zip 内所有 .tex 成员转为目标格式。
+
+    - 先全部转换到内存/临时文件，全部成功后才用 os.replace 原子替换原 zip；
+      中途任何成员失败/闪退都不会损坏原包，重跑即可继续。
+    - 失败返回 False，成功返回 True（无 .tex 成员的 zip 视为成功）。
+    """
+    tmp = zpath.with_name(zpath.name + ".tmp")
+    try:
+        ok = True
+        with zipfile.ZipFile(zpath, "r") as zin:
+            with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
+                for info in zin.infolist():
+                    data = zin.read(info.filename)
+                    if info.filename.lower().endswith(".tex"):
+                        try:
+                            data = convert_tex_bytes(
+                                data, dst_fmt, generate_mips=not no_mips
+                            )
+                        except Exception as e:
+                            logger.error(f"  [失败] {info.filename} -> {e}")
+                            ok = False
+                            break
+                    zout.writestr(info, data)
+        if not ok:
+            try:
+                tmp.unlink()
+            except Exception:
+                pass
+            return False
+        tmp.replace(zpath)
+        return True
+    except Exception as e:
+        logger.error(f"[错误] 处理 ZIP {zpath} 失败: {e}")
+        try:
+            tmp.unlink()
+        except Exception:
+            pass
+        return False
+
+
+def run_resume_convert(
+    inputs: List[str],
+    fmt: int,
+    progress_file: str,
+    retry_failed: bool = False,
+) -> None:
+    """
+    断点续传转换（convert --resume）。
+
+    - 进度文件每行一个单位：成功为普通路径，失败为 '!' 开头（默认跳过，--retry-failed 重试）。
+    - 每次成功/失败后立即追加写入，进程中途闪退后重跑同一命令即可从断点继续。
+    - 已转成目标格式的单位自动跳过（不会重复有损压缩）。
+    - 顺带清理上次崩溃残留的 *.zip.tmp。
+    """
+    pfile = Path(progress_file)
+    done: set = set()
+    failed_prev: set = set()
+    if pfile.exists():
+        for line in pfile.read_text(encoding="utf-8-sig", errors="ignore").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("!"):
+                if retry_failed:
+                    continue
+                failed_prev.add(line[1:])
+            else:
+                done.add(line)
+
+    roots = [Path(p) for p in inputs]
+    texs: List[Path] = []
+    zips: List[Path] = []
+    for root in roots:
+        if not root.exists():
+            logger.warning(f"路径不存在，跳过: {root}")
+            continue
+        if root.is_file():
+            if root.suffix.lower() == ".tex":
+                texs.append(root)
+            elif root.suffix.lower() == ".zip":
+                zips.append(root)
+            continue
+        for tmp in root.rglob("*.zip.tmp"):
+            try:
+                tmp.unlink()
+                logger.info(f"[清理崩溃残留] {tmp}")
+            except Exception:
+                pass
+        texs.extend(sorted(root.rglob("*.tex")))
+        zips.extend(sorted(root.rglob("*.zip")))
+
+    def key(p: Path) -> str:
+        return str(p.resolve())
+
+    def record(unit: str, ok: bool) -> None:
+        with pfile.open("a", encoding="utf-8") as fh:
+            fh.write(("" if ok else "!") + unit + "\n")
+
+    done_n = 0
+    skip_fail_n = 0
+    failed_now: List[str] = []
+    total = len(texs) + len(zips)
+
+    # 1) 普通 .tex 文件
+    for p in texs:
+        k = key(p)
+        if k in done:
+            done_n += 1
+            continue
+        if k in failed_prev:
+            skip_fail_n += 1
+            continue
+        try:
+            cur = _tex_header_pixel_format(Path(p).read_bytes()[:24])
+            if cur == fmt:
+                record(k, True)
+                done_n += 1
+                continue
+            convert_ktex(str(p), str(p), dst_fmt=fmt, generate_mips=True)
+            record(k, True)
+            logger.info(f"[OK] {p}  (fmt={FMT_NAMES[fmt]})")
+        except Exception as e:
+            logger.error(f"[失败] {p} -> {e}")
+            record(k, False)
+            failed_now.append(str(p))
+
+    # 2) zip（整包原子转换）
+    for z in zips:
+        k = key(z)
+        if k in done:
+            done_n += 1
+            continue
+        if k in failed_prev:
+            skip_fail_n += 1
+            continue
+        try:
+            if _zip_all_tex_converted(z, fmt):
+                record(k, True)
+                done_n += 1
+                continue
+            if _convert_zip_to_fmt(z, fmt):
+                record(k, True)
+                logger.info(f"[OK] {z}  (fmt={FMT_NAMES[fmt]})")
+            else:
+                record(k, False)
+                failed_now.append(str(z))
+        except Exception as e:
+            logger.error(f"[失败] {z} -> {e}")
+            record(k, False)
+            failed_now.append(str(z))
+
+    logger.info(
+        f"完成：单位总数 {total}，本次跳过(已完成/无需转) {done_n}，"
+        f"跳过历史失败 {skip_fail_n}，新失败 {len(failed_now)}"
+    )
+    if failed_now:
+        logger.warning("失败清单（已记入进度文件，前缀 '!'；修好后加 --retry-failed 重试）：")
+        for f in failed_now:
+            logger.warning("  " + f)
+    logger.info(f"进度文件：{pfile}")
+
+
 # ---------- CLI ----------
 
 def _normalize_fmt(name: str) -> int:
@@ -1226,7 +1492,16 @@ def batch_process(action: str, paths: List[str], out_dir: Optional[str],
 
     logger.info(f"找到 {len(zip_entries)} 个 ZIP 内文件")
     if action == "convert":
-        _process_zip_in_place(zip_entries, fmt, no_mips)
+        # 整包原子转换：按 zip 逐个处理，全部成员成功才替换原包，失败不动原包
+        seen_zips2 = set()
+        for zpath, _member in zip_entries:
+            if zpath in seen_zips2:
+                continue
+            seen_zips2.add(zpath)
+            if _convert_zip_to_fmt(zpath, fmt, no_mips):
+                logger.info(f"[OK] ZIP {zpath}  (fmt={FMT_NAMES[fmt]})")
+            else:
+                failed.append(str(zpath))
     else:
         for zpath, member in tqdm(zip_entries, desc=f"[{action.upper()}] 处理 ZIP 文件", 
                                   unit="file", disable=not _HAS_TQDM):
@@ -1280,19 +1555,26 @@ def _process_zip_in_place(
                 with zipfile.ZipFile(zpath, "r") as zf:
                     zf.extractall(tmp_path)
 
-                for member in tqdm(members, desc=f"转换 {zpath.name}", 
+                zip_failed = []
+                for member in tqdm(members, desc=f"转换 {zpath.name}",
                                    unit="file", disable=not _HAS_TQDM):
                     src = tmp_path / member
                     if not src.exists():
                         logger.warning(f"  [跳过] 不存在: {member}")
                         continue
-                    logger.debug(f"  [convert] {member}  (fmt={FMT_NAMES[fmt]})")
-                    ktex = read_ktex(str(src))
-                    rgba = decode_ktex_to_rgba(ktex, level=0)
-                    new_ktex = _encode_rgba_to_ktex(
-                        rgba, fmt=fmt, generate_mips=not no_mips
-                    )
-                    write_ktex(str(src), new_ktex)
+                    try:
+                        logger.debug(f"  [convert] {member}  (fmt={FMT_NAMES[fmt]})")
+                        ktex = read_ktex(str(src))
+                        rgba = decode_ktex_to_rgba(ktex, level=0)
+                        new_ktex = _encode_rgba_to_ktex(
+                            rgba, fmt=fmt, generate_mips=not no_mips
+                        )
+                        write_ktex(str(src), new_ktex)
+                    except Exception as e:
+                        logger.error(f"  [失败] {member} -> {e}")
+                        zip_failed.append(member)
+                if zip_failed:
+                    logger.warning(f"  {len(zip_failed)} 个 ZIP 成员转换失败，详见上方错误日志")
 
                 tmp_zip = zpath.with_suffix(".zip.tmp")
                 with zipfile.ZipFile(tmp_zip, "w", zipfile.ZIP_DEFLATED) as new_zf:
@@ -1688,6 +1970,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     p3.add_argument("-o", "--output", help="输出目录")
     p3.add_argument("--batch", action="store_true",
                     help="启用批处理：递归扫描目录 / 处理 zip")
+    p3.add_argument("--resume", action="store_true",
+                    help="断点续传：把已处理/失败的单位记入进度文件，中途闪退后重跑同一命令会跳过已完成的继续")
+    p3.add_argument("--progress", default="",
+                    help="进度文件路径（默认：工具同目录 .ktex_convert_progress.txt）")
+    p3.add_argument("--retry-failed", action="store_true",
+                    help="重试进度文件中带 '!' 前缀的失败记录")
 
     p4 = sub.add_parser("info", help="显示 .tex / .zip 文件详细信息")
     p4.add_argument("inputs", nargs="+", help="一个或多个 .tex / .zip / 目录")
@@ -1722,12 +2010,23 @@ def main(argv: Optional[List[str]] = None) -> int:
             if has_dir_or_zip and not args.batch:
                 logger.info("[自动] 检测到目录/ZIP 输入，启用批处理模式")
             fmt = _normalize_fmt(args.format) if args.action != "tex2png" else FMT_ASTC8x8
-            batch_process(
-                args.action, args.inputs, args.output,
-                fmt=fmt,
-                level=getattr(args, "level", 0),
-                no_mips=getattr(args, "no_mips", False),
-            )
+            if args.action == "convert" and getattr(args, "resume", False):
+                progress_file = args.progress or str(
+                    Path(__file__).resolve().parent / ".ktex_convert_progress.txt"
+                )
+                run_resume_convert(
+                    args.inputs,
+                    fmt,
+                    progress_file,
+                    retry_failed=getattr(args, "retry_failed", False),
+                )
+            else:
+                batch_process(
+                    args.action, args.inputs, args.output,
+                    fmt=fmt,
+                    level=getattr(args, "level", 0),
+                    no_mips=getattr(args, "no_mips", False),
+                )
         elif args.action == "tex2png":
             for inp in args.inputs:
                 src = Path(inp)

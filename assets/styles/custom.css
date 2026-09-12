@@ -1,4 +1,4 @@
-﻿/*
+/*
   You can add custom styles and css variables here.
 */
 
@@ -87,12 +87,17 @@ main.container {
   padding: 2px var(--space-8);
 }
 
-/* 亮色主题：复制按钮文字颜色加深 */
+/* 亮色主题：复制/折叠按钮文字颜色加深 */
 :root[data-theme="light"] .book-codeblock-copy,
+:root[data-theme="light"] .book-codeblock-collapse,
 :root[data-theme="catppuccin-light"] .book-codeblock-copy,
+:root[data-theme="catppuccin-light"] .book-codeblock-collapse,
 :root[data-theme="ayu-light"] .book-codeblock-copy,
+:root[data-theme="ayu-light"] .book-codeblock-collapse,
 :root[data-theme="contrast-light"] .book-codeblock-copy,
-:root[data-theme="github-light"] .book-codeblock-copy {
+:root[data-theme="contrast-light"] .book-codeblock-collapse,
+:root[data-theme="github-light"] .book-codeblock-copy,
+:root[data-theme="github-light"] .book-codeblock-collapse {
   color: var(--gray-700);
 }
 
@@ -115,7 +120,20 @@ main.container {
   border-top: 0;
 }
 
-.book-codeblock-copy {
+/* 文件名栏右侧按钮组：折叠按钮排在复制按钮左边 */
+.book-codeblock-actions {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+
+.book-codeblock-copy,
+.book-codeblock-collapse {
   background: none;
   border: none;
   color: var(--gray-500);
@@ -123,21 +141,58 @@ main.container {
   padding: 2px 8px;
   font-size: 0.8em;
   border-radius: var(--border-radius);
+  white-space: nowrap;
 }
 
-.book-codeblock-copy:hover {
+.book-codeblock-copy:hover,
+.book-codeblock-collapse:hover {
   color: var(--body-font-color);
   background: var(--gray-100);
 }
 
-/* PNG 菜单图标：保留原色，不受暗色主题 --icon-filter 影响 */
-img.book-icon[src$=".png"] {
+/* 折叠模式：第 1 行完整显示，第 2~3 行渐隐（提示下面还有内容） */
+.book-codeblock-folded pre code {
+  display: block;
+  overflow: hidden;
+  /* 旧浏览器回退：3 行（代码行高为 1.6em） */
+  max-height: 4.8em;
+  max-height: 3lh;
+  /* 33% = 第 1 行结束，之后第 2、3 行逐级淡出；mask 只作用于文字、不动背景，任何配色主题下都成立 */
+  -webkit-mask-image: linear-gradient(to bottom, #000 33%, rgba(0, 0, 0, 0.42) 58%, rgba(0, 0, 0, 0.12) 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 33%, rgba(0, 0, 0, 0.42) 58%, rgba(0, 0, 0, 0.12) 82%, transparent 100%);
+}
+
+/* 折叠时才出现的行数提示 */
+.book-codeblock-lines {
+  color: var(--gray-500);
+  font-size: 0.75em;
+  padding-right: var(--space-4);
+  white-space: nowrap;
+}
+
+/* 打印时展开，避免只打印出前 3 行 */
+@media print {
+  .book-codeblock-folded pre code {
+    max-height: none;
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* 位图菜单图标（png / webp / jpg…）：保留原色，不受暗色主题 --icon-filter 影响。
+   注意：不能只写 [src$=".png"] —— 2026-09-01 起站点图片统一转成 webp
+   （ds_icon.png/dst_icon.png → ds_icon.webp/dst_icon.webp），png 选择器失配后
+   暗色主题的 filter: brightness(0) invert(1) 会把不透明的封面图刷成纯白色块，
+   看起来就是"图标不显示了"。用 :not(.svg) 覆盖所有位图，主题自带的线性图标
+   （menu/toc/chevron/bi-* 等 .svg）仍然照常反色。 */
+img.book-icon:not([src$=".svg"]) {
   filter: none;
   -webkit-filter: none;
 }
 
-/* PNG 菜单图标尺寸：保持宽高比，避免被强制为 1em 正方形 */
-a img.book-icon[src$=".png"] {
+/* 位图菜单图标尺寸：保持宽高比，避免被 a .book-icon 强制成 1em 正方形 */
+a img.book-icon:not([src$=".svg"]) {
   width: auto;
   height: 1.2em;
 }
@@ -716,7 +771,8 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   opacity: 0;
   pointer-events: none;
 }
-/* 底部说明：手柄图标 + 文字（整体居中） */
+/* 底部说明：文字/链接（靠左，与轮播里第一张图的左边缘对齐；
+   早先为 justify-content:center，会相对整条内容列居中，单图时看着偏右） */
 .gallery-caption {
   display: -webkit-box;
   display: -webkit-flex;
@@ -724,9 +780,9 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   -webkit-box-align: center;
   -webkit-align-items: center;
   align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  justify-content: flex-start;
   gap: 8px;
   margin-top: 8px;
   color: var(--body-font-color);

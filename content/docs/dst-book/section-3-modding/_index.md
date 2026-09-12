@@ -25,3 +25,4 @@ bookCollapseSection: false
 
 - [《KTEX 工具的简单实现》](/p/ktex)
 
+<!-- {{% include "./carney" %}} -->

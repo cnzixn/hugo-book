@@ -1,0 +1,9 @@
+{{ with .Get 0 }}
+{{ with $.Page.GetPage . }}
+{{- .RenderShortcodes }}
+{{ else }}
+{{ errorf "include短代码找不到页面：%q" . }}
+{{ end }}
+{{ else }}
+{{ errorf "include 需要传入md页面路径" }}
+{{ end }}

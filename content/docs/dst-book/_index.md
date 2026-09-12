@@ -9,9 +9,9 @@ aliases:
 
 
 {{< gallery caption="" href="" >}}
-  /img/dst/97F15F8FCA9B74085ED4A309ABAD84FE.webp
-  /img/dst/49AC483F2482238446724C7AAD9353B6.webp
-  /img/dst/D45E08AF1612836D55F8CFBA7E623BB2.webp
+  97F15F8FCA9B74085ED4A309ABAD84FE.webp
+  49AC483F2482238446724C7AAD9353B6.webp
+  D45E08AF1612836D55F8CFBA7E623BB2.webp
 {{< /gallery >}}
 
 {{<button href="https://playdigious.com/games/dont-starve-together" class="btn-block">}}{{< svg "bi-globe2" >}} Playdigious{{</button>}}

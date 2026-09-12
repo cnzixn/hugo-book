@@ -7,6 +7,8 @@
 {{- $currentDate := now.Format "20060102" -}}
 {{- /* 网盘链接策略：modal(默认)=不内嵌直链，点击下载在当前页弹框校验邮箱后新标签打开；direct=旧行为直链 */ -}}
 {{- $panMode := $.Site.Params.dstPanMode | default "modal" -}}
+{{- /* 网盘总开关（params.panBaiduEnabled / panXunleiEnabled / panQuarkEnabled） */ -}}
+{{- $panSw := partial "docs/pan-switches.html" . -}}
 
 
 {{/* ========== 1. 构建 WS000000-WSxxxxxxxxxxxx 切片 ========== */}}
@@ -21,6 +23,10 @@
     {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
     {{- $xunleiUrl := index (where $itemData "url2" "ne" nil) 0 "url2" -}}
     {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
+    {{- /* 总开关关闭的网盘：先清空 url → 下面 has* 判定自然为 false（按钮不渲染，direct 模式也不写进 JSON） */ -}}
+    {{- if not $panSw.baidu -}}{{- $baiduUrl = "" -}}{{- end -}}
+    {{- if not $panSw.xunlei -}}{{- $xunleiUrl = "" -}}{{- end -}}
+    {{- if not $panSw.quark -}}{{- $quarkUrl = "" -}}{{- end -}}
     {{- $hasBaidu := gt (len (findRE `^https://pan\.baidu\.com/s/` $baiduUrl)) 0 -}}
     {{- $hasXunlei := gt (len (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl)) 0 -}}
     {{- $hasQuark := gt (len (findRE `^https://pan\.quark\.cn/s/` $quarkUrl)) 0 -}}
@@ -82,6 +88,9 @@
 <script id="mods-data" type="application/json"
         data-current-date="{{ $currentDate }}"
         data-pan-mode="{{ $panMode }}"
+        data-pan-baidu-enabled="{{ $panSw.baidu }}"
+        data-pan-xunlei-enabled="{{ $panSw.xunlei }}"
+        data-pan-quark-enabled="{{ $panSw.quark }}"
         data-img-base="/img/ws/"
         data-img-fallback="/img/ws/none.png"
         data-src="{{ $dataAsset.RelPermalink }}"></script>

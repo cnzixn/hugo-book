@@ -20,7 +20,7 @@ processing_status: "completed"
 [查看创意工坊原页面](https://steamcommunity.com/sharedfiles/filedetails/?id=2302837868)
 
 {{< gallery caption="" href="" >}}
-  static\img\dst-mods\Snipaste_2026-09-08_12-45-48.png
+  38662315507C35F8D348C3662B7126FF.png
 {{< /gallery >}}
 
 - 装备锄头后，会显示“犁地模式”按钮。

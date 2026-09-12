@@ -3,7 +3,7 @@ title: "关于"
 bookHidden: true
 ---
 
-{{< svg "bi-journal-bookmark" >}} **饥荒模组手册**，是一个面向《饥荒》手游玩家的 **非官方** 资源站。
+{{< svg "bi-journal-bookmark" >}} **饥荒模组手册**，是一个面向《饥荒》手游玩家的 **社区** 资源站。
 
 -----
 
@@ -24,13 +24,15 @@ bookHidden: true
 
 {{< details "点击展开，扫码为“天才程序员”助力 " >}}
   {{< gallery caption="" href="" >}}
-    static\img\icons\C62DA793C5250F1BC356917362095C6E.png
+    static\img\qr\C62DA793C5250F1BC356917362095C6E.png
+    static\img\qr\7EDE7F7AD16357EE2C23FC0C27F5D694.png
   {{< /gallery >}}
 {{< /details >}}
 
-<!-- static\img\icons\C62DA793C5250F1BC356917362095C6E.png -->
-<!-- static\img\icons\7EDE7F7AD16357EE2C23FC0C27F5D694.png -->
-<!-- static\img\icons\C4E3762CFE91968B16582A5E51ED0A35.png -->
+
+<!-- static\img\qr\C62DA793C5250F1BC356917362095C6E.png -->
+<!-- static\img\qr\7EDE7F7AD16357EE2C23FC0C27F5D694.png -->
+<!-- static\img\qr\C4E3762CFE91968B16582A5E51ED0A35.png -->
 
 ## 域名
 -----
@@ -47,5 +49,5 @@ bookHidden: true
 ## 致谢
 -----
 
-- 本站由 [Hugo](https://gohugo.io/) 构建，主题基于 [Hugo Book](https://github.com/alex-shpak/hugo-book/) 定制
 - 感谢每一位投稿、反馈与赞助的朋友，是你们的支持让本站持续更新
+- 本站由 [Hugo](https://gohugo.io/) 构建，主题基于 [Hugo Book](https://github.com/alex-shpak/hugo-book/) 定制，部署在 [Cloudflare](https://www.cloudflare.com/) 提供的 Pages 服务（免费）。

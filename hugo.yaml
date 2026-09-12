@@ -1,4 +1,4 @@
-﻿baseURL: https://bxq.me/
+baseURL: https://bxq.me/
 title: 饥荒模组手册
 theme: hugo-book
 
@@ -132,6 +132,17 @@ params:
   #       游戏下载页(ds-pans/dst-pans)固定为直链展示，不在弹框范围内。
   dsPanMode: "modal"      # 单机版：模组列表(ds-mods) 走当前页邮箱弹框
   dstPanMode: "modal"     # 联机版：模组列表(dst-mods) 走当前页邮箱弹框
+
+  # ------- 网盘总开关（3 个：分别控制是否启用对应网盘） -------
+  # true / 未配置（默认）= 启用；false = 整站关闭该网盘的所有入口：
+  #   - 模组列表(ds-mods/dst-mods)的下载按钮：关闭后连"暂无"灰按钮都不渲染
+  #   - 网盘下载弹框：不再提供该网盘选项（也不使用后端返回的该网盘链接）
+  #   - 游戏下载页(ds-pans/dst-pans)：不再渲染该网盘标签页
+  #   - direct 模式：不会把该网盘真实直链写进 /ds-mods.json 等数据文件
+  # 注意：只能显式写 true / false（写成字符串 "false" 同样按关闭处理）
+  panBaiduEnabled: true    # 百度网盘
+  panXunleiEnabled: false   # 迅雷网盘
+  panQuarkEnabled: true    # 夸克网盘
 
   # (Optional, default light) Sets color theme: light or dark.
   # （可选，默认 light）设置颜色主题：light 或 dark

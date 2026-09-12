@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="△行动跑刀助手：计时、每局收益记录、总资产与纯币收益统计、平均每小时、假账核对、导出 TXT。数据仅保存在本机浏览器。">
+<title>△跑刀助手</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔪</text></svg>">
+<script>
+  (function () {
+    try {
+      var m = localStorage.getItem('df-paodao-theme');
+      if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+    } catch (e) { /* ignore */ }
+  })();
+</script>
+<style>
+/* ---------- 页面基础 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--body-background);
+  color: var(--body-font-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.wrap { max-width: 920px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+
+/* ---------- 主题变量（原 hugo-book 主题变量，独立化） ---------- */
+:root {
+  --body-background: #ffffff;
+  --body-font-color: #1f2328;
+  --gray-100: #f6f8fa;
+  --gray-200: #d0d7de;
+  --gray-500: #6e7781;
+  --color-link: #0969da;
+  --color-accent-tip: #1a7f37;
+  --color-accent-caution: #cf222e;
+}
+:root[data-theme="dark"] {
+  --body-background: #0d1117;
+  --body-font-color: #e6edf3;
+  --gray-100: #161b22;
+  --gray-200: #30363d;
+  --gray-500: #8b949e;
+  --color-link: #58a6ff;
+  --color-accent-tip: #3fb950;
+  --color-accent-caution: #f85149;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --body-background: #0d1117;
+    --body-font-color: #e6edf3;
+    --gray-100: #161b22;
+    --gray-200: #30363d;
+    --gray-500: #8b949e;
+    --color-link: #58a6ff;
+    --color-accent-tip: #3fb950;
+    --color-accent-caution: #f85149;
+  }
+}
+
+/* ---------- 主题切换按钮 ---------- */
+.theme-toggle {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--gray-200);
+  background: var(--gray-100);
+  color: var(--body-font-color);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.theme-toggle:hover { opacity: 0.85; }
+
+/* 左上角主题按钮留位，避免压住标题 */
+.wrap .dp-app .dp-head { padding-left: 3rem; }
+
+/* ---------- 页脚 ---------- */
+.page-foot {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  color: var(--gray-500);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+/* ============================================================
+   以下为助手组件样式（与 Hugo 页面同一份）
+   ============================================================ */
+/* ============================================================
+   △跑刀助手（隐藏页专用）—— 卡片式计时 / 收益统计
+   仅在 front matter 含 dfPaodao: true 的页面加载
+   ============================================================ */
+.dp-app {
+  --dp-border: var(--gray-200);
+  --dp-muted: var(--gray-500);
+  --dp-radius: 12px;
+  margin: 0.5rem 0 2rem;
+}
+
+/* ---------- 头部 ---------- */
+.dp-app .dp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.dp-app .dp-title { margin: 0; font-size: 1.55rem; line-height: 1.2; }
+.dp-app .dp-sub { margin: 0.35rem 0 0; color: var(--dp-muted); font-size: 0.82rem; }
+.dp-app .dp-head-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+.dp-app .dp-badge {
+  display: inline-block;
+  padding: 0.18rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  border: 1px solid var(--dp-border);
+  color: var(--dp-muted);
+  background: var(--gray-100);
+  white-space: nowrap;
+}
+.dp-app .dp-badge-running { color: var(--color-accent-tip); border-color: var(--color-accent-tip); background: transparent; }
+.dp-app .dp-badge-ended { color: var(--color-link); border-color: var(--color-link); background: transparent; }
+
+/* ---------- 卡片栅格 ---------- */
+.dp-app .dp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.dp-app .dp-card {
+  min-width: 0;
+  padding: 1rem 1.05rem 1.1rem;
+  border: 1px solid var(--dp-border);
+  border-radius: var(--dp-radius);
+  background: var(--body-background);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.dp-app .dp-card-timer,
+.dp-app .dp-card-wide { grid-column: 1 / -1; }
+
+.dp-app .dp-card-hd {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.8rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--body-font-color);
+}
+.dp-app .dp-dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-link);
+}
+
+/* ---------- 计时器 ---------- */
+.dp-app .dp-timer {
+  padding: 0.35rem 0 0.2rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(2.1rem, 8vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--body-font-color);
+}
+.dp-app .dp-timer-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--dp-muted);
+}
+.dp-app .dp-timer-meta b { color: var(--body-font-color); font-weight: 600; }
+
+/* ---------- 表单 ---------- */
+.dp-app .dp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--dp-muted);
+}
+.dp-app .dp-field input {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--dp-border);
+  border-radius: 8px;
+  background: var(--body-background);
+  color: var(--body-font-color);
+}
+.dp-app .dp-field input:focus {
+  outline: 2px solid var(--color-link);
+  outline-offset: 0;
+  border-color: transparent;
+}
+.dp-app .dp-field input:disabled { opacity: 0.65; background: var(--gray-100); }
+.dp-app .dp-field input::placeholder { color: var(--dp-muted); opacity: 0.75; }
+
+/* 数字 + 单位下拉（记录本局只填数字） */
+.dp-app .dp-input-group { display: flex; gap: 0.4rem; }
+.dp-app .dp-input-group input { flex: 1 1 auto; width: auto; min-width: 0; }
+.dp-app .dp-input-group .dp-unit {
+  flex: none;
+  width: auto;
+  padding: 0 0.45rem;
+  font: inherit;
+  font-size: 0.9rem;
+  border: 1px solid var(--dp-border);
+  border-radius: 8px;
+  background: var(--gray-100);
+  color: var(--body-font-color);
+  cursor: pointer;
+}
+.dp-app .dp-input-group .dp-unit:focus { outline: 2px solid var(--color-link); outline-offset: 0; }
+
+/* 资产卡：总资产 / 仓库纯币 两栏 */
+.dp-app .dp-asset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 0 0.75rem;
+}
+
+/* ---------- 按钮 ---------- */
+.dp-app .dp-btn {
+  display: inline-block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 1px solid var(--dp-border);
+  border-radius: 8px;
+  background: var(--gray-100);
+  color: var(--body-font-color);
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.05s ease;
+}
+.dp-app .dp-btn:not(:disabled):hover { opacity: 0.85; }
+.dp-app .dp-btn:not(:disabled):active { transform: translateY(1px); }
+.dp-app .dp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.dp-app .dp-btn-primary {
+  background: var(--color-accent-tip);
+  border-color: var(--color-accent-tip);
+  color: var(--body-background);
+}
+.dp-app .dp-btn-danger {
+  background: var(--color-accent-caution);
+  border-color: var(--color-accent-caution);
+  color: var(--body-background);
+}
+.dp-app .dp-btn-ghost {
+  width: auto;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  background: transparent;
+  border-color: transparent;
+  color: var(--dp-muted);
+}
+.dp-app .dp-btn-ghost:not(:disabled):hover { color: var(--color-accent-caution); text-decoration: underline; opacity: 1; }
+
+.dp-app .dp-hint { margin: 0.5rem 0 0; font-size: 0.75rem; color: var(--dp-muted); }
+
+/* ---------- 每局表格 ---------- */
+.dp-app .dp-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 12.9rem;   /* 表头 + 5 行；超过 5 局可上下滑动 */
+  margin-top: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+.dp-app .dp-table { display: table; width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 0; }
+.dp-app .dp-table th,
+.dp-app .dp-table td {
+  height: 2.15rem;
+  line-height: 1.3rem;
+  padding: 0.4rem 0.5rem;
+  border: none;
+  border-bottom: 1px solid var(--dp-border);
+  text-align: right;
+  white-space: nowrap;
+}
+.dp-app .dp-table th:first-child,
+.dp-app .dp-table td:first-child { text-align: left; }
+.dp-app .dp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--body-background);
+  color: var(--dp-muted);
+  font-weight: 600;
+  font-size: 0.76rem;
+}
+.dp-app .dp-table td.dp-empty { height: 4.3rem; text-align: center; color: var(--dp-muted); }
+.dp-app .dp-table-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.6rem 0 1.1rem;   /* 与下方「本局收益」输入区留出间距 */
+  font-size: 0.8rem;
+  color: var(--dp-muted);
+}
+.dp-app .dp-table-foot b { color: var(--body-font-color); font-variant-numeric: tabular-nums; }
+.dp-app .dp-del {
+  padding: 0 0.3rem;
+  border: none;
+  background: transparent;
+  color: var(--color-accent-caution);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.dp-app .dp-del:hover { opacity: 0.7; }
+
+/* ---------- 结算 ---------- */
+.dp-app .dp-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 0.75rem;
+}
+.dp-app .dp-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--dp-border);
+  border-radius: 10px;
+}
+.dp-app .dp-stat span { font-size: 0.74rem; color: var(--dp-muted); }
+.dp-app .dp-stat b { font-size: 1.15rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dp-app .dp-stat-highlight { border-color: var(--color-accent-tip); }
+.dp-app .dp-stat-highlight b { color: var(--color-accent-tip); }
+.dp-app .dp-gap-warn { color: var(--color-accent-caution); }
+.dp-app .dp-detail { margin: 0 0 0.9rem; font-size: 0.8rem; line-height: 1.6; color: var(--dp-muted); }
+.dp-app .dp-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.dp-app .dp-actions .dp-btn { width: auto; flex: 1 1 8rem; }
+
+.dp-app .dp-error { min-height: 1.2em; margin: 0.75rem 0 0; font-size: 0.82rem; color: var(--color-accent-caution); }
+
+/* ---------- 按状态显隐 ---------- */
+.dp-app[data-status="idle"] #dp-record-card,
+.dp-app[data-status="idle"] #dp-result-card { display: none; }
+
+.dp-app[data-status="running"] #dp-result-card { display: none; }
+
+.dp-app[data-status="ended"] .dp-record-input,
+.dp-app[data-status="ended"] .dp-cell-op { display: none; }
+
+.dp-app[data-status="idle"] #dp-reset,
+.dp-app[data-status="idle"] #dp-round-now-wrap,
+.dp-app[data-status="ended"] #dp-round-now-wrap { display: none; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 560px) {
+  .dp-app .dp-grid { grid-template-columns: 1fr; }
+  .dp-app .dp-head { align-items: flex-start; }
+  .dp-app .dp-asset-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<button type="button" id="dp-theme" class="theme-toggle">☀️</button>
+<div class="wrap">
+<div class="dp-app" data-status="idle">
+  <div class="dp-head">
+    <div>
+      <!-- <h1 class="dp-title">△跑刀助手</h1>
+      <p class="dp-sub">记录每一局的收益与耗时 · 数据仅保存在本机浏览器，刷新不丢</p> -->
+    </div>
+    <div class="dp-head-actions">
+      <span id="dp-status" class="dp-badge dp-badge-idle">未开始</span>
+      <button type="button" id="dp-reset" class="dp-btn dp-btn-ghost" data-action="reset">重置</button>
+    </div>
+  </div>
+
+  <div class="dp-grid">
+
+    <section class="dp-card dp-card-timer">
+      <header class="dp-card-hd"><span class="dp-dot"></span>计时器</header>
+      <div id="dp-timer" class="dp-timer">00:00:00</div>
+      <div class="dp-timer-meta">
+        <span>开局时间：<b id="dp-start-time">—</b></span>
+        <span id="dp-round-now-wrap">本局已用：<b id="dp-round-now">00:00:00</b></span>
+      </div>
+    </section>
+
+    <section id="dp-record-card" class="dp-card dp-card-wide">
+      <header class="dp-card-hd"><span class="dp-dot"></span>对局记录</header>
+
+      <div id="dp-table-wrap" class="dp-table-wrap">
+        <table class="dp-table">
+          <thead>
+            <tr><th>局数</th><th>本局收益</th><th>本局耗时</th><th>累计收益</th><th></th></tr>
+          </thead>
+          <tbody id="dp-round-list"></tbody>
+        </table>
+      </div>
+      <div class="dp-table-foot">
+        <span>平均每局 <b id="dp-round-avg">—</b></span>
+        <span>平均耗时 <b id="dp-round-avgdur">—</b></span>
+        <span><b id="dp-round-count">0</b> 局</span>
+      </div>
+      <div class="dp-record-input">
+        <label class="dp-field">
+          <span class="dp-input-group">
+            <input id="dp-round-profit" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="本局收益，如 123456">
+            <select id="dp-round-unit" class="dp-unit" aria-label="本局收益单位">
+              <option value="">无</option>
+              <option value="k" selected>K</option>
+              <option value="m">M</option>
+              <option value="b">B</option>
+              <option value="w">万</option>
+              <option value="亿">亿</option>
+            </select>
+          </span>
+        </label>
+        <button type="button" id="dp-record" class="dp-btn dp-btn-primary">记录本局</button>
+        <!-- <p class="dp-hint">只填数字即可，单位用右侧下拉选择（也可直接写 123,456K）。每记录一局自动算出「距上一局开始」的耗时并累计。</p> -->
+      </div>
+    </section>
+
+    <section id="dp-result-card" class="dp-card dp-card-wide">
+      <header class="dp-card-hd"><span class="dp-dot"></span>结算结果</header>
+      <div class="dp-stats">
+        <div class="dp-stat"><span>总耗时</span><b id="dp-r-duration">—</b></div>
+        <div class="dp-stat dp-stat-highlight"><span>总资产 / 小时</span><b id="dp-r-assets-hour">—</b></div>
+        <div class="dp-stat"><span>记录收益</span><b id="dp-r-roundsum">—</b></div>
+        <div class="dp-stat"><span>资产收益</span><b id="dp-r-assets">—</b></div>
+        <div class="dp-stat"><span>假账（记录收益−资产收益）</span><b id="dp-r-gap">—</b></div>
+        <div class="dp-stat"><span>仓库纯币</span><b id="dp-r-havoc">—</b></div>
+        <!-- <div class="dp-stat"><span>平均每局 · 总资产</span><b id="dp-r-assets-avg">—</b></div> -->
+      </div>
+      <p id="dp-r-detail" class="dp-detail"></p>
+      <div class="dp-actions">
+        <button type="button" id="dp-export" class="dp-btn dp-btn-primary">导出 TXT</button>
+        <button type="button" class="dp-btn" data-action="reset">重新开始</button>
+      </div>
+    </section>
+
+    <section id="dp-asset-card" class="dp-card dp-card-wide">
+      <header class="dp-card-hd"><span class="dp-dot"></span>资产</header>
+      <div class="dp-asset-grid">
+        <label class="dp-field">总资产
+          <span class="dp-input-group">
+            <input id="dp-assets-input" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="只填数字，如 123">
+            <select id="dp-assets-unit" class="dp-unit" aria-label="总资产单位">
+              <option value="">无</option>
+              <option value="k">K</option>
+              <option value="m" selected>M</option>
+              <option value="b">B</option>
+              <option value="w">万</option>
+              <option value="亿">亿</option>
+            </select>
+          </span>
+        </label>
+        <label class="dp-field">仓库纯币
+          <span class="dp-input-group">
+            <input id="dp-havoc-input" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="可留空，如 123456">
+            <select id="dp-havoc-unit" class="dp-unit" aria-label="仓库纯币单位">
+              <option value="">无</option>
+              <option value="k" selected>K</option>
+              <option value="m">M</option>
+              <option value="b">B</option>
+              <option value="w">万</option>
+              <option value="亿">亿</option>
+            </select>
+          </span>
+        </label>
+      </div>
+      <div class="dp-actions">
+        <button type="button" id="dp-toggle" class="dp-btn dp-btn-primary">开始跑刀</button>
+      </div>
+      <p class="dp-hint" id="dp-asset-note"></p>
+    </section>
+  </div>
+
+  <p id="dp-error" class="dp-error" role="alert"></p>
+</div>
+</div>
+<p class="page-foot">数据仅保存在本机浏览器（localStorage），换浏览器 / 清缓存会丢失。</p>
+<script>
+/* ============================================================
+   △跑刀助手 —— 计时 / 每局收益记录 / 结算平均每小时
+   纯前端实现，数据保存在 localStorage，刷新页面不丢。
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'df-paodao-session-v1';
+
+  var state = {
+    status: 'idle',      // idle | running | ended
+    startAt: null,       // 开局时间戳(ms)
+    endAt: null,         // 结束时间戳(ms)
+    startAssets: null,   // 开局总资产(基础单位)
+    startHavoc: null,    // 开局仓库纯币
+    endAssets: null,     // 结束总资产
+    endHavoc: null,      // 结束仓库纯币
+    records: []          // [{ t: 记录时间, amount: 本局收益 }]
+  };
+
+  var els = {};
+  var KEYS = [
+    'status', 'timer', 'start-time', 'round-now', 'round-now-wrap',
+    'assets-input', 'assets-unit', 'havoc-input', 'havoc-unit', 'toggle', 'asset-note',
+    'round-profit', 'round-unit', 'round-list', 'table-wrap', 'round-avg', 'round-avgdur',
+    'round-count',
+    'r-duration', 'r-assets', 'r-havoc', 'r-assets-hour', 'r-assets-avg', 'r-gap', 'r-roundsum', 'r-detail',
+    'record', 'reset', 'export', 'error'
+  ];
+
+  function byId(id) { return document.getElementById(id); }
+
+  function cacheEls() {
+    for (var i = 0; i < KEYS.length; i++) {
+      els[KEYS[i]] = byId('dp-' + KEYS[i]);
+    }
+    els.app = document.querySelector('.dp-app');
+  }
+
+  /* ---------------- 数字解析 / 格式化 ---------------- */
+
+  // 全角转半角 + 去掉千分位/空格：中文输入法下 ６５７．０Ｍ、657。0M 也能识别
+  function normalizeNumber(str) {
+    var out = '';
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charCodeAt(i);
+      // 半/全角逗号、顿号、全角空格、普通与不换行空格：丢弃
+      if (c === 0x2C || c === 0xFF0C || c === 0x3001 || c === 0x20 || c === 0xA0 || c === 0x3000) continue;
+      // 全角句点/中文句号/间隔号：统一成小数点
+      if (c === 0xFF0E || c === 0x3002 || c === 0x00B7) { out += '.'; continue; }
+      // 全角 ０-９
+      if (c >= 0xFF10 && c <= 0xFF19) { out += String.fromCharCode(c - 0xFEE0); continue; }
+      // 全角 Ａ-Ｚ / ａ-ｚ
+      if ((c >= 0xFF21 && c <= 0xFF3A) || (c >= 0xFF41 && c <= 0xFF5A)) { out += String.fromCharCode(c - 0xFEE0); continue; }
+      out += str.charAt(i);
+    }
+    return out;
+  }
+
+  // 单位后缀 -> 倍率。匹配前统一转小写，K/k、M/m、B/b（以及 T/t、W/w）大小写均可
+  var UNIT_MULT = { k: 1e3, m: 1e6, b: 1e9, t: 1e12, w: 1e4, '千': 1e3, '万': 1e4, '亿': 1e8 };
+
+  // 支持 123 / 123,456 / 657.0M / 657m / 0.5K / 1.2亿 / 30万 / 5w
+  // 返回 { value, hasUnit }；hasUnit 表示输入框里是否写了单位后缀
+  function parseAmountDetail(raw) {
+    if (raw === null || raw === undefined) return null;
+    var s = normalizeNumber(String(raw));
+    if (!s) return null;
+
+    var hasUnit = false;
+    var mult = UNIT_MULT[s.charAt(s.length - 1).toLowerCase()];
+    if (mult === undefined) {
+      mult = 1;
+    } else {
+      hasUnit = true;
+      s = s.slice(0, -1);
+    }
+
+    if (s.charAt(s.length - 1) === '.') s += '0';   // 657. → 657.0
+    if (!/^[+-]?[0-9]*\.?[0-9]+$/.test(s)) return null;
+    var num = parseFloat(s);
+    if (!isFinite(num)) return null;
+    // 返回原始数字 + 倍率，由调用方最后取整（否则 "2.5" 会先被四舍五入成 3）
+    return { num: num, mult: mult, hasUnit: hasUnit };
+  }
+
+  // 存真实数字：按基础单位取整（657.0M -> 657000000），不保留缩写字符串
+  function parseAmount(raw) {
+    var d = parseAmountDetail(raw);
+    return d ? Math.round(d.num * d.mult) : null;
+  }
+
+  // 只输入数字 + 下拉选单位：输入框没写后缀时套用所选单位，写了后缀则以后缀为准
+  function parseWithUnit(raw, unitMult) {
+    var d = parseAmountDetail(raw);
+    if (!d) return null;
+    return Math.round(d.num * (d.hasUnit ? d.mult : (unitMult || 1)));
+  }
+
+  // 读取指定下拉当前选中的单位倍率（默认「本局收益」那个）
+  function selectedUnitMult(id) {
+    var el = els[id || 'round-unit'];
+    var m = el ? UNIT_MULT[String(el.value || '').toLowerCase()] : undefined;
+    return m === undefined ? 1 : m;
+  }
+
+  // 读取资产类输入：空 => { empty:true, value:null }；只写数字则套用所选单位
+  function readAssetField(key) {
+    var raw = els[key + '-input'].value;
+    if (String(raw).trim() === '') return { empty: true, value: null };
+    return { empty: false, value: parseWithUnit(raw, selectedUnitMult(key + '-unit')) };
+  }
+
+  function trimNum(n) {
+    var s = n.toFixed(2);
+    s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s;
+  }
+
+  // 紧凑显示：12.5M / 123,456K
+  function formatAmount(v) {
+    if (v === null || v === undefined || !isFinite(v)) return '—';
+    var sign = v < 0 ? '-' : '';
+    var abs = Math.abs(v);
+    if (abs >= 1e12) return sign + trimNum(abs / 1e12) + 'T';
+    if (abs >= 1e9) return sign + trimNum(abs / 1e9) + 'B';
+    if (abs >= 1e6) return sign + trimNum(abs / 1e6) + 'M';
+    if (abs >= 1e3) return sign + trimNum(abs / 1e3) + 'K';
+    return sign + String(Math.round(abs));
+  }
+
+  function exact(v) {
+    if (v === null || v === undefined || !isFinite(v)) return '';
+    return Math.round(v).toLocaleString('en-US');
+  }
+
+  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+
+  function formatDuration(ms) {
+    if (ms === null || ms === undefined || !isFinite(ms) || ms < 0) ms = 0;
+    var total = Math.floor(ms / 1000);
+    var h = Math.floor(total / 3600);
+    var m = Math.floor((total % 3600) / 60);
+    var s = total % 60;
+    return pad2(h) + ':' + pad2(m) + ':' + pad2(s);
+  }
+
+  function formatClock(t) {
+    var d = new Date(t);
+    return pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+
+  /* ---------------- 渲染 ---------------- */
+
+  function setError(msg) { els.error.textContent = msg || ''; }
+
+  function renderStatus() {
+    var map = { idle: '未开始', running: '跑刀中', ended: '已结束' };
+    els.app.setAttribute('data-status', state.status);
+    els.status.textContent = map[state.status] || '未开始';
+    els.status.className = 'dp-badge dp-badge-' + state.status;
+    // 一个按钮走完：开始跑刀 → 结束跑刀 → 重新开始
+    if (state.status === 'idle') {
+      els.toggle.textContent = '开始跑刀';
+      els.toggle.className = 'dp-btn dp-btn-primary';
+    } else if (state.status === 'running') {
+      els.toggle.textContent = '结束跑刀';
+      els.toggle.className = 'dp-btn dp-btn-danger';
+    } else {
+      els.toggle.textContent = '重新开始';
+      els.toggle.className = 'dp-btn';
+    }
+    els.toggle.disabled = false;
+
+    // 资产说明：当前阶段该填什么 / 已记录了什么
+    if (!els['asset-note']) return;
+    if (state.status === 'idle') {
+      els['asset-note'].textContent = '填写开局的总资产（仓库纯币可以不填），点「开始跑刀」计时；单位可下拉选择，只填数字即可';
+    } else if (state.status === 'running') {
+      els['asset-note'].textContent = '开局：总资产 ' + formatAmount(state.startAssets)
+        + ' · 仓库纯币 ' + formatAmount(state.startHavoc)
+        + '　—— 结束时把上面改成最新数值，再点「结束跑刀」';
+    } else {
+      els['asset-note'].textContent = '开始 ' + formatAmount(state.startAssets) + ' · ' + formatAmount(state.startHavoc)
+        + '  →  结束 ' + formatAmount(state.endAssets) + ' · ' + formatAmount(state.endHavoc);
+    }
+  }
+
+  function renderTimer() {
+    var now = Date.now();
+    var dur = 0;
+    if (state.startAt) {
+      if (state.status === 'ended' && state.endAt) dur = state.endAt - state.startAt;
+      else if (state.status === 'running') dur = now - state.startAt;
+    }
+    els.timer.textContent = formatDuration(dur);
+    els['start-time'].textContent = state.startAt ? formatClock(state.startAt) : '—';
+
+    if (state.status === 'running' && state.startAt) {
+      var last = state.records.length ? state.records[state.records.length - 1].t : state.startAt;
+      els['round-now'].textContent = formatDuration(now - last);
+    } else {
+      els['round-now'].textContent = '00:00:00';
+    }
+  }
+
+  function makeCell(text, cls, title) {
+    var td = document.createElement('td');
+    if (cls) td.className = cls;
+    if (title) td.title = title;
+    td.textContent = text;
+    return td;
+  }
+
+  function renderRecords() {
+    var tbody = els['round-list'];
+    while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+
+    var prev = state.startAt || 0;
+    var sum = 0;
+    var durSum = 0;
+    for (var i = 0; i < state.records.length; i++) {
+      var rec = state.records[i];
+      var dur = rec.t - prev;   // 本局耗时 = 距上一局开始
+      prev = rec.t;
+      sum += rec.amount;
+      durSum += dur;
+
+      var tr = document.createElement('tr');
+      tr.appendChild(makeCell(String(i + 1), 'dp-cell-idx'));
+      tr.appendChild(makeCell(formatAmount(rec.amount), 'dp-cell-amt', exact(rec.amount)));
+      tr.appendChild(makeCell(formatDuration(dur), 'dp-cell-dur', (dur / 1000).toFixed(1) + ' 秒'));
+      tr.appendChild(makeCell(formatAmount(sum), 'dp-cell-sum', exact(sum)));
+
+      var td = document.createElement('td');
+      td.className = 'dp-cell-op';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'dp-del';
+      btn.textContent = '×';
+      btn.title = '删除第 ' + (i + 1) + ' 局';
+      btn.setAttribute('aria-label', '删除第 ' + (i + 1) + ' 局');
+      btn.setAttribute('data-idx', String(i));
+      td.appendChild(btn);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+    }
+    if (!state.records.length) {
+      var emptyTr = document.createElement('tr');
+      var emptyTd = document.createElement('td');
+      emptyTd.className = 'dp-empty';
+      emptyTd.setAttribute('colspan', '5');
+      emptyTd.textContent = '暂无记录，先记一局吧';
+      emptyTr.appendChild(emptyTd);
+      tbody.appendChild(emptyTr);
+    }
+    var n = state.records.length;
+    els['round-count'].textContent = String(n);
+    // 统计平均：平均每局收益 / 平均每局耗时
+    if (n) {
+      els['round-avg'].textContent = formatAmount(sum / n);
+      els['round-avg'].title = exact(sum / n);
+      els['round-avgdur'].textContent = formatDuration(durSum / n);
+    } else {
+      els['round-avg'].textContent = '—';
+      els['round-avg'].title = '';
+      els['round-avgdur'].textContent = '—';
+    }
+  }
+
+  // 记录新一局后把列表滚到底部，露出最新一条
+  function scrollListToBottom() {
+    var wrap = els['table-wrap'];
+    if (!wrap) return;
+    wrap.scrollTop = wrap.scrollHeight;
+    if (typeof window.requestAnimationFrame === 'function') {
+      window.requestAnimationFrame(function () { wrap.scrollTop = wrap.scrollHeight; });
+    }
+  }
+
+  function sumRecords() {
+    var s = 0;
+    for (var i = 0; i < state.records.length; i++) s += state.records[i].amount;
+    return s;
+  }
+
+  // 一个统计格子：有值显示紧凑数字（title 精确值），无值显示占位
+  function setStat(id, v, emptyText) {
+    var el = els[id];
+    if (!el) return;
+    if (v === null || v === undefined || !isFinite(v)) {
+      el.textContent = emptyText || '—';
+      el.title = '';
+    } else {
+      el.textContent = formatAmount(v);
+      el.title = exact(v);
+    }
+  }
+
+  function renderResult() {
+    if (state.status !== 'ended') return;
+
+    var dur = (state.endAt || Date.now()) - (state.startAt || Date.now());
+    if (dur < 0) dur = 0;
+    var hours = dur / 3600000;
+    var rs = sumRecords();
+
+    var assetProfit = (state.endAssets !== null && state.startAssets !== null)
+      ? state.endAssets - state.startAssets : null;
+    var havocProfit = (state.endHavoc !== null && state.startHavoc !== null)
+      ? state.endHavoc - state.startHavoc : null;
+
+    // 总资产：收益 / 每小时 / 每局；纯币：只算收益；假账 = 记录累计 − 总资产收益
+    var n = state.records.length;
+    var assetHour = (assetProfit !== null && hours > 0) ? assetProfit / hours : null;
+    var assetAvg = (assetProfit !== null && n > 0) ? assetProfit / n : null;
+    var gap = (assetProfit !== null && n > 0) ? rs - assetProfit : null;
+
+    els['r-duration'].textContent = formatDuration(dur);
+    setStat('r-assets', assetProfit, '— 未填写');
+    setStat('r-havoc', havocProfit, '— 未填写');
+    setStat('r-assets-hour', assetHour);
+    setStat('r-assets-avg', assetAvg);
+    setStat('r-gap', gap);
+    if (els['r-gap']) els['r-gap'].className = (gap !== null && gap !== 0) ? 'dp-gap-warn' : '';
+    els['r-roundsum'].textContent = formatAmount(rs);
+    els['r-roundsum'].title = exact(rs);
+
+    var parts = [];
+    if (state.startAssets !== null && state.endAssets !== null) {
+      parts.push('总资产 ' + formatAmount(state.startAssets) + ' → ' + formatAmount(state.endAssets)
+        + '（' + (assetProfit >= 0 ? '+' : '') + formatAmount(assetProfit) + '）');
+    }
+    if (state.startHavoc !== null && state.endHavoc !== null) {
+      parts.push('纯币 ' + formatAmount(state.startHavoc) + ' → ' + formatAmount(state.endHavoc)
+        + '（' + (havocProfit >= 0 ? '+' : '') + formatAmount(havocProfit) + '）');
+    }
+    parts.push('共 ' + state.records.length + ' 局');
+    if (state.records.length && hours > 0) {
+      parts.push('记录均 ' + formatAmount(rs / state.records.length) + '/局');
+    }
+    els['r-detail'].textContent = parts.join(' · ');
+  }
+
+  function refresh() {
+    renderStatus();
+    renderTimer();
+    renderRecords();
+    renderResult();
+  }
+
+  // 程序化写入资产框：回填精确整数时把单位置为「无」，避免再被放大
+  function setAssetField(key, v, keepUnit) {
+    var input = els[key + '-input'];
+    var unit = els[key + '-unit'];
+    if (v === null || v === undefined) {
+      input.value = '';
+      if (!keepUnit && unit) unit.value = (key === 'assets') ? 'm' : 'k';
+    } else {
+      input.value = exact(v);
+      if (unit) unit.value = '';
+    }
+  }
+
+  // 两个输入框：未开始=开局值，跑刀中=留空待填结束值，已结束=结束值
+  function syncAssetInputs() {
+    var a = null;
+    var h = null;
+    if (state.status === 'ended') {
+      a = state.endAssets;
+      h = state.endHavoc;
+    } else if (state.status === 'idle') {
+      a = state.startAssets;
+      h = state.startHavoc;
+    }
+    var keepUnit = state.status === 'running';   // 刚清空时保留用户选好的单位
+    setAssetField('assets', a, keepUnit);
+    setAssetField('havoc', h, keepUnit);
+  }
+
+  /* ---------------- 导出 TXT ---------------- */
+
+  function repeatStr(ch, n) {
+    var s = '';
+    for (var i = 0; i < n; i++) s += ch;
+    return s;
+  }
+
+  function formatDateTime(t) {
+    var d = new Date(t);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+      + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
+  }
+
+  function stampName(t) {
+    var d = new Date(t);
+    return '' + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate())
+      + '_' + pad2(d.getHours()) + pad2(d.getMinutes()) + pad2(d.getSeconds());
+  }
+
+  function amtPair(v) {
+    if (v === null || v === undefined || !isFinite(v)) return '—';
+    return formatAmount(v) + '(' + exact(v) + ')';
+  }
+
+  function signedAmt(v) {
+    if (v === null || v === undefined || !isFinite(v)) return '—';
+    var sign = v >= 0 ? '+' : '-';
+    return sign + formatAmount(Math.abs(v)) + '(' + sign + exact(Math.abs(v)) + ')';
+  }
+
+  // 生成战报纯文本，\r\n 换行，Windows 记事本可直接打开
+  function buildReport() {
+    var dur = (state.endAt || Date.now()) - (state.startAt || Date.now());
+    if (dur < 0) dur = 0;
+    var hours = dur / 3600000;
+    var rs = sumRecords();
+
+    var assetProfit = (state.endAssets !== null && state.startAssets !== null)
+      ? state.endAssets - state.startAssets : null;
+    var havocProfit = (state.endHavoc !== null && state.startHavoc !== null)
+      ? state.endHavoc - state.startHavoc : null;
+    var L = [];
+    L.push('△跑刀助手 · 跑刀战报');
+    L.push('生成时间：' + formatDateTime(Date.now()));
+    L.push(repeatStr('=', 48));
+    L.push('开局时间：' + (state.startAt ? formatDateTime(state.startAt) : '—'));
+    L.push('结束时间：' + (state.endAt ? formatDateTime(state.endAt) : '—'));
+    L.push('总耗时：' + formatDuration(dur));
+    L.push('');
+    L.push('【资产变化】');
+    if (state.startAssets !== null && state.endAssets !== null) {
+      L.push('总资产： ' + formatAmount(state.startAssets) + ' → ' + formatAmount(state.endAssets) + '   变动 ' + signedAmt(assetProfit));
+      L.push('         ' + exact(state.startAssets) + ' → ' + exact(state.endAssets));
+    } else {
+      L.push('总资产： （信息不完整）');
+    }
+    if (state.startHavoc !== null && state.endHavoc !== null) {
+      L.push('纯币：   ' + formatAmount(state.startHavoc) + ' → ' + formatAmount(state.endHavoc) + '   变动 ' + signedAmt(havocProfit));
+      L.push('         ' + exact(state.startHavoc) + ' → ' + exact(state.endHavoc));
+    } else {
+      L.push('纯币：   （信息不完整）');
+    }
+    L.push('');
+    L.push('【结算】');
+    var n = state.records.length;
+    L.push('跑刀局数：' + n + ' 局');
+    L.push('总资产  收益 ' + (assetProfit === null ? '—' : amtPair(assetProfit))
+      + '　每小时 ' + ((assetProfit !== null && hours > 0) ? amtPair(assetProfit / hours) : '—')
+      + '　每局 ' + ((assetProfit !== null && n > 0) ? amtPair(assetProfit / n) : '—'));
+    L.push('纯币    收益 ' + (havocProfit === null ? '—' : amtPair(havocProfit)));
+    L.push('每局记录累计：' + amtPair(rs));
+    L.push('假账(记录累计-总资产收益)：' + ((assetProfit !== null && n > 0) ? signedAmt(rs - assetProfit) : '—'));
+    L.push('');
+    L.push('【每局明细】');
+    if (!state.records.length) {
+      L.push('（无记录）');
+    } else {
+      var prev = state.startAt || 0;
+      var cum = 0;
+      for (var i = 0; i < state.records.length; i++) {
+        var rec = state.records[i];
+        var d = rec.t - prev;
+        prev = rec.t;
+        cum += rec.amount;
+        L.push('第 ' + (i + 1) + ' 局 | 收益 ' + amtPair(rec.amount)
+          + ' | 本局耗时 ' + formatDuration(d)
+          + ' | 累计 ' + formatAmount(cum)
+          + ' | 记录时间 ' + formatDateTime(rec.t));
+      }
+    }
+    L.push('');
+    L.push(repeatStr('=', 48));
+    L.push('数据由「△跑刀助手」在浏览器本地生成');
+    return L.join('\r\n');
+  }
+
+  function onExport() {
+    if (state.status !== 'ended') return;
+    var text = buildReport();
+    var name = '跑刀战报_' + stampName(state.endAt || Date.now()) + '.txt';
+    try {
+      var blob = new Blob(['\ufeff' + text], { type: 'text/plain;charset=utf-8' });
+      if (window.navigator && window.navigator.msSaveBlob) {
+        window.navigator.msSaveBlob(blob, name);
+        return;
+      }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      window.setTimeout(function () {
+        URL.revokeObjectURL(url);
+        if (a.parentNode) a.parentNode.removeChild(a);
+      }, 0);
+    } catch (e) {
+      // 兜底：新窗口展示纯文本，用户可手动另存
+      var w = window.open('', '_blank');
+      if (w) {
+        w.document.write('<pre style="white-space:pre-wrap;font:14px/1.6 monospace">'
+          + text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>');
+        w.document.title = name;
+      } else {
+        setError('导出失败，请检查浏览器是否拦截了下载');
+      }
+    }
+  }
+
+  /* ---------------- 交互 ---------------- */
+
+  function onStart() {
+    var a = readAssetField('assets');
+    var h = readAssetField('havoc');
+    if (!a.empty && a.value === null) {
+      setError('「总资产」数字无法识别，例如 123M，或选好单位后只填数字');
+      return;
+    }
+    if (!h.empty && h.value === null) {
+      setError('「仓库纯币」数字无法识别');
+      return;
+    }
+    if (a.value === null && h.value === null) {
+      setError('请至少填写「总资产」或「仓库纯币」其中一项');
+      return;
+    }
+    setError('');
+    state.status = 'running';
+    state.startAt = Date.now();
+    state.endAt = null;
+    state.startAssets = a.value;
+    state.startHavoc = h.value;
+    state.endAssets = null;
+    state.endHavoc = null;
+    state.records = [];
+    els['round-profit'].value = '';
+    save();
+    refresh();
+    syncAssetInputs();   // 清空，等待填写结束数值
+    els['round-profit'].focus();
+  }
+
+  function onRecord() {
+    if (state.status !== 'running') return;
+    var amount = parseWithUnit(els['round-profit'].value, selectedUnitMult());
+    if (amount === null) {
+      setError('请输入本局收益，例如 123,456K');
+      return;
+    }
+    setError('');
+    state.records.push({ t: Date.now(), amount: amount });
+    els['round-profit'].value = '';
+    save();
+    refresh();
+    scrollListToBottom();
+    els['round-profit'].focus();
+  }
+
+  function onEnd() {
+    if (state.status !== 'running') return;
+    var a = readAssetField('assets');
+    var h = readAssetField('havoc');
+    if ((!a.empty && a.value === null) || (!h.empty && h.value === null)) {
+      setError('结束数值无法识别，请检查数字或单位');
+      return;
+    }
+    if (a.value === null && h.value === null) {
+      setError('请填写结束时的「总资产」或「仓库纯币」');
+      return;
+    }
+    setError('');
+    state.status = 'ended';
+    state.endAt = Date.now();
+    state.endAssets = a.value;
+    state.endHavoc = h.value;
+    save();
+    refresh();
+    syncAssetInputs();   // 回填结束数值
+  }
+
+  function onToggle() {
+    if (state.status === 'idle') onStart();
+    else if (state.status === 'running') onEnd();
+    else onReset();
+  }
+
+  function onReset() {
+    if (state.status !== 'idle' && !window.confirm('确定要清空本次跑刀记录并重新开始吗？')) return;
+    state = {
+      status: 'idle', startAt: null, endAt: null,
+      startAssets: null, startHavoc: null, endAssets: null, endHavoc: null,
+      records: []
+    };
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+    syncAssetInputs();
+    setError('');
+    refresh();
+  }
+
+  function onDelete(idx) {
+    if (!(idx >= 0) || idx >= state.records.length) return;
+    state.records.splice(idx, 1);
+    save();
+    refresh();
+  }
+
+  /* ---------------- 持久化 ---------------- */
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+  }
+
+  function load() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var obj = null;
+    try { obj = JSON.parse(raw); } catch (e) { return; }
+    if (!obj || typeof obj !== 'object') return;
+
+    if (obj.status === 'running' || obj.status === 'ended' || obj.status === 'idle') state.status = obj.status;
+    if (typeof obj.startAt === 'number') state.startAt = obj.startAt;
+    if (typeof obj.endAt === 'number') state.endAt = obj.endAt;
+    if (typeof obj.startAssets === 'number') state.startAssets = obj.startAssets;
+    if (typeof obj.startHavoc === 'number') state.startHavoc = obj.startHavoc;
+    if (typeof obj.endAssets === 'number') state.endAssets = obj.endAssets;
+    if (typeof obj.endHavoc === 'number') state.endHavoc = obj.endHavoc;
+    if (Object.prototype.toString.call(obj.records) === '[object Array]') {
+      state.records = obj.records.filter(function (r) {
+        return r && typeof r.t === 'number' && typeof r.amount === 'number';
+      });
+    }
+    if (state.status !== 'idle' && !state.startAt) state.status = 'idle';
+  }
+
+  /* ---------------- 初始化 ---------------- */
+
+  function bindEnter(id, fn) {
+    var el = byId('dp-' + id);
+    if (!el) return;
+    el.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.keyCode === 13) {
+        ev.preventDefault();
+        fn();
+      }
+    });
+  }
+
+  function init() {
+    cacheEls();
+    if (!els.app) return;   // 当前页面没有助手组件
+    load();
+
+    els.toggle.addEventListener('click', onToggle);
+    els.record.addEventListener('click', onRecord);
+    if (els['export']) els['export'].addEventListener('click', onExport);
+
+    var resets = document.querySelectorAll('[data-action="reset"]');
+    for (var i = 0; i < resets.length; i++) resets[i].addEventListener('click', onReset);
+
+    els['round-list'].addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (t && t.classList && t.classList.contains('dp-del')) {
+        onDelete(parseInt(t.getAttribute('data-idx'), 10));
+      }
+    });
+
+    bindEnter('assets-input', onToggle);
+    bindEnter('havoc-input', onToggle);
+    bindEnter('round-profit', onRecord);
+
+    syncAssetInputs();
+    refresh();
+    if (state.records.length) scrollListToBottom();
+
+    window.setInterval(function () {
+      if (state.status === 'running') renderTimer();
+    }, 250);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // 调试入口：浏览器控制台可用 window.dpPaodao
+  if (typeof window !== 'undefined') {
+    window.dpPaodao = {
+      parse: parseAmount,
+      parseWithUnit: parseWithUnit,
+      format: formatAmount,
+      duration: formatDuration,
+      report: buildReport,
+      exportTxt: onExport,
+      getState: function () { return state; }
+    };
+  }
+})();
+</script>
+<script>
+  (function () {
+    var KEY = 'df-paodao-theme';
+    var root = document.documentElement;
+    var btn = document.getElementById('dp-theme');
+    if (!btn) return;
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) { /* ignore */ }
+    // 只有两个状态：浅色 / 深色
+    var cur = (saved === 'light' || saved === 'dark') ? saved : null;
+    if (!cur) {
+      cur = 'light';
+      try {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) cur = 'dark';
+      } catch (e) { /* ignore */ }
+    }
+
+    function paint() {
+      root.setAttribute('data-theme', cur);
+      btn.textContent = cur === 'dark' ? '🌙' : '☀️';
+      btn.title = cur === 'dark' ? '切换到浅色' : '切换到深色';
+      btn.setAttribute('aria-label', btn.title);
+    }
+    paint();
+    btn.addEventListener('click', function () {
+      cur = cur === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(KEY, cur); } catch (e) { /* ignore */ }
+      paint();
+    });
+  })();
+</script>
+</body>
+</html>

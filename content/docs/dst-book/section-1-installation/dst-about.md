@@ -11,7 +11,7 @@ aliases:
 
 ### 1. 模组包位置
 
-```plaintext  {{filename="xxx.apk", copy="false"}}
+```plaintext  {filename="xxx.apk", copy="false"}
 xxx.apk
 └─ assets
    └─ databundles
@@ -19,7 +19,7 @@ xxx.apk
       └─ ...
 ```
 
-```plaintext  {{filename="xxx.ipa", copy="false"}}
+```plaintext  {filename="xxx.ipa", copy="false"}
 xxx.ipa
 └─ Payload
    └─ dontstarvetogether.app
@@ -35,7 +35,7 @@ xxx.ipa
 
 ### 2. 模组包结构
 
-```plaintext  {{filename="klump.zip", copy="false"}}
+```plaintext  {filename="klump.zip", copy="false"}
 klump.zip
 └─ mods/
    ├─ modsettings.lua      ← 配置文件

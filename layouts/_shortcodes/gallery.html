@@ -5,15 +5,26 @@
       /img/dst/shot1.jpg
       /img/dst/shot2.jpg
     {{< /gallery >}}
+  图片路径支持三种写法：
+  1) 站点绝对路径：/img/dst/shot1.jpg，或历史写法 static\img\dst\shot1.jpg
+     （自动把 \ 转 / 并去掉开头的 static/）
+  2) 完整 URL：https://example.com/a.png
+  3) 「文章束」（page bundle）同目录图片：直接写文件名，如 shot1.jpg
+     - 文章和图片放在同一个文件夹（叶子束 index.md / 分支束 _index.md 均可），
+       优先按键页面资源（.Resources.Get / GetMatch）解析成资源的 RelPermalink；
+       取不到资源时退化为「当前页面目录 + 文件名」，因为 Hugo 会把束内文件
+       发布到页面同目录（如 /docs/xxx/carney/foo.png）。
+     - 也支持束内子目录：img/shot1.jpg
   说明：
   - 图片按原始比例展示，最高 260px，横向滑动（scroll-snap 吸附）
   - 移动端手势滑动；桌面端左右箭头翻页，滑到边缘对应箭头自动隐藏
   - 提供 href 时，底部 caption 变为可点击链接（新标签页打开，rel=noopener）
   - 图片全部 loading="lazy" 懒加载
-  - 底部说明文字带手柄图标（sprite 里的 bi-controller），caption 省略则不显示
+  - 底部说明文字（无图标），caption 省略或为空则不显示底部说明
 */ -}}
 {{- $caption := .Get "caption" -}}
 {{- $href := .Get "href" -}}
+{{- $page := .Page -}}
 <figure class="book-gallery">
   <div class="gallery-viewport">
     <button type="button" class="gallery-nav gallery-prev" aria-label="上一张">&#8249;</button>
@@ -23,15 +34,35 @@
         {{- /* 空行直接跳过（避免被归一化补成 "/" 而渲染成破图） */ -}}
         {{- if $raw -}}
           {{- /* 路径归一化：兼容 Windows 反斜杠路径（如 static\img\dst-mods\x.png）
-                 1) \ → /；2) 去掉开头的 static/（Hugo 把 static 挂到站点根 /）；
-                 3) 非绝对 URL 且不以 / 开头时补前导 /  */ -}}
+                 1) \ → /；2) 去掉开头的 static/（Hugo 把 static 挂到站点根 /） */ -}}
           {{- $src := replace $raw "\\" "/" -}}
-          {{- $src = strings.TrimPrefix "static/" $src -}}
-          {{- if not (or (hasPrefix $src "/") (findRE `^[a-zA-Z][a-zA-Z0-9+.\-]*://` $src 1)) -}}
-            {{- $src = printf "/%s" $src -}}
+          {{- /* static/ 开头（含 Windows 反斜杠写法）：映射到站点根，即去掉 static/ 前缀 */ -}}
+          {{- if hasPrefix $src "static/" -}}
+            {{- $src = strings.TrimPrefix "static/" $src -}}
+            {{- if not (hasPrefix $src "/") -}}
+              {{- $src = printf "/%s" $src -}}
+            {{- end -}}
           {{- end -}}
-          {{- with $src -}}
-      <img src="{{ . }}" alt="{{ $caption | default "截图" }}" loading="lazy">
+          {{- $isURL := findRE `^[a-zA-Z][a-zA-Z0-9+.\-]*://` $src 1 -}}
+          {{- if $isURL -}}
+            {{- /* 完整 URL：原样输出 */ -}}
+      <img src="{{ $src }}" alt="{{ $caption | default "截图" }}" loading="lazy">
+          {{- else if hasPrefix $src "/" -}}
+            {{- /* 站点绝对路径：原样输出 */ -}}
+      <img src="{{ $src }}" alt="{{ $caption | default "截图" }}" loading="lazy">
+          {{- else -}}
+            {{- /* 相对路径（文章束同目录图片）：先按页面资源解析，取不到再退化为页面目录 + 文件名 */ -}}
+            {{- $src = strings.TrimPrefix "./" $src -}}
+            {{- $res := $page.Resources.Get $src -}}
+            {{- if not $res -}}
+              {{- $res = $page.Resources.GetMatch $src -}}
+            {{- end -}}
+            {{- if $res -}}
+              {{- $src = $res.RelPermalink -}}
+            {{- else -}}
+              {{- $src = printf "%s%s" $page.RelPermalink $src -}}
+            {{- end -}}
+      <img src="{{ $src }}" alt="{{ $caption | default "截图" }}" loading="lazy">
           {{- end -}}
         {{- end -}}
       {{- end -}}
@@ -40,8 +71,12 @@
   </div>
   {{- with $caption -}}
     <figcaption class="gallery-caption">
-      {{- /* 手柄图标：走 sprite（bi-controller），首次调用自动内联 sprite */ -}}
-      {{- partial "docs/svg" (dict "name" "bi-controller" "size" "18px" "page" .Page) -}}
+      {{- /* 这里曾经调用 partial "docs/svg" 内联 bi-controller 手柄图标，但：
+             1) 项目/主题里都没有 docs/svg 这个 partial（只有同名的 svg shortcode，shortcode 不能被 partial 调用）；
+             2) with $caption 之后 . 已经是字符串，再写 .Page 必然报
+                "can't evaluate field Page in type string"。
+             caption 为空时整段被 with 跳过，所以该 bug 只在第一次给 caption 赋值时暴露。
+             现只输出文字/链接，不渲染图标（.gallery-caption-icon 的 CSS 保留但暂未使用）。 */ -}}
       {{- if $href -}}
       <a href="{{ $href }}" target="_blank" rel="noopener">{{ . }}</a>
       {{- else -}}

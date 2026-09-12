@@ -13,6 +13,21 @@
   var SEARCH_DEBOUNCE_MS = 200;
   var STORAGE_SORT_KEY = 'mods-sort-preference';
 
+  /* ---- 网盘相关常量 ---- */
+  var DISK_ORDER = ['baidu', 'xunlei', 'quark'];
+  var DISK_LABEL = { baidu: '百度网盘', xunlei: '迅雷网盘', quark: '夸克网盘' };
+  var DISK_ICON = {
+    baidu: '/img/icons/pan_baidu.webp',
+    xunlei: '/img/icons/pan_xunlei.webp',
+    quark: '/img/icons/pan_quark.webp'
+  };
+  /**
+   * 网盘总开关（hugo.yaml → params.panBaiduEnabled/panXunleiEnabled/panQuarkEnabled）
+   * false = 整站关闭该网盘：列表按钮不渲染、弹框不提供该选项。
+   * 由 loadConfig() 读 #mods-data 的 data-pan-*-enabled 覆盖（缺失时默认全开）。
+   */
+  var panEnabled = { baidu: true, xunlei: true, quark: true };
+
   /**
    * localStorage 安全访问（隐私模式 Safari 会抛 quota exceeded 异常）
    */
@@ -52,7 +67,13 @@
           imgBase: dataEl.dataset.imgBase || '/img/bm/',
           imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png',
           // 网盘直链策略：modal=点击在当前页弹框校验邮箱后新标签打开（页面不内嵌直链）；direct=直接输出直链
-          panMode: dataEl.dataset.panMode || 'direct'
+          panMode: dataEl.dataset.panMode || 'direct',
+          // 网盘总开关（缺省=启用）；显式 "false" 才关闭
+          panEnabled: {
+            baidu: dataEl.dataset.panBaiduEnabled !== 'false',
+            xunlei: dataEl.dataset.panXunleiEnabled !== 'false',
+            quark: dataEl.dataset.panQuarkEnabled !== 'false'
+          }
         });
       }
 
@@ -171,6 +192,19 @@
     var isModal = (cfg.panMode === 'modal' || cfg.panMode === 'jump'); // jump 为旧别名，视同 modal
     var site = getSiteOrigin();
     var tagsHtml = buildTagsHtml(mod.tags);
+    var on = cfg.panEnabled || panEnabled;
+
+    // 逐个网盘生成下载按钮；总开关关闭的网盘整条不渲染（连"暂无"灰按钮也不留）
+    var actions = '';
+    for (var i = 0; i < DISK_ORDER.length; i++) {
+      var disk = DISK_ORDER[i];
+      if (!on[disk]) continue;
+      var has = disk === 'baidu' ? mod.hasBaidu : (disk === 'xunlei' ? mod.hasXunlei : mod.hasQuark);
+      var title = DISK_LABEL[disk] + '下载';
+      actions += isModal
+        ? buildModalBtn(disk, title, mod.id, has)
+        : buildDirectBtn(disk, title, has ? buildDownloadTarget(mod, cfg, disk) : null);
+    }
 
     return (
       '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '">' +
@@ -186,15 +220,7 @@
               '</div>' +
             '</div>' +
           '</div>' +
-          '<div class="item-actions">' +
-            (isModal
-              ? buildModalBtn('baidu', '百度网盘下载', mod.id, mod.hasBaidu) +
-                buildModalBtn('xunlei', '迅雷网盘下载', mod.id, mod.hasXunlei) +
-                buildModalBtn('quark', '夸克网盘下载', mod.id, mod.hasQuark)
-              : buildDirectBtn('baidu', '百度网盘下载', mod.hasBaidu ? buildDownloadTarget(mod, cfg, 'baidu') : null) +
-                buildDirectBtn('xunlei', '迅雷网盘下载', mod.hasXunlei ? buildDownloadTarget(mod, cfg, 'xunlei') : null) +
-                buildDirectBtn('quark', '夸克网盘下载', mod.hasQuark ? buildDownloadTarget(mod, cfg, 'quark') : null)) +
-          '</div>' +
+          '<div class="item-actions">' + actions + '</div>' +
         '</div>' +
       '</div>'
     );
@@ -244,12 +270,6 @@
   var PAN_API = 'https://d1.225228.xyz/ds/api/pan';
   var PAN_EMAIL_KEY = 'pan-email';
   var PAN_MID_KEY = 'pan-mid';
-  var DISK_LABEL = { baidu: '百度网盘', xunlei: '迅雷网盘', quark: '夸克网盘' };
-  var DISK_ICON = {
-    baidu: '/img/icons/pan_baidu.webp',
-    xunlei: '/img/icons/pan_xunlei.webp',
-    quark: '/img/icons/pan_quark.webp'
-  };
 
   function isEmail(v) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
@@ -319,6 +339,7 @@
         if (act === 'close') { close(); return; }
         if (act === 'disk') {
           var k = node.getAttribute('data-disk');
+          if (!panEnabled[k]) return;   // 总开关已关闭的网盘一律不打开
           var url = cur && cur.links && cur.links[k];
           if (url) window.open(url, '_blank', 'noopener');
           return;
@@ -405,13 +426,13 @@
 
     function diskButtonsHtml(links, activeDisk, big) {
       var order = [];
-      if (activeDisk) order.push(activeDisk);
-      ['baidu', 'xunlei', 'quark'].forEach(function (k) {
-        if (k !== activeDisk) order.push(k);
+      if (activeDisk && panEnabled[activeDisk]) order.push(activeDisk);
+      DISK_ORDER.forEach(function (k) {
+        if (k !== activeDisk && panEnabled[k]) order.push(k);
       });
       var out = [];
       order.forEach(function (k) {
-        if (!links[k]) return;
+        if (!panEnabled[k] || !links[k]) return;
         var active = k === activeDisk ? ' is-active' : '';
         out.push(
           '<button type="button" class="pd-disk' + (big && k === activeDisk ? ' pd-big' : '') + active + '" data-act="disk" data-disk="' + k + '">' +
@@ -425,26 +446,30 @@
     }
 
     function viewResult(data) {
-      cur.links = {
-        baidu: usableDiskUrl(data.baidu),
-        xunlei: usableDiskUrl(data.xunlei),
-        quark: usableDiskUrl(data.quark)
-      };
+      // 只保留"总开关启用 + 后端确实返回了有效链接"的网盘
+      var links = {};
+      DISK_ORDER.forEach(function (k) {
+        if (panEnabled[k]) links[k] = usableDiskUrl(data[k]);
+      });
+      cur.links = links;
 
-      if (cur.disk && cur.links[cur.disk]) {
-        var label = DISK_LABEL[cur.disk];
-        var opened = openNewTab(cur.links[cur.disk]);
+      // 点击时选中的网盘若已被总开关关闭 / 无链接，则不自动打开，交给用户从可选网盘中点选
+      var autoDisk = (cur.disk && links[cur.disk]) ? cur.disk : '';
+
+      if (autoDisk) {
+        var label = DISK_LABEL[autoDisk];
+        var opened = openNewTab(links[autoDisk]);
         render(
           (opened
             ? '<p class="pd-hint">已在新标签页打开「' + label + '」；若未弹出请点击下方按钮。</p>'
             : '<p class="pd-hint">浏览器拦截了自动打开，请点击下方按钮手动打开「' + label + '」。</p>') +
-          diskButtonsHtml(cur.links, cur.disk, true) +
+          diskButtonsHtml(links, autoDisk, true) +
           '<button type="button" class="pd-linkbtn" data-act="change-email">更换邮箱</button>'
         );
       } else {
         render(
           '<p class="pd-hint">请选择要使用的网盘：</p>' +
-          diskButtonsHtml(cur.links, '', false) +
+          diskButtonsHtml(links, '', false) +
           '<button type="button" class="pd-linkbtn" data-act="change-email">更换邮箱</button>'
         );
       }
@@ -586,7 +611,11 @@
     if (!document.getElementById('mods-list')) return;   // 页面没包含 shortcode 就退出
 
     loadConfig()
-      .then(function (cfg) { bootstrap(cfg); })
+      .then(function (cfg) {
+        // 网盘总开关：进列表渲染前生效（弹框共用同一份配置）
+        if (cfg.panEnabled) panEnabled = cfg.panEnabled;
+        bootstrap(cfg);
+      })
       .catch(function (err) {
         console.error('[mods-list] init failed', err);
         var list = document.getElementById('mods-list');

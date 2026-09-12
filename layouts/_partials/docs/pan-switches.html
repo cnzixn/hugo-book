@@ -1,0 +1,21 @@
+{{/*
+  网盘总开关（3 个）——整站统一读取入口
+  配置位置：hugo.yaml → params
+    panBaiduEnabled / panXunleiEnabled / panQuarkEnabled
+
+  取值规则：
+    未配置   → 启用（保持旧站点行为）
+    true     → 启用
+    false    → 关闭（该网盘的下载按钮 / 弹框选项 / 游戏下载页标签页全部不渲染，
+               且 direct 模式下不把该网盘直链写进数据 JSON）
+
+  ⚠ 这里不能用 default 兜底：Hugo 的 default 会把 false 当成"空值"返回默认值，
+    所以改用 printf "%v" 转字符串后与 "false" 比较，只有显式关闭才算关闭。
+
+  返回：dict "baidu" <bool> "xunlei" <bool> "quark" <bool>
+  用法：{{- $panSw := partial "docs/pan-switches.html" . -}}
+*/}}
+{{- $baidu := ne (printf "%v" .Site.Params.panBaiduEnabled) "false" -}}
+{{- $xunlei := ne (printf "%v" .Site.Params.panXunleiEnabled) "false" -}}
+{{- $quark := ne (printf "%v" .Site.Params.panQuarkEnabled) "false" -}}
+{{- return (dict "baidu" $baidu "xunlei" $xunlei "quark" $quark) -}}

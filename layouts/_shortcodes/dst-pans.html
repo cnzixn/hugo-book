@@ -3,8 +3,12 @@
   用法: {{< dst-pans "KEY_NAME" >}}
   数据来源: data/dst_pan.yml
   说明：游戏下载页保持“直链”展示（如需与模组列表一样走邮箱弹框，可在此处接入 PanDialog）
+
+  网盘总开关：hugo.yaml → params.panBaiduEnabled / panXunleiEnabled / panQuarkEnabled
+              false 时对应网盘标签页不渲染；三个都关闭时只显示一条提示。
 */}}
 {{- $name := .Get 0 -}}
+{{- $panSw := partial "docs/pan-switches.html" . -}}
 
 {{- with index hugo.Data.dst_pan $name -}}
   {{- $baiduUrl := index (where . "url1" "ne" nil) 0 "url1" -}}
@@ -13,50 +17,46 @@
   {{- if not (findRE `^https://pan\.baidu\.com/s/` $baiduUrl) -}}{{- $baiduUrl = "" -}}{{- end -}}
   {{- if not (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl) -}}{{- $xunleiUrl = "" -}}{{- end -}}
   {{- if not (findRE `^https://pan\.quark\.cn/s/` $quarkUrl) -}}{{- $quarkUrl = "" -}}{{- end -}}
+  {{- /* 网盘总开关关闭：等同于该网盘无链接 */ -}}
+  {{- if not $panSw.baidu -}}{{- $baiduUrl = "" -}}{{- end -}}
+  {{- if not $panSw.xunlei -}}{{- $xunleiUrl = "" -}}{{- end -}}
+  {{- if not $panSw.quark -}}{{- $quarkUrl = "" -}}{{- end -}}
   {{- $firstDisk := "baidu" -}}
   {{- if not $baiduUrl -}}{{- $firstDisk = "xunlei" -}}{{- end -}}
   {{- if not $baiduUrl -}}{{- if not $xunleiUrl -}}{{- $firstDisk = "quark" -}}{{- end -}}{{- end -}}
   {{- $itemName := index (where . "name" "ne" nil) 0 "name" -}}
   {{- $itemSize := index (where . "size" "ne" nil) 0 "size" -}}
 
+  {{- if or $baiduUrl $xunleiUrl $quarkUrl -}}
   <div class="book-tabs">
     {{- if $baiduUrl -}}<input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-0"{{ if eq $firstDisk "baidu" }} checked="checked"{{ end }} />
     <label for="pan-{{ $name }}-0">百度网盘</label>
     <div class="book-tabs-content markdown-inner">
       <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
-      {{- with $baiduUrl -}}
-        <div class="pan-link"><a href="{{ . }}" target="_blank">{{ . }}</a></div>
-      {{- else -}}
-        <div class="pan-link">暂无百度网盘下载</div>
-      {{- end -}}
+      <div class="pan-link"><a href="{{ $baiduUrl }}" target="_blank">{{ $baiduUrl }}</a></div>
     </div>{{- end -}}
 
     {{- if $xunleiUrl -}}<input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-1"{{ if eq $firstDisk "xunlei" }} checked="checked"{{ end }} />
     <label for="pan-{{ $name }}-1">迅雷网盘</label>
     <div class="book-tabs-content markdown-inner">
       <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
-      {{- with $xunleiUrl -}}
-        <div class="pan-link"><a href="{{ . }}" target="_blank">{{ . }}</a></div>
-      {{- else -}}
-        <div class="pan-link">暂无迅雷网盘下载</div>
-      {{- end -}}
+      <div class="pan-link"><a href="{{ $xunleiUrl }}" target="_blank">{{ $xunleiUrl }}</a></div>
     </div>{{- end -}}
 
     {{- if $quarkUrl -}}<input type="radio" class="toggle" name="pan-{{ $name }}" id="pan-{{ $name }}-2"{{ if eq $firstDisk "quark" }} checked="checked"{{ end }} />
     <label for="pan-{{ $name }}-2">夸克网盘</label>
     <div class="book-tabs-content markdown-inner">
       <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
-      {{- with $quarkUrl -}}
-        <div class="pan-link"><a href="{{ . }}" target="_blank">{{ . }}</a></div>
-      {{- else -}}
-        <div class="pan-link">暂无夸克网盘下载</div>
-      {{- end -}}
+      <div class="pan-link"><a href="{{ $quarkUrl }}" target="_blank">{{ $quarkUrl }}</a></div>
     </div>{{- end -}}
   </div>
+  {{- else -}}
+  <div class="pan-info">{{ $itemName }} <span class="pan-size">({{ $itemSize }})</span></div>
+  <div class="pan-link">暂无可用网盘下载</div>
+  {{- end -}}
 {{- else -}}
   <div class="pan-error">
     网盘文件「{{ $name }}」分享链接已过期...
   </div>
 {{- end -}}
-
 
