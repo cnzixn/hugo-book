@@ -34,11 +34,11 @@ bookHidden: true
 <!-- static\img\qr\7EDE7F7AD16357EE2C23FC0C27F5D694.png -->
 <!-- static\img\qr\C4E3762CFE91968B16582A5E51ED0A35.png -->
 
-## 域名
+## 网址
 -----
 
-- 主 b.bxq.me
-- 备 b.225228.xyz
+- 主站 b.bxq.me
+- 备用 b.225228.xyz
 
 ## 版权
 -----

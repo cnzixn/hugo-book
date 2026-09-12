@@ -39,7 +39,9 @@ Each post needs at minimum a `title` and `date` in frontmatter. See [Blog](/docs
 ## Shortcode For Gallery
 
 {{< gallery caption="" href="" >}}
-  static\img\dst\Snipaste_2026-09-11_20-18-55.png
+  static\img\FCEECA4DEE8C0FC69B02211320945071.png
+  static\img\FCEECA4DEE8C0FC69B02211320945071.png
+  static\img\FCEECA4DEE8C0FC69B02211320945071.png
 {{< /gallery >}}
 
 ## Markdown Alerts

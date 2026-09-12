@@ -26,7 +26,7 @@ bookCollapseSection: false
 
    从 [[模组分享]](/p/ds-mods) 下载， 使用 [[iMod]](https://d1.225228.xyz/imod/) 在线工具安装。  
 
-   PS：安卓端，可以使用 `MT管理器` 安装模组，参考文章 [[关于 apk/ipa 文件]](/p/ds-about)。
+   注：安卓端，可以使用 `MT管理器` 安装模组，参考文章 [[关于 apk/ipa 文件]](/p/ds-about)。
 
 
 {{% /steps %}}
