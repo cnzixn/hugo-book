@@ -4,6 +4,17 @@
 --   1. options：有 key 时模拟按键，否则有 fn 时直接执行函数
 --   2. main_button：主按钮的文字和贴图
 -- key 选项模拟原始按键的“按下 -> 松开”；fn 选项调用 fn(controls, option)。
+--
+-- 复用/共存（同一局里同时存在多份轮盘副本）时的约定，改动本文件请勿破坏：
+--   1. 所有共享状态都必须按 rid 分键：`controls._radial_wheels_added[rid]`（装载去重）、
+--      `ac._radial_wheel_hidden_by[rid]`（隐藏请求）、`TheInput._radial_wheel_key_hooks[rid]`
+--      （按键捕获只装一次）、`editable_name`（编辑模式位置存档名）。
+--   2. 不要用“宿主控件上的单例布尔”来控制只装一次：那会让第二份副本的逻辑被整个跳过
+--      （历史问题：`ac._radial_wheel_hide_guard`，见下面创建按钮处的注释）。
+--   3. 主按钮的显隐挂在按钮自己的 OnUpdate 上，不要占用宿主（ac）的 OnUpdate。
+--   4. 同一时刻只允许一个轮盘打开：各自把“静默关闭自己”的回调登记到
+--      `controls._radial_wheels_live[rid]`，开轮盘前先把别人的关掉。
+--   5. 主按钮默认位置按装载顺序自动错开（coexist_offset），避免两个按钮叠在一起只有一个摸得到。
 
 -- 声明模组 API 函数
 local GLOBAL = GLOBAL
@@ -42,20 +53,28 @@ local RADIAL_WHEEL_CONFIG = {
         text_offset = { 3, 0 },
         scale = 1.0,
         normal_colour = { .3, .3, .3, .75 },
+        -- 主按钮显隐条件（两者都写时 owner_prefab 优先）：
+        --   owner_prefab：只有这个人物才显示，例如 "carney"；nil = 所有人物都显示
+        --   is_available(player)：要按人物/状态精细控制就写函数，返回 true 才显示
         -- Musha 有自己的技能轮盘，隐藏通用轮盘以避免触摸区域重叠。
-        is_available = function(player)
-            return player == nil or player.prefab ~= "musha"
-        end,
+        -- is_available = function(player)
+        --     return player == nil or player.prefab ~= "musha"
+        -- end,
+        -- owner_prefab = "xxx",
+        -- 编辑模式里是否强制显示（要拖着调位置就得显示；默认 true）
+        show_in_editmode = true,
         -- 默认放在“副动作”左边。
         secondary_offset = { -120, 0 },
         fallback_position = { -250, -10 },
+        -- 复用共存：同一局里第 N 个轮盘的主按钮再额外错开 (N-1) 份这个量，避免两个按钮叠住。
+        coexist_offset = { -120, 0 },
     },
 
     -- 编辑模式中用于保存主按钮位置的唯一名称。
     editable_name = "edit_" .. modname .. "_radial_wheel",
     hide_action_buttons_while_open = true,
     show_empty_slots = false,
-    minimum_outer_slots = 4,
+    minimum_outer_slots = 2,
 }
 --------------------------------------------------------------------------
 
@@ -508,17 +527,27 @@ local function CreateRadialWheelButton(controls)
         text:SetColour(unpack(main_cfg.text_colour or { 1, 1, 1, 1 }))
     end
 
+    -- 复用共存：按装载顺序给主按钮错开位置。_radial_wheels_added 已经包含自己
+    -- （入口处先登记再建按钮），所以第一份的序号是 1、偏移 0，不会影响单轮盘的默认位置。
+    local wheel_index = 0
+    for _ in pairs(controls._radial_wheels_added or {}) do
+        wheel_index = wheel_index + 1
+    end
+    local coexist = main_cfg.coexist_offset or { -120, 0 }
+    local coexist_x = (coexist[1] or 0) * (wheel_index - 1)
+    local coexist_y = (coexist[2] or 0) * (wheel_index - 1)
+
     local secondary = ac.secondaryButton
     if secondary ~= nil then
         local pos = secondary:GetPosition()
         local offset = main_cfg.secondary_offset or { -120, 0 }
-        button:SetPosition(pos.x + (offset[1] or 0), pos.y + (offset[2] or 0), 0)
+        button:SetPosition(pos.x + (offset[1] or 0) + coexist_x, pos.y + (offset[2] or 0) + coexist_y, 0)
     else
         local fallback = main_cfg.fallback_position or { -250, -10 }
-        button:SetPosition(fallback[1] or 0, fallback[2] or 0, 0)
+        button:SetPosition((fallback[1] or 0) + coexist_x, (fallback[2] or 0) + coexist_y, 0)
     end
     TheFrontEnd:AddEditableWidget(button, RADIAL_WHEEL_CONFIG.editable_name, 80, 80)
-    Log("button created")
+    Log("button created, wheel_index=" .. tostring(wheel_index))
 
     local wheel = nil
     local holding = false
@@ -530,9 +559,14 @@ local function CreateRadialWheelButton(controls)
     local actioncontrols_was_shown = false
 
     -- actioncontrols 的 OnUpdate 会主动重新显示自己；参考 TMIR 增加持续隐藏守卫。
+    -- ⚠ 复用注意：这里**不能**写成"宿主控件上的单例布尔 + 只装一层"（历史写法
+    -- `ac._radial_wheel_hide_guard`）。同一局里存在第二份副本、或别的模组也想包
+    -- `ac.OnUpdate` 时，第二个会被 `if not guard` 整个挡掉，它的显隐逻辑永远不生效。
+    -- 改成：每个副本按自己的 rid 只装自己那一层，链式调用（后装的包在前装的上面）。
     ac._radial_wheel_hidden_by = ac._radial_wheel_hidden_by or {}
-    if not ac._radial_wheel_hide_guard then
-        ac._radial_wheel_hide_guard = true
+    local hide_guard_key = "_radial_wheel_hide_guard_" .. tostring(RADIAL_WHEEL_CONFIG.rid)
+    if not ac[hide_guard_key] then
+        ac[hide_guard_key] = true
         local old_actioncontrols_update = ac.OnUpdate
         ac.OnUpdate = function(actioncontrols, ...)
             if next(actioncontrols._radial_wheel_hidden_by or {}) ~= nil then
@@ -563,8 +597,45 @@ local function CreateRadialWheelButton(controls)
     end
 
     local function IsEditMode()
-        return ac._edit_mode_active == true
-            or (TheFrontEnd ~= nil and TheFrontEnd.editmode == true)
+        if ac._edit_mode_active == true then return true end
+        -- 优先问官方 PlayerHud（卡尼猫副本同步过来的写法），字段式判定只作兜底。
+        local hud = ThePlayer ~= nil and ThePlayer.HUD or nil
+        if hud ~= nil then
+            if hud.IsInEditMode ~= nil then
+                if hud:IsInEditMode() == true then return true end
+            elseif hud.editmode == true then
+                return true
+            end
+        end
+        return TheFrontEnd ~= nil and TheFrontEnd.editmode == true
+    end
+
+    -- 主按钮显隐（可选）：owner_prefab 或 is_available(player) 任一给出条件才接管，
+    -- 否则完全不干预官方/编辑模式的显隐。
+    -- ⚠ 复用注意：必须挂在**按钮自己**的 OnUpdate 上，不要去包 ac.OnUpdate ——
+    -- ac 上的包装是所有副本共享的宿主状态，抢它就会和别的轮盘副本互相顶掉。
+    local owner_prefab = main_cfg.owner_prefab
+    local has_visibility_rule = owner_prefab ~= nil
+        or type(main_cfg.is_available) == "function"
+        or main_cfg.show_in_editmode == false
+    if has_visibility_rule then
+        local function ShouldShowButton()
+            if ac.shown == false then return false end      -- 整组动作按钮被藏起来时（开轮盘/制作栏/手柄）
+            if IsEditMode() and main_cfg.show_in_editmode ~= false then return true end
+            if owner_prefab ~= nil then
+                return ThePlayer ~= nil and ThePlayer.prefab == owner_prefab
+            end
+            local available = main_cfg.is_available
+            if type(available) == "function" then
+                return available(ThePlayer) == true
+            end
+            return true
+        end
+        button.OnUpdate = function(b, dt)
+            if ShouldShowButton() then b:Show() else b:Hide() end
+        end
+        button:StartUpdating()
+        Log("button visibility rule enabled")
     end
 
     local function EnsureWheel()
@@ -643,6 +714,21 @@ local function CreateRadialWheelButton(controls)
         virtual_x, virtual_y = 0, 0
     end
 
+    -- 复用共存：登记"静默关闭自己"（不触发任何选项），供别的轮盘副本在开启前调用；
+    -- 反过来开自己的轮盘时也先把别人关掉，避免两个轮盘同时叠在屏幕正中。
+    controls._radial_wheels_live = controls._radial_wheels_live or {}
+    controls._radial_wheels_live[RADIAL_WHEEL_CONFIG.rid] = function()
+        Finish(false)
+    end
+
+    local function CloseOtherWheels()
+        for other_rid, closer in pairs(controls._radial_wheels_live) do
+            if other_rid ~= RADIAL_WHEEL_CONFIG.rid and type(closer) == "function" then
+                closer()
+            end
+        end
+    end
+
     -- 用全局触摸监听跟踪已认领的触点，手指移出按钮后仍能继续操作；只按 touch id 过滤。
     if TheInput ~= nil then
         TheInput:AddTouchMoveHandler(function(id, x, y)
@@ -682,6 +768,7 @@ local function CreateRadialWheelButton(controls)
         local editing = IsEditMode()
         Log("button OnTouchStart id=" .. tostring(id) .. ", editmode=" .. tostring(editing))
         if not editing and not holding then
+            CloseOtherWheels()
             local current = EnsureWheel()
             if current ~= nil then
                 holding = true
