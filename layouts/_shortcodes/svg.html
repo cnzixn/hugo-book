@@ -1,12 +1,12 @@
 {{/*
   svg shortcode（PaperMod 风格）：站内图标查表输出
-  数据源：layouts/_partials/docs/bs-icons.html（图标名 → 完整 svg 标签）
+  数据源：data/bs_icons.yml（图标名 → 完整 svg 标签），模板里读 hugo.Data.bs_icons
   用法（位置参数 / 命名参数二选一，勿混用）：
     {{< svg "bs/envelope" >}}
     {{< svg name="bs/chat" size="1.5em" >}}
-  维护：新图标往 partials/docs/bs-icons.html 的 dict 里加一行
+  维护：新图标往 data/bs_icons.yml 追加一条
 */}}
-{{- $icons := partial "docs/bs-icons" . -}}
+{{- $icons := hugo.Data.bs_icons | default dict -}}
 {{- $name := strings.TrimPrefix "bs/" (.Get "name" | default (.Get 0)) -}}
 {{- $size := .Get "size" | default "1em" -}}
 {{- $svg := index $icons $name -}}

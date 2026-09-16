@@ -800,67 +800,199 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   width: 100%;
   height: 100%;
 }
-/* ===== iOS 旧版 Safari 菜单打开兼容 =====
- * 4 个补丁：
- *  1) 旧 WebKit 对 :checked ~ main 相邻兄弟选择器常不重绘，显式写 visibility/display 兜底
- *  2) book-menu-content 滑出补 -webkit-transform 前缀（book.css 原版无前缀，旧iOS直接不滑）
- *  3) label[for=menu-control/toc-control] 放大点击区 + 提升层级 + 去 300ms 延迟
- *  4) label 内的 img/book-icon pointer-events:none 保证点击永远命中 label 本身不被子元素吞掉
+/* ===== 移动端左侧菜单：抽屉式（正文右移 + 手势跟手 + 松手回弹） =====
+ * 目标：点汉堡 / 从左边缘右滑拉出时，抽屉面板与正文一起位移 —— 正文整体右移让出
+ *       一个抽屉的宽度（主流 App 的 push 式侧栏）；拉动不足阈值松手时沿缓动曲线弹回。
+ *
+ * DOM（layouts/baseof.html）：
+ *   body > #menu-control(checkbox) ~ main.container.flex
+ *          ├ aside.book-menu          ← 抽屉面板：fixed，随 --bk-drawer 平移
+ *          ├ div.book-page            ← 内容层：随 --bk-drawer 右移
+ *          └ label.book-menu-overlay  ← 遮罩：fixed 全屏（故意放在 .book-page 之外：
+ *                                        .book-page 带 transform 后会成为 fixed 子孙的
+ *                                        包含块，遮罩留在里面会跟着页面滚走，不再贴屏）
+ *
+ * 状态模型：唯一真值源仍是 #menu-control 的勾选态（label 直接可用，无 JS 也能开合）。
+ *   --bk-drawer          开合位移（px）  —— 静止值：关 0 / 开 var(--menu-width)
+ *   --bk-drawer-progress 开合进度（0~1） —— 用来算遮罩透明度
+ *   手指拖动期间由 assets/js/modules/gesture.js 在 main 上写内联变量覆盖这两个值，
+ *   同时给 body 加 .bk-dragging（关过渡、强制面板可见、压悬浮按钮层级）；
+ *   松手时删掉内联变量，数值回到 :checked 对应的静止值，transform/opacity 的过渡
+ *   负责把抽屉送到位 ——「拉出不足会回弹」就是这条过渡曲线跑出来的。
+ *
+ * 旧实现（translateX 只滑面板 + 正文不动 / margin 归零秒开）已整体替换。
  */
 @media screen and (max-width: 896px) {
-  /* —— 菜单容器（aside）：外层负责 fixed 定位 + 定高，
-     与内层滚动职责分离，避免 iOS Safari 上 fixed + overflow 同一元素时定位失效 —— */
-  #menu-control:checked ~ main .book-menu {
-    visibility: visible !important;
-    display: block !important;
-    z-index: 25 !important;
-    /* 外层固定悬浮左侧，定高一屏 */
+  /* —— 静止态的开合位移：关 = 0，开 = 一个抽屉宽 ——
+     overflow-x: hidden 一起写在这里：正文右移会让文档右侧溢出（390px 屏 + 256px 抽屉），
+     不掐掉会出现横向滚动条、还能把整页拖偏。
+     掐在 main 上而不是 html/body 上：溢出源就在 main 内部，裁掉这一层就不会往上传播，
+     同时避免给根元素加 overflow —— 旧 iOS 上根元素带 overflow 时 position:fixed
+     元素的行为会变得不可靠（本站 #theme-switcher / #back-to-top 都靠 fixed 贴屏）。 */
+  main.container.flex {
+    --bk-drawer: 0px;
+    --bk-drawer-progress: 0;
+    overflow-x: hidden;
+  }
+  #menu-control:checked ~ main.container.flex {
+    --bk-drawer: var(--menu-width);
+    --bk-drawer-progress: 1;
+  }
+
+  /* —— 抽屉面板（aside）：只负责定位 + 位移 ——
+     与内层滚动职责分离，避免 iOS Safari 上 fixed + overflow 同一元素时定位失效 */
+  #menu-control ~ main .book-menu {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
+    /* 定高一屏：dvh 兜 iOS 地址栏伸缩，不支持的浏览器落到上一行 vh */
     height: 100vh !important;
     height: 100dvh !important;
+    width: var(--menu-width) !important;
+    /* 抵消主题 .book-menu { margin-inline-start: calc(-1*var(--menu-width)) }：
+       屏外改由 transform 表示 —— margin 变化要重排，跟手拖动时会掉帧 */
+    margin-inline-start: 0 !important;
+    margin-left: 0 !important;
+    z-index: 25 !important;
+    background: var(--body-background);
+    /* 关闭态整体停在屏外左侧；打开态 --bk-drawer = --menu-width → 正好回到 0 */
+    -webkit-transform: translate3d(calc(var(--bk-drawer, 0px) - var(--menu-width)), 0, 0);
+            transform: translate3d(calc(var(--bk-drawer, 0px) - var(--menu-width)), 0, 0);
+    /* visibility 走离散过渡：打开立即可见；关闭时延迟 0.34s 等滑出动画跑完才 hidden，
+       既保住主题「屏外菜单不可 Tab 聚焦」的原意，又不会在收回时秒消失 */
+    visibility: hidden;
+    -webkit-transition: -webkit-transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0s linear 0.34s;
+            transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0s linear 0.34s;
   }
-  /* —— 菜单面板内层：只负责滚动 + 背景 + 滑入 transform，
-     不再设 fixed/height，这些由父容器 aside 承担 —— */
-  #menu-control:checked ~ main .book-menu .book-menu-content {
-    -webkit-transform: translateX(var(--menu-width));
-            transform: translateX(var(--menu-width));
-    -webkit-box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
-            box-shadow: 0 0 var(--space-8) rgba(0, 0, 0, 0.1);
+  #menu-control:checked ~ main .book-menu {
+    visibility: visible !important;
+    -webkit-transition: -webkit-transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0s linear 0s;
+            transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0s linear 0s;
+  }
+  /* RTL：抽屉贴右、正文左移 */
+  body[dir="rtl"] #menu-control ~ main .book-menu {
+    left: auto !important;
+    right: 0 !important;
+    -webkit-transform: translate3d(calc(var(--menu-width) - var(--bk-drawer, 0px)), 0, 0);
+            transform: translate3d(calc(var(--menu-width) - var(--bk-drawer, 0px)), 0, 0);
+  }
+
+  /* —— 面板内层：只负责滚动 + 背景，不再承担定位/位移 —— */
+  #menu-control ~ main .book-menu .book-menu-content {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    -webkit-transform: none !important;
+            transform: none !important;
+    -webkit-box-shadow: none !important;
+            box-shadow: none !important;
     background: var(--body-background) !important;
     background-color: var(--body-background) !important;
-    /* 高度跟随父容器，内部滚动 */
-    height: 100% !important;
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
   }
-  body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
-    -webkit-transform: translateX(calc(-1 * var(--menu-width)));
-            transform: translateX(calc(-1 * var(--menu-width)));
+
+  /* —— 内容层：跟着抽屉一起右移（"拉出会把网页右移"就是这条）——
+     注意 transform 只写在「打开 / 拖动中」两条规则里，静止关闭态刻意不声明：
+     元素一旦有 transform（哪怕 translate3d(0,0,0)）就成了 fixed 子孙的包含块，
+     正文里若将来放进全屏弹层会从「贴视口」变成「贴 .book-page 这个盒子」。
+     这里只在需要位移时才建包含块，动画结束回到 transform:none。 */
+  #menu-control ~ main .book-page {
+    -webkit-transition: -webkit-transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    /* 主题原版靠 .book-page { opacity: .25 } 表示「菜单开着」，这里改由遮罩压暗：
+       在位移层上做全屏半透明混合，每帧全屏混合，老机型掉帧 */
+    opacity: 1 !important;
+    -webkit-filter: none !important;
+            filter: none !important;
+    /* 移开后左边缘不露出别的底色 */
+    background: var(--body-background);
   }
-  /* —— 页面变暗：主题原版 .book-page { opacity: .25 }，旧 WebKit 不认兄弟选择器要显式写 —— */
-  #menu-control:checked ~ main .book-page {
-    opacity: 0.25 !important;
-    -webkit-filter: opacity(0.25);
-            filter: opacity(0.25);
+  #menu-control:checked ~ main .book-page,
+  body.bk-dragging .book-page {
+    -webkit-transform: translate3d(var(--bk-drawer, 0px), 0, 0);
+            transform: translate3d(var(--bk-drawer, 0px), 0, 0);
   }
-  /* —— 遮罩层：主题原始只写了 display/position/inset，完全没 background 和 z-index，旧 iOS 还不认兄弟选择器 ——
-     这里硬写：全 !important + 半透明黑 + 固定层级(20：页面之上 / 面板之下)，点遮罩会触发 body.html 的关闭逻辑
+  body[dir="rtl"] #menu-control:checked ~ main .book-page,
+  body[dir="rtl"].bk-dragging .book-page {
+    -webkit-transform: translate3d(calc(-1 * var(--bk-drawer, 0px)), 0, 0);
+            transform: translate3d(calc(-1 * var(--bk-drawer, 0px)), 0, 0);
+  }
+
+  /* —— 遮罩层：全屏 fixed，只靠透明度显隐（拖动时透明度跟着进度走）——
      Safari <14 不支持 inset 合并属性，分写 top/bottom/left/right */
-  #menu-control:checked ~ main .book-menu-overlay {
+  #menu-control ~ main .book-menu-overlay {
     display: block !important;
     position: fixed !important;
     top: 0 !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    z-index: 20 !important;
+    z-index: 20 !important; /* 正文之上、抽屉(25)之下 */
     background-color: rgba(0, 0, 0, 0.45) !important; /* color-mix() 回退色 */
     background-color: color-mix(in srgb, #000 45%, transparent) !important;
+    opacity: var(--bk-drawer-progress, 0);
     cursor: pointer;
+    -webkit-transition: opacity 0.34s linear;
+            transition: opacity 0.34s linear;
   }
-  /* —— 菜单打开时，隐藏汉堡按钮和 TOC 按钮，避免层级竞争（菜单面板 z-index:25，
+  /* 关闭态不吃点击，正文照常可点。
+     注意这条故意用「单类」低优先级写：pointer-events 若写进上面那条带 ID 的规则里，
+     下面用 body.bk-dragging（0,2,1）写的打开态就盖不住它 —— 拖动中遮罩会拦不住正文点击 */
+  .book-menu-overlay {
+    pointer-events: none;
+  }
+  /* 打开态 / 拖动中才拦截点击（点遮罩 = label[for=menu-control]，原生就会关菜单） */
+  #menu-control:checked ~ main .book-menu-overlay,
+  body.bk-dragging .book-menu-overlay {
+    pointer-events: auto;
+  }
+
+  /* —— 右下角悬浮按钮（#theme-switcher / #back-to-top，JS 内联 z-index:9998/9999 的
+     body 直接子元素）：抽屉打开或拖动中压到遮罩(20)之下，跟着背景一起"让位"。
+     不压的话它们会浮在遮罩上、还能被点到，和抽屉的层级关系就乱了 —— */
+  #menu-control:checked ~ #theme-switcher,
+  #menu-control:checked ~ #back-to-top,
+  body.bk-dragging #theme-switcher,
+  body.bk-dragging #back-to-top {
+    z-index: 15 !important;
+  }
+
+  /* —— 拖动中（gesture.js 给 body 加 .bk-dragging）——
+     跟手期间必须关掉过渡，位移才会 1:1 跟着手指；面板也要强制可见（此时还没 :checked） */
+  body.bk-dragging .book-menu {
+    visibility: visible !important;
+    -webkit-transition: none !important;
+            transition: none !important;
+    will-change: transform;
+  }
+  body.bk-dragging .book-page {
+    -webkit-transition: none !important;
+            transition: none !important;
+    will-change: transform;
+  }
+  body.bk-dragging .book-menu-overlay {
+    -webkit-transition: none !important;
+            transition: none !important;
+  }
+  /* —— 拖动期间锁掉文本选择与长按呼出菜单 ——
+     慢速右拉 / 按住再拉时，浏览器会中途转入「选中文字」或呼出链接预览，
+     一旦进了选区就会 touchcancel 掉整个手势（表现就是「按住右拉没反应」）。
+     只在拖动期间生效，松手立刻恢复，不影响平时长按选字复制。 */
+  body.bk-dragging {
+    -webkit-user-select: none !important;
+            user-select: none !important;
+    -webkit-touch-callout: none !important;
+  }
+
+  /* —— 菜单打开时隐藏汉堡按钮和 TOC 按钮，避免层级竞争（菜单面板 z-index:25，
      按钮原 z-index:30 比面板还高，会盖在面板上）—— */
   #menu-control:checked ~ main .book-header label[for="menu-control"],
   #menu-control:checked ~ main .book-header label[for="toc-control"] {
@@ -894,22 +1026,16 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   }
 }
 
-/* ===== C 档：性能急救（秒开无动画 + 砍合成层） =====
- * 目标：10 分钟立刻把「卡顿感」降到接近 PaperMod（旧设备体感提升最大）
- *  1) 关 will-change：释放 transform/margin/opacity 3 层 GPU 合成层，避免低内存 iOS 纹理回收抖动
- *  2) 关 transition/animation：菜单 / 遮罩 / TOC 全部秒切，旧设备不做任何过渡动画最丝滑
- *  3) 移动端（896px）砍全屏 opacity 混合：比阴影更贵，每帧全屏幕素做 GPU 混合，旧 iOS 直接掉帧
- *  4) 移动端砍菜单 box-shadow：transform 变化时阴影每帧要重栅格化，旧设备明显卡
- *  5) 移动端弃用 transform 合成层路径：改由「容器 margin 归零」实现菜单位移
- *     关闭时靠主题默认 .book-menu { margin-inline-start: calc(-1*--menu-width) } 在屏外
- *     打开时把容器 margin-inline-start 归零 → 内容自然到屏内，内容 transform:none 不建合成层
- *     （旧 WebKit 的合成层实现有内存泄漏与掉帧 bug，走盒模型 margin 反而更稳）
- */
+/* ===== 合成层瘦身（保留自「C 档：性能急救」）=====
+ * book.css 给 .book-menu-content / .book-toc-content 挂了
+ * will-change: transform, margin, opacity + 0.2s 四属性过渡。
+ * 现在位移全部由外层 aside(.book-menu) 和 .book-page 承担，内层不再需要过渡，
+ * 长期挂 will-change 只会在低内存 iOS 上换来纹理回收抖动 —— 统一释放。
+ * （原来「关遮罩过渡 / margin 归零秒开 / 砍 box-shadow」几条已随抽屉式实现重写，
+ *   见上面「移动端左侧菜单：抽屉式」。） */
 .book-menu-content,
 .book-toc-content {
-  /* 释放 3 层 GPU 合成层：transform / margin / opacity */
   will-change: auto !important;
-  /* 过渡全部清零：秒开秒关，不再走 0.2s 4 属性同时动画 */
   transition: none !important;
   -webkit-transition: none !important;
   transition-property: none !important;
@@ -917,48 +1043,6 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   transition-duration: 0s !important;
   -webkit-transition-duration: 0s !important;
   animation: none !important;
-}
-.book-menu-overlay {
-  /* 遮罩层同步关过渡，与菜单秒开保持视觉一致，减少淡入淡出额外帧 */
-  transition: none !important;
-  -webkit-transition: none !important;
-  will-change: auto !important;
-  animation: none !important;
-}
-
-@media screen and (max-width: 896px) {
-  /* —— 3. 砍全屏 opacity 混合 —— */
-  #menu-control:checked ~ main .book-page {
-    opacity: 1 !important;
-    -webkit-filter: none !important;
-            filter: none !important;
-  }
-  /* —— 4. 砍菜单 box-shadow（每帧重栅格化，旧 iOS 掉帧主因之一） —— */
-  #menu-control:checked ~ main .book-menu .book-menu-content {
-    -webkit-box-shadow: none !important;
-            box-shadow: none !important;
-  }
-  /* —— 5. 关闭时：容器 margin 负一屏宽（沿用主题默认，不写）
-        打开时：容器 margin 归零把菜单拉进屏内 + 内容 transform 全关
-        彻底不再走 GPU 合成层（translateX / translate3d 都不写） —— */
-  #menu-control:checked ~ main .book-menu {
-    -webkit-margin-start: 0 !important;
-            margin-inline-start: 0 !important;
-    margin-left: 0 !important;
-  }
-  body[dir="rtl"] #menu-control:checked ~ main .book-menu {
-    -webkit-margin-start: 0 !important;
-            margin-inline-start: 0 !important;
-    margin-right: 0 !important;
-  }
-  #menu-control:checked ~ main .book-menu .book-menu-content {
-    -webkit-transform: none !important;
-            transform: none !important;
-  }
-  body[dir="rtl"] #menu-control:checked ~ main .book-menu .book-menu-content {
-    -webkit-transform: none !important;
-            transform: none !important;
-  }
 }
 
 /* ===== 移动端目录（TOC）下拉面板 =====
@@ -1136,8 +1220,8 @@ h1.book-article-title {
 .book-menu .book-brand .book-sponsor-icon {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
-  width: 0.95em;
-  height: 0.95em;
+  width: 1.25em;
+  height: 1.25em;
   color: var(--color-accent-caution, #cf222e);
 }
 

@@ -1,6 +1,7 @@
 ---
-title: "🔀 模组开发"
+title: "模组开发"
 weight: 30
+bookIcon: bi-code-slash
 bookCollapseSection: false
 ---
 

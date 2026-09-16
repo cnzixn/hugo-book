@@ -1,6 +1,7 @@
 ---
-title: "📁 资源分享"
+title: "资源分享"
 weight: 20
+bookicon:  bi-cloud-download
 bookCollapseSection: false
 aliases:
   - "/p/ds-mods"

@@ -27,9 +27,16 @@
         {{ template "copyright" . }} <!-- Copyright block -->
         {{ template "clipboard" . }}
       </footer>
-
-      <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
+
+    {{- /*
+      遮罩层刻意放在 .book-page 之外（原来的位置是 .book-page 内最后一个子元素）。
+      原因：移动端抽屉打开时 .book-page 带 transform 右移，带 transform 的元素会成为
+      其 fixed 子孙的包含块 —— 遮罩若留在里面就不再相对视口定位，页面一滚动它就跟着走。
+      放在 main 下：它仍是 position:fixed 全屏，层级 20（正文之上、抽屉 25 之下），
+      点击它等于点击 label[for=menu-control]，原生就会关菜单。
+    */}}
+    <label for="menu-control" class="hidden book-menu-overlay"></label>
 
     {{ template "toc-container" . }} <!-- Table of Contents -->
   </main>

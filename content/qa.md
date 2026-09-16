@@ -1,9 +1,9 @@
 ---
-title: "Q&A"
+title: "常见问题"
+bookicon: bi-chat
 bookHidden: true
 ---
 
-{{< svg "bi-chat" >}} 这里收集关于《饥荒》手游模组的常见问题。
 ---
 
 > [!TIP]

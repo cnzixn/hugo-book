@@ -1,6 +1,7 @@
 ---
-title: "🪧 安装教程"
+title: "安装教程"
 weight: 10 
+bookIcon: bi-signpost
 bookCollapseSection: false
 ---
 

@@ -3,7 +3,7 @@
   规则：
   1. 名字带 "/" → 当完整路径（relURL）
   2. 名字带 "."（后缀）→ img/icons/ 下的静态文件（如 "ds_icon.webp" → /img/icons/ds_icon.webp）
-  3. 其他（如 "bi-book"）→ bs-icons 数据表 → resources.FromString 发布为 /icons/<名>.svg
+  3. 其他（如 "bi-book"）→ data/bs_icons.yml 数据表 → resources.FromString 发布为 /icons/<名>.svg
      表里没有的（主题 UI 图标 menu/toc 等）→ 主题 assets/icons/ 自带文件兜底
   注意：return 只能出现在 partial 顶层，因此先算 $url 最后统一 return
 */ -}}
@@ -13,9 +13,12 @@
 {{- else if strings.Contains . "." -}}
 {{- $url = printf "img/icons/%s" . | relURL -}}
 {{- else -}}
-{{- $svg := index (partial "docs/bs-icons" .) . -}}
+{{- $svg := index (hugo.Data.bs_icons | default dict) . -}}
 {{- if $svg -}}
-{{- /* 独立 .svg 文件供 <img> 加载，必须是带 xmlns 的合法 XML；字典里省略了该属性，发布前统一补上 */ -}}
+{{- /* 独立 .svg 文件供 <img> 加载，必须是带 xmlns 的合法 XML；数据表里约定不写该属性，这里统一补上。
+     若维护者直接粘贴官网那段自带 xmlns 的 svg，先剥掉原有 xmlns 再补一个 —— 否则会出现重复属性，
+     XML 解析直接失败（duplicate attribute），<img> 就成了破图。 */ -}}
+{{- $svg = replaceRE `\s+xmlns="[^"]*"` "" $svg -}}
 {{- $svg = strings.Replace $svg `<svg ` `<svg xmlns="http://www.w3.org/2000/svg" ` 1 -}}
 {{- $res := resources.FromString (printf "icons/%s.svg" .) $svg -}}
 {{- $url = $res.RelPermalink -}}
