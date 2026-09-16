@@ -1148,9 +1148,28 @@ h1.book-article-title {
 }
 
 /* ---------- 位置二：移动端顶栏右侧按钮 ---------- */
+/* 关键：按钮组「不许收缩」。顶栏一行里的顺序是
+   菜单按钮 / 站点标题 / [赞助 + 目录] / ——
+   标题的 h3 带着 `margin: 0 16px` 且 min-width:auto，会把放不下的按钮组压扁：
+   赞助文字被压成 0 宽（看起来"隐身"但点得到），甚至盖到目录按钮上。
+   这里把按钮组锁成 flex-shrink:0，改让标题（flex:1 1 0 + ellipsis）去让位。 */
 .book-header .book-header-actions {
+  -webkit-box-flex: 0 0 auto;
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
+  /* flex-wrap 只作为 JS 失效时的兜底：真挤不下时按钮换行，不会互相压住 */
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+}
+
+/* 站名独占剩余空间，过长时走主题自带的 ellipsis（另见上面第 1042 行的居中/省略号规则） */
+.book-header .book-header-site-title {
+  -webkit-box-flex: 1 1 0;
+  -webkit-flex: 1 1 0;
+  flex: 1 1 0;
 }
 
 /* 纯粹的文字入口：无边框、无底色、无胶囊，只有一颗小红心 */
@@ -1164,21 +1183,48 @@ h1.book-article-title {
   -webkit-box-pack: center;
   -webkit-justify-content: center;
   justify-content: center;
+  -webkit-box-flex: 0 0 auto;
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   gap: 0.2rem;
   /* 视觉上很小，但点击区仍有 44px 高（与菜单/目录按钮一致，方便拇指点）；
-     宽度不锁 44px —— 那样文字右侧会多出一截看不见的空白 */
+     宽度不锁 44px —— 文字在时那样会给右侧留一截看不见的空白 */
   min-height: 44px;
-  padding: 0 0.15rem;
+  padding: 0 0.35rem 0 0;
   border: 0;
   background: none;
   color: var(--gray-500);
   font-size: var(--font-size-smallest);
   font-weight: 400;
   line-height: 1;
+  white-space: nowrap;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* 文字与图标都不许被压扁（被压扁就是"隐身"的元凶） */
+.book-header a.book-header-sponsor[href] > * {
+  -webkit-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+
+/* 紧凑形态（由 assets/js/modules/sponsor-fit.js 按真实可用宽度加上）：只留 ♥
+   不写死媒体查询断点 —— 实际可用宽度受机型、字体、系统缩放影响，
+   运行时量一次比猜断点准。留 0.35rem 右内边距，避免 ♥ 贴着目录按钮。 */
+.book-header a.book-header-sponsor.is-compact {
+  min-width: 44px;
+  padding: 0 0.35rem 0 0;
+}
+
+.book-header a.book-header-sponsor.is-compact > span:not(.book-sponsor-icon) {
+  display: none;
+}
+
+/* 极窄屏兜底：连 ♥ 都放不下时整组隐藏（JS 判定后加 .is-hidden）；
+   JS 失效时靠上面 actions 的 flex-wrap 兜底，不会互相遮挡 */
+.book-header .book-header-actions.is-hidden {
+  display: none;
 }
 
 .book-header a.book-header-sponsor[href] .book-sponsor-icon {
@@ -1207,19 +1253,6 @@ h1.book-article-title {
 /* 顶栏赞助入口只在移动端出现；桌面端走左侧菜单里的同款入口，避免重复 */
 @media screen and (min-width: 56.0625rem) {
   .book-header a.book-header-sponsor[href] {
-    display: none;
-  }
-}
-
-/* 窄屏（≤400px）：文字隐藏后 ♥ 会紧贴目录按钮，补一点右内边距做视觉间隔，
-   同时补足 44×44 的点击区（文字在时不必锁宽，否则右侧会多一截空白） */
-@media screen and (max-width: 400px) {
-  .book-header a.book-header-sponsor[href] {
-    min-width: 44px;
-    padding: 0 0.35rem 0 0;
-  }
-
-  .book-header a.book-header-sponsor[href] span {
     display: none;
   }
 }

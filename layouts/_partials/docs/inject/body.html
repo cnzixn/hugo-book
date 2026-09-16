@@ -5,9 +5,10 @@
 {{ $gesture := resources.Get "js/modules/gesture.js" }}
 {{ $themeSwitcher := resources.Get "js/modules/theme-switcher.js" }}
 {{ $backToTop := resources.Get "js/modules/back-to-top.js" }}
+{{ $sponsorFit := resources.Get "js/modules/sponsor-fit.js" }}
 {{ $main := resources.Get "js/main.js" }}
 
-{{ $combined := slice $gesture $themeSwitcher $backToTop $main | resources.Concat "js/custom.js" | resources.Minify | resources.Fingerprint "sha256" }}
+{{ $combined := slice $gesture $themeSwitcher $backToTop $sponsorFit $main | resources.Concat "js/custom.js" | resources.Minify | resources.Fingerprint "sha256" }}
 
 <script src="{{ $combined.RelPermalink }}" integrity="{{ $combined.Data.Integrity }}" defer></script>
 
