@@ -1,5 +1,5 @@
 ---
-title: "卡尼猫移植实战"
+title: "卡尼猫移植"
 weight: 100
 aliases:
   - "/p/carney"
@@ -13,8 +13,9 @@ aliases:
 
 下面的教程，全程不写一行代码，将创意工坊的“卡尼猫”模组移植适配到手机版。
 
+---
+
 ## 一、模组贴图处理
------
 
 
 工具：[ktex_tool.py](/files/ktex_tool.py)
@@ -48,12 +49,12 @@ PS D:/Project/dst> py d:/Project/dst/ktex/ktex_tool.py
 选择格式编号 [1]: 3
 生成 mipmap 链? [Y/n] [y]: 
 
---------------------------------------------------
+
 操作    : convert
 路径    : ['d:/Project/dst/mods/949808360']
 输出目录: (原地)
 目标格式: ASTC8x8  (mipmap=on)
---------------------------------------------------
+
 
 2026-09-10 21:23:58,298 [INFO] 找到 19 个原生文件
 2026-09-10 21:23:58,298 [INFO] [convert] d:/Project/dst/mods/949808360/modicon.tex -> d:/Project/dst/mods/949808360/modicon.tex  (fmt=ASTC8x8)
@@ -67,8 +68,10 @@ d:/Project/dst/mods/949808360/anim/whiteberet_plus.zip  (fmt=ASTC8x8)
 PS D:/Project/dst> 
 ```
 
+---
+
 ## 二、进游戏测试
------
+
 
 贴图弄完就完美运行，这就是“老资历”?
 
@@ -80,9 +83,10 @@ PS D:/Project/dst>
 
 游戏日志在 `/storage/emulated/0/Android/data/<package>/files/saves/logs/client_log.txt` 
 
+---
 
 ## 三、技能按键适配
------
+
 
 我用的 AI 工具是 [Harness](https://deepseek-harness.github.io/deepseek-harness/guide/quickstart) ，我懒得看模组代码，直接让它帮我看：
 
@@ -138,17 +142,16 @@ modinfo.lua
   F4E58108E30BC3D7EF2CB3CDDE4C485F.png
 {{< /gallery >}}
 
-完整的对话记录：[Harness-42fb9176-对话快照](/html/42fb9176-对话快照.html)
+---
 
-附件：
+## 四、附件
+
+- [Harness-42fb9176-对话快照](/html/42fb9176-对话快照.html)
 - [baidu/260913/949808360.zip](https://pan.baidu.com/s/1pQpO_uysAZnbcG2ol4pYtg?pwd=ve4i)
 - [quark/260913/949808360.zip](https://pan.quark.cn/s/7df778ae0586?pwd=x3hF)
 
+---
 
-## 四、给作者点赞
------
-
-{{< gallery caption="向我支付“鲸元券”，赞助作者↗" href="/about" >}}
+{{< gallery caption="赞助作者“鲸元券”，狠狠地催更↗" href="/sponsor/" >}}
   CA8AC56B13AB3110467543FB2F574C4F.png
 {{< /gallery >}}
-

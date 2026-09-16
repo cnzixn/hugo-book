@@ -92,7 +92,23 @@
 {{ end }}
 
 {{ define "main" }}
+  {{- /*
+    内容区顶部补渲染「页面标题」（文章标题）。
+    原因：主题原本只在移动端顶栏（.book-header）显示页面标题，桌面端内容区没有标题；
+    现在移动端顶栏改成了网站标题，页面标题就必须落到内容区，否则移动端会彻底看不到标题。
+    两种页面不补：
+      1) 内容本身已有一级标题（BM001 / BM002 / ktex 等），避免同一标题出现两次；
+      2) landing 布局（首页），其 markdown 里已手写 # 标题。
+  */ -}}
+  {{- $title := partial "docs/title" . -}}
+  {{- $hasOwnTitle := false -}}
+  {{- with .Fragments.Headings -}}
+    {{- $hasOwnTitle = eq (index . 0).Level 1 -}}
+  {{- end -}}
   <article class="markdown book-article">
+    {{- if and $title (not $hasOwnTitle) (ne .Layout "landing") }}
+    <h1 class="book-article-title">{{ $title }}</h1>
+    {{- end }}
     {{- .Content -}}
   </article>
 {{ end }}

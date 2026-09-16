@@ -24,8 +24,11 @@
 */ -}}
 {{- $caption := .Get "caption" -}}
 {{- $href := .Get "href" -}}
+{{- /* 可选 class：附加到 figure 上，便于按用途单独调样式
+       （如赞助页收款码写 class="sponsor-qr"，把图片固定成 220×220 正方形） */ -}}
+{{- $class := .Get "class" -}}
 {{- $page := .Page -}}
-<figure class="book-gallery">
+<figure class="book-gallery{{ with $class }} {{ . }}{{ end }}">
   <div class="gallery-viewport">
     <button type="button" class="gallery-nav gallery-prev" aria-label="上一张">&#8249;</button>
     <div class="gallery-track" tabindex="0" aria-label="图片列表，可左右滑动">

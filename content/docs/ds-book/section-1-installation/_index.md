@@ -6,7 +6,7 @@ bookCollapseSection: false
 
 
 {{< gallery caption="" href="" >}}
-  /img/ds/D4F323F3876EBF86B9282335AACFB775.webp
+  D4F323F3876EBF86B9282335AACFB775.webp
 {{< /gallery >}}
 
 ## 安装步骤

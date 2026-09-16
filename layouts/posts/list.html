@@ -1,4 +1,6 @@
 {{ define "main" }}
+  {{/* 移动端顶栏已改为网站标题，列表页标题需要落到内容区 */}}
+  <h1 class="book-article-title">{{ partial "docs/title" . }}</h1>
   <div class="book-posts-list">
   {{ range sort .Paginator.Pages "Date" "desc" }}
   <a href="{{ .RelPermalink }}" class="book-post-card">

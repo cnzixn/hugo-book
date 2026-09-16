@@ -1,0 +1,36 @@
+{{- /*
+  项目级覆写（原文件：themes/hugo-book/layouts/_partials/docs/header.html）
+  原行为：移动端顶栏（.book-header 仅在 ≤56rem 显示）中间输出「当前页面标题」，
+  与内容区将要显示的标题重复；这里改为输出「网站标题」并链接回首页。
+  页面标题（文章标题）由 baseof.html 的 main 块渲染到内容区顶部。
+
+  本次变更：顶栏右侧（目录按钮左侧）追加「赞助支持」入口。
+  原因：≤56rem 时左侧菜单收进汉堡菜单，菜单里的赞助按钮被隐藏，
+  需要在常驻顶栏上保留一个显眼入口；>56rem 时该按钮由 CSS 隐藏（桌面走左侧菜单）。
+*/ -}}
+<div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="{{ partial "docs/icon" "menu" }}" class="book-icon" alt="{{ partial "docs/text/i18n" "Menu" }}" />
+  </label>
+
+  <h3 class="book-header-site-title">
+    <a href="{{ partial "docs/links/home" . }}">{{ .Site.Title }}</a>
+  </h3>
+
+  {{/* 右侧按钮组：避免直接塞进 justify-between 把中间的站点标题挤偏 */}}
+  <div class="book-header-actions flex align-center">
+    {{- if .Site.Params.BookSponsor }}
+    <a class="book-header-sponsor" href="{{ "sponsor/" | relLangURL }}" title="{{ .Site.Params.BookSponsorLabel | default "赞助支持" }}">
+      {{/* 内联 svg 而不是 <img>：只有这颗 ♥ 上红色，文字保持正文灰度（见 custom.css .book-sponsor-icon） */}}
+      <span class="book-sponsor-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/></svg></span>
+      <span>{{ .Site.Params.BookSponsorLabel | default "赞助支持" }}</span>
+    </a>
+    {{- end }}
+
+    <label for="toc-control">
+      {{ if partial "docs/toc-show" . }}
+      <img src="{{ partial "docs/icon" "toc" }}" class="book-icon" alt="{{ partial "docs/text/i18n" "Table of Contents" }}" />
+      {{ end }}
+    </label>
+  </div>
+</div>

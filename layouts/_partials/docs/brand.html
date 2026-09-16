@@ -1,0 +1,28 @@
+{{/*
+  项目级新增（主题 layouts/_partials/docs/brand.html 为原版，此处只扩展）：
+  在左侧菜单顶部的站点标题行右侧，追加「赞助支持」入口。
+
+  为什么放这一行：菜单树正常时有十几行，赞助按钮放最底部需要滚动才能看到；
+  放在品牌行右侧则永远第一眼可见，且不额外占用竖直空间（品牌行本来就在最上方）。
+  隐藏页面：content/sponsor.md 带 bookHidden，不会出现在目录里，只能靠这个按钮进入。
+  移动端：≤56rem 时左侧菜单收进汉堡菜单，顶栏另有 docs/header.html 里的同款入口。
+  说明：品牌行改为 flex + space-between 由 assets/styles/custom.css 里
+       `.book-menu .book-brand` 提供；关闭开关（BookSponsor: false）时
+       行内只剩原有的一个 <a>，靠 `.book-brand > :only-child { margin-inline-start: auto }`
+       保持图标+标题右对齐，不会跑到左边。
+*/}}
+<h2 class="book-brand">
+  <a class="flex align-center" href="{{ partial "docs/links/home" . }}">
+    {{- with .Site.Params.BookLogo -}}
+    <img src="{{ . | relURL }}" alt="{{ partial "docs/text/i18n" "Logo" }}" />
+    {{- end -}}
+    <span>{{ .Site.Title }}</span>
+  </a>
+  {{- if .Site.Params.BookSponsor -}}
+  <a class="book-sponsor-btn" href="{{ "sponsor/" | relLangURL }}" title="{{ .Site.Params.BookSponsorLabel | default "赞助支持" }}">
+    {{/* 内联 svg 而不是 <img>：只有这颗 ♥ 上红色，文字保持正文灰度（见 custom.css .book-sponsor-icon） */}}
+    <span class="book-sponsor-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/></svg></span>
+    <span>{{ .Site.Params.BookSponsorLabel | default "赞助支持" }}</span>
+  </a>
+  {{- end -}}
+</h2>

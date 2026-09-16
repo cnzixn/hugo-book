@@ -123,6 +123,15 @@ params:
   # 也可以用 DNS TXT 方式验证，那就无需填这里
   googleSiteVerification: ""
 
+  # ------- 赞助入口（隐藏页 /sponsor/ 的按钮） -------
+  # 赞助页 content/sponsor.md 带 bookHidden，不出现在左侧目录里，只能靠按钮进入：
+  #   - 桌面端（>56rem）：左侧菜单顶部「站点标题行」右侧的红色胶囊按钮（docs/brand.html）
+  #   - 移动端（≤56rem）：左侧菜单收进汉堡菜单，改由顶栏右侧常驻按钮进入（docs/header.html）
+  #   - 首页 hero 区：两个版本按钮下方的全宽按钮（content/_index.md 里手写）
+  # 设为 false 即整站隐藏以上按钮（页面 /sponsor/ 仍可直接访问）。
+  BookSponsor: true
+  BookSponsorLabel: " "
+
   # ------- 网盘直链策略（下载入口模式） -------
   # modal  = 模组列表点击「下载」在当前页面弹框：输入/校验注册邮箱(记 localStorage)，
   #          通过后用新标签页打开真实网盘直链。静态页/JSON 不内嵌真实直链（防抓取）。

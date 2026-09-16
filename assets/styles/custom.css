@@ -1033,3 +1033,229 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
     transform: translateY(0);
   }
 }
+
+/* ===== 顶栏标题 = 网站标题，页面标题进内容区 =====
+ * 移动端顶栏 .book-header（仅 ≤56rem 显示，两侧是 44px 的菜单/目录按钮）
+ * 中间原本显示当前页面标题，现改为网站标题（链接回首页）；
+ * 页面标题由 baseof.html 的 main 块输出到内容区顶部的 h1.book-article-title。
+ */
+.book-header .book-header-site-title {
+  /* 真居中：去掉 flex 子项的 min-width 限制，长标题左右对称收缩 */
+  min-width: 0;
+  text-align: center;
+  /* 主题 .book-header h3 只有 overflow+ellipsis，没有 nowrap，补上省略号才生效 */
+  white-space: nowrap;
+}
+
+/* 网站标题跟随正文颜色（不用全局 a[href] 的链接蓝），无下划线 */
+.book-header .book-header-site-title a {
+  color: var(--body-font-color);
+  text-decoration: none;
+}
+
+/* 内容区顶部页面标题：与站点其它标题同款字重，仅保留底部间距
+ * （.markdown > :first-child 已负责 margin-top: 0） */
+h1.book-article-title {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 var(--space-16);
+}
+
+/* ==========================================================================
+   赞助支持入口（隐藏页 /sponsor/ 的按钮入口）
+   位置一：左侧菜单顶部、站点标题行右侧（桌面常驻）—— .book-sponsor-btn
+   位置二：移动端顶栏右侧（≤56rem 左侧菜单收进汉堡菜单）—— .book-header-sponsor
+   位置三：首页 hero 区两个版本按钮下方（全宽）—— .book-btn.btn-sponsor
+
+   设计（2026-09 调整）：去掉描边胶囊、去掉实心红底，整体走「普通链接 + 一颗小红心」：
+     - 文字跟随主题正文/链接色（亮 #1f2328 / 暗 #c9d1d9），不再整块红
+     - 只有那颗 ♥ 用 --color-accent-caution（亮 #cf222e / 暗 #da3633）当焦点，
+       一眼能认出是赞助，又不会刺眼
+     - 点击区依然保证 ≥44px（移动端顶栏），但视觉上没有"肥"的实心块
+   ========================================================================== */
+
+/* ---------- 位置一：左侧菜单顶部（站点标题行右侧）的赞助按钮 ---------- */
+/* 品牌行改成两端对齐：左边图标+站名，右边赞助入口（行高只有一行，不占额外竖直空间） */
+.book-menu .book-brand {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* 关掉赞助按钮时行内只剩原有的一个 <a>，仍保持右对齐（与原来视觉一致） */
+.book-menu .book-brand > :only-child {
+  margin-inline-start: auto;
+  -webkit-margin-start: auto;
+}
+
+.book-menu .book-brand > a.book-sponsor-btn {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  gap: 0.25rem;
+  -webkit-box-flex: 0 0 auto;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  /* 文字低调：跟正文色，不跟链接蓝 */
+  color: var(--gray-500);
+  font-size: var(--font-size-smallest);
+  font-weight: 400;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-decoration: none;
+  -webkit-transition: color 0.15s ease;
+  transition: color 0.15s ease;
+}
+
+/* 悬停/聚焦：只把文字加深，不出现色块（覆盖主题 nav ul a[href]:hover 的 opacity 淡出） */
+.book-menu .book-brand > a.book-sponsor-btn:hover,
+.book-menu .book-brand > a.book-sponsor-btn:focus,
+.book-menu .book-brand > a.book-sponsor-btn:focus-visible {
+  opacity: 1;
+  background: none;
+  color: var(--body-font-color);
+  text-decoration: none;
+}
+
+/* 唯一的一抹红：心形图标 */
+.book-menu .book-brand .book-sponsor-icon {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  width: 0.95em;
+  height: 0.95em;
+  color: var(--color-accent-caution, #cf222e);
+}
+
+.book-menu .book-brand .book-sponsor-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- 位置二：移动端顶栏右侧按钮 ---------- */
+.book-header .book-header-actions {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+
+/* 纯粹的文字入口：无边框、无底色、无胶囊，只有一颗小红心 */
+.book-header a.book-header-sponsor[href] {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  gap: 0.2rem;
+  /* 视觉上很小，但点击区仍有 44px 高（与菜单/目录按钮一致，方便拇指点）；
+     宽度不锁 44px —— 那样文字右侧会多出一截看不见的空白 */
+  min-height: 44px;
+  padding: 0 0.15rem;
+  border: 0;
+  background: none;
+  color: var(--gray-500);
+  font-size: var(--font-size-smallest);
+  font-weight: 400;
+  line-height: 1;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-header a.book-header-sponsor[href] .book-sponsor-icon {
+  width: 0.95em;
+  height: 0.95em;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  color: var(--color-accent-caution, #cf222e);
+}
+
+.book-header a.book-header-sponsor[href] .book-sponsor-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.book-header a.book-header-sponsor[href]:hover,
+.book-header a.book-header-sponsor[href]:focus,
+.book-header a.book-header-sponsor[href]:focus-visible {
+  opacity: 1;
+  background: none;
+  color: var(--body-font-color);
+  text-decoration: none;
+}
+
+/* 顶栏赞助入口只在移动端出现；桌面端走左侧菜单里的同款入口，避免重复 */
+@media screen and (min-width: 56.0625rem) {
+  .book-header a.book-header-sponsor[href] {
+    display: none;
+  }
+}
+
+/* 窄屏（≤400px）：文字隐藏后 ♥ 会紧贴目录按钮，补一点右内边距做视觉间隔，
+   同时补足 44×44 的点击区（文字在时不必锁宽，否则右侧会多一截空白） */
+@media screen and (max-width: 400px) {
+  .book-header a.book-header-sponsor[href] {
+    min-width: 44px;
+    padding: 0 0.35rem 0 0;
+  }
+
+  .book-header a.book-header-sponsor[href] span {
+    display: none;
+  }
+}
+
+/* ---------- 位置三：首页 hero 区（两个版本按钮下方）的赞助按钮 ---------- */
+/* 走站内普通描边按钮的样式（与"手游-单机版/联机版"同族），只有心是红的 */
+a.book-btn.btn-sponsor[href] {
+  color: var(--gray-500);
+}
+
+a.book-btn.btn-sponsor[href]:hover,
+a.book-btn.btn-sponsor[href]:focus,
+a.book-btn.btn-sponsor[href]:focus-visible {
+  color: var(--body-font-color);
+  text-decoration: none;
+}
+
+a.book-btn.btn-sponsor[href] .book-sponsor-icon {
+  width: 1em;
+  height: 1em;
+  color: var(--color-accent-caution, #cf222e);
+}
+
+a.book-btn.btn-sponsor[href] .book-sponsor-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- 赞助页收款码：固定成正方形，方便扫码和长按识别 ---------- */
+.sponsor-qr .gallery-track img {
+  max-height: none;
+  width: 220px;
+  height: 220px;
+  -o-object-fit: contain;
+  object-fit: contain;
+  /* 二维码是细黑线，反色后会扫不出来，这里锁死白底 */
+  background: #ffffff;
+}
