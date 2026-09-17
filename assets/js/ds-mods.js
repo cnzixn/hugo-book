@@ -228,7 +228,7 @@
     return (
       '<a class="workshop-id-link" href="https://steamcommunity.com/sharedfiles/filedetails/?id=' + digits + '"' +
         ' target="_blank" rel="noopener noreferrer"' +
-        ' title="在 Steam 创意工坊中查看 ' + digits + '"' +
+        ' title="在创意工坊中查看 ' + digits + '"' +
         ' onclick="event.stopPropagation()">' + name + '</a>'
     );
   }
@@ -257,7 +257,7 @@
     var on = cfg.panEnabled || panEnabled;
     // 订阅数只在本页开启排序时展示（单机版没有该字段，不渲染空文字）
     var subsText = cfg.subs ? buildSubsText(mod.subs) : '';
-    var subsTitle = subsText ? 'Steam 当前订阅数 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
+    var subsTitle = subsText ? '当前订阅数 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
 
     // 逐个网盘生成下载按钮；总开关关闭的网盘整条不渲染（连"暂无"灰按钮也不留）
     var actions = '';
@@ -913,8 +913,8 @@
       sortModeBtn.setAttribute('data-dir', dirOfMode(sortMode));
       sortModeBtn.setAttribute('aria-pressed', isDownloads ? 'true' : 'false');
       sortModeBtn.setAttribute('title', isDownloads
-        ? '当前：倒序 · 下载（Steam 订阅数高到低），点击切换为正序 · 名称'
-        : '当前：正序 · 名称（ID 小到大），点击切换为倒序 · 下载（Steam 订阅数高到低）');
+        ? '当前：倒序 · 订阅（高到低）'
+        : '当前：正序 · 名称（小到大）');
     }
 
     /** 单机版：沿用原有的正序/倒序按钮外观 */
