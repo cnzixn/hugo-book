@@ -22,6 +22,7 @@
     - url1: {百度网盘链接（已带?pwd）}
     - url2: https://pan.xunlei.com   （迅雷暂无数据，写占位URL）
     - url3: {夸克网盘链接（自动补?pwd=提取码）}
+    - subs: {可选，Steam 订阅数，非空才输出}
     - size: {文件大小}
 
 注意：
@@ -34,9 +35,13 @@
       # xxxxx，注释信息
   行尾注释（`WS1.名字.zip\t10MB\t# 备注`）也被天然兼容——第1行按 tab 切分后只取前两段。
 * 缺行有害：过滤只处理空行 / 注释行，**补不回「整行缺失」**。若某条记录少了第3行（提取码），
-  后续三元组会整体串位，脚本不报错但会产出脏数据（表现为 key 变成 URL、size 变成 0B）。
+  后续三元组会整体串位，脚本不报错但会产出脏数据（表现为 key 变成 URL、size 变成 0）。
   因此修改 txt 后请确认每条记录仍是完整的 3 行。
-* yml 里的注释**不会保留**：回写时按固定格式重写（只输出 key + name/tags/url1~url3/size）。
+* 零大小统一写成 `size: 0`（读取时把 0B / 0.00B / 0KB 等旧写法归一成 0，写回也只有这一种），
+  页面（ds-mods / dst-mods / ds-pans / dst-pans）对 0 一律不显示大小，不会出现「(0)」。
+* 合并只更新 name/size/url1/url3：tags 与 subs（Steam 订阅数，见 fetch_dst_workshop_subs.py）
+  一律沿用旧值，不会因为 txt 里没有对应列而被清掉；新增条目这两项留空，等后续补齐。
+* yml 里的注释**不会保留**：回写时按固定格式重写（只输出 key + name/tags/url1~url3/subs/size）。
   想把说明长期留存，请写在 txt 侧或另外记文档。
 """
 
@@ -106,6 +111,18 @@ def unquote(value):
             inner = inner.replace("''", "'")
         return inner
     return v
+
+
+# 「没有量到文件大小」的统一写法：0B / 0b / 0.00B / 0KB 全部归一成 0。
+# 页面（ds-mods / dst-mods / ds-pans / dst-pans）对 0 一律不显示大小，
+# 所以这里保持单一写法，避免同一个含义出现多种字符串。
+ZERO_SIZE_TOKENS = ("", "0", "0b", "0B", "0.0", "0.00", "0KB", "0kb", "0.0KB", "0.00KB", "0.00B")
+
+
+def normalize_size(value):
+    """把「零大小」的各种写法统一成 '0'；其它值原样返回。"""
+    v = ("" if value is None else str(value)).strip()
+    return "0" if v in ZERO_SIZE_TOKENS else v
 
 
 def discover_prefixes():
@@ -210,12 +227,14 @@ def parse_pan_txt(txt_path):
 def parse_existing_yml(yml_path):
     """
     读取已有的 dst_pan.yml，用 OrderedDict 返回：
-        { key: { name, url1, url2, url3, size } }
+        { key: { name, url1, url2, url3, size, tags, subs } }
     保持原顺序不变，便于之后写回。
 
     兼容性说明：
       * key 可以是 "WSxxx"，也可以是 "LocalSend"、"游戏" 等任意非空字符串（行首非 `-`、以 `:` 结尾即作为 key）
-      * 5 个字段（name/url1/url2/url3/size）顺序随意，不要求固定位置
+      * 字段（name/url1/url2/url3/size/tags/subs）顺序随意，不要求固定位置
+      * subs（Steam 订阅数，由 fetch_dst_workshop_subs.py 抓取）必须在这里解析出来并原样写回：
+        否则每次合并都会把整条记录重写成固定字段列表，订阅数就丢了
       * 不依赖 PyYAML，按行逐段解析，避免用户安装依赖
     """
     result = OrderedDict()
@@ -227,8 +246,8 @@ def parse_existing_yml(yml_path):
 
     # 匹配 key 行：行首无缩进 + 以 ":" 结尾（key 本身不含 ":"，避免把 "http:" 当 key）
     key_re = re.compile(r"^(?P<key>[^:\s-][^:]*):\s*$")
-    # 匹配字段行：- field: value（支持 name/url1/url2/url3/size/tags）
-    field_re = re.compile(r"^\s*-\s*(?P<k>name|url1|url2|url3|size|tags):\s*(?P<v>.*?)\s*$")
+    # 匹配字段行：- field: value（支持 name/url1/url2/url3/size/tags/subs）
+    field_re = re.compile(r"^\s*-\s*(?P<k>name|url1|url2|url3|size|tags|subs):\s*(?P<v>.*?)\s*$")
 
     cur_key = None
     cur_item = None
@@ -236,8 +255,8 @@ def parse_existing_yml(yml_path):
     def flush():
         """把当前累积的条目写入 result"""
         if cur_key is not None and cur_item is not None:
-            # 缺失的字段补空（tags 也补空，确保后续 merge 不会 KeyError）
-            for f2 in ("name", "url1", "url2", "url3", "size", "tags"):
+            # 缺失的字段补空（tags / subs 也补空，确保后续 merge 不会 KeyError）
+            for f2 in ("name", "url1", "url2", "url3", "size", "tags", "subs"):
                 if f2 not in cur_item:
                     cur_item[f2] = ""
             result[cur_key] = cur_item
@@ -257,7 +276,12 @@ def parse_existing_yml(yml_path):
         m_field = field_re.match(ln)
         if m_field and cur_item is not None:
             # 去掉 yaml_scalar 写入时可能加的引号，保证与 txt 侧裸值可比对
-            cur_item[m_field.group("k")] = unquote(m_field.group("v"))
+            field_name = m_field.group("k")
+            field_value = unquote(m_field.group("v"))
+            # size 的「零大小」历史写法（0B/0.00B/0KB…）统一成 0，写回时也只有一种写法
+            if field_name == "size":
+                field_value = normalize_size(field_value)
+            cur_item[field_name] = field_value
 
     # 文件结束时 flush 最后一条
     flush()
@@ -296,7 +320,7 @@ def merge_data(baidu_map, quark_map, existing_map):
             # ---- 已存在条目：逐字段智能更新 ----
             old = merged[ws]
             new_name = old.get("name", "")
-            new_size = old.get("size", "0B")
+            new_size = old.get("size", "0") or "0"
             new_url1 = old.get("url1", "")
             new_url2 = old.get("url2", "")  # 迅雷保持不动
             new_url3 = old.get("url3", "")
@@ -323,15 +347,17 @@ def merge_data(baidu_map, quark_map, existing_map):
                 changed = True
 
             if changed:
-                # 保留旧条目里的 tags（merge 不覆盖 tags，tag 由用户手动维护）
-                new_tags = old.get("tags", "")
+                # 保留旧条目里的 tags 与 subs：
+                #   tags 由用户手动维护，merge 不覆盖；
+                #   subs（Steam 订阅数）由 fetch_dst_workshop_subs.py 抓取，更不该被合并流程抹掉。
                 merged[ws] = {
                     "name": new_name,
                     "url1": new_url1,
                     "url2": new_url2,
                     "url3": new_url3,
-                    "size": new_size,
-                    "tags": new_tags,
+                    "size": normalize_size(new_size),
+                    "tags": old.get("tags", ""),
+                    "subs": old.get("subs", ""),
                 }
                 updated += 1
             # else：没有任何变化，完全保留原 dict，保证写回字节级一致
@@ -339,7 +365,7 @@ def merge_data(baidu_map, quark_map, existing_map):
             # ---- 新条目：组装完整结构 ----
             primary = b or q
             name = primary["name"] if primary else ""
-            size = primary["size"] if primary else "0B"
+            size = normalize_size(primary["size"]) if primary else "0"
             url1 = b["url"] if b else ""
             url2 = XUNLEI_PLACEHOLDER  # 迅雷占位
             url3 = q["url"] if q else ""
@@ -351,6 +377,7 @@ def merge_data(baidu_map, quark_map, existing_map):
                 "url3": url3,
                 "size": size,
                 "tags": "",  # 新条目无 tag，后续由用户手动维护或由 migrate_tags.py 补充
+                "subs": "",  # 新条目无订阅数，跑 fetch_dst_workshop_subs.py 补齐
             }
             added += 1
 
@@ -361,10 +388,14 @@ def merge_data(baidu_map, quark_map, existing_map):
 def write_yml(yml_path, merged_map):
     """
     按固定格式写回 yml（key + 字段行），条目之间空一行分隔。
-    可选字段：tags 非空时输出，空则省略。
+    可选字段：tags / subs 非空时输出，空则省略。
     所有字段值都经 yaml_scalar() 处理：只在必要时加引号（名字以 [ 开头等），
     普通值保持原样，避免无谓地改写整份文件。
     不使用 PyYAML，避免用户装依赖。
+
+    注意：这里输出的是「固定字段列表」，所以任何需要长期保留的字段都必须同时出现在
+    parse_existing_yml 的解析白名单、merge_data 的保留逻辑和本函数里，
+    否则会被整条重写抹掉（subs 曾经就是这样丢的）。
     """
     lines = []
     items = list(merged_map.items())
@@ -378,7 +409,12 @@ def write_yml(yml_path, merged_map):
         lines.append("- url1: " + yaml_scalar(info.get("url1", "")))
         lines.append("- url2: " + yaml_scalar(info.get("url2", "")))
         lines.append("- url3: " + yaml_scalar(info.get("url3", "")))
-        lines.append("- size: " + yaml_scalar(info.get("size", "0B")))
+        # subs（Steam 订阅数）插在 size 之前，与 fetch_dst_workshop_subs.py 的写入位置一致
+        subs_val = info.get("subs", "")
+        if subs_val:
+            lines.append("- subs: " + yaml_scalar(subs_val))
+        # size：零大小统一写成 0（页面会忽略 0，不显示「(0)」）
+        lines.append("- size: " + yaml_scalar(normalize_size(info.get("size", "0"))))
         # 条目之间空一行（末尾不追加多余空行，这里简单处理：除最后一条都加空行）
         if idx != len(items) - 1:
             lines.append("")

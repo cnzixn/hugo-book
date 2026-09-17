@@ -139,9 +139,9 @@ processing_status: "completed"
 
 重新抓取某个已完成条目时，先从 `completed_ids` 移除它，再运行脚本；需要全部重抓则使用 `--refresh`。重新整理完中文稿后，再恢复页面标记和完成清单。
 
-## 5.1 Steam 订阅数（模组列表「按下载」排序）
+## 5.1 Steam 订阅数（模组列表「↓ 下载」排序）
 
-联机版模组页（`layouts/_shortcodes/dst-mods.html`）支持按 Steam 当前订阅数排序，数据来自：
+联机版模组页（`layouts/_shortcodes/dst-mods.html`）用 Steam 当前订阅数做排序与展示，数据来自：
 
 ```powershell
 python data_src/fetch_dst_workshop_subs.py            # 抓取并写回
@@ -149,19 +149,24 @@ python data_src/fetch_dst_workshop_subs.py --dry-run  # 只看结果
 python data_src/fetch_dst_workshop_subs.py --limit 5  # 试跑
 ```
 
+只保留一个字段：`subs` = 接口的 `subscriptions`（Steam 当前订阅数），页面用它排序、并在模组图标下方显示成 `12.3万` 这种缩写。历史遗留的 `lifetime_subs`（`lifetime_subscriptions`）已废弃，脚本再次运行会自动清理掉。
+
 脚本对 `data/dst_pan.yml`、`data_src/dst_pan.yml`、`data_src/dst_pan.json` 三份数据同时生效：
 
 | 字段 | 含义 | 用途 |
 | --- | --- | --- |
-| `subs` | `subscriptions`，Steam 当前订阅数 | 页面展示「订阅 x万/亿」+「按下载」排序 |
-| `lifetime_subs` | `lifetime_subscriptions`，历史累计订阅次数 | 仅存档，便于后续换口径 |
+| `subs` | `subscriptions`，Steam 当前订阅数 | 图标下方显示缩写 +「↓ 下载」排序 |
 
 约定：
 
 - 字段插在 `size` 之前，写成与原有字段一致的 `- subs: 数字` 列表风格；重复运行幂等（只改数值，不动顺序）。
+- `size` 的零值统一写作 `size: 0`（不是 `0B`）；页面遇到 0 不显示大小，模组列表里也不会出现「(0)」。
 - `WS000000` 不是有效工坊 ID，脚本会跳过，其余条目应全部有 `subs`。
 - 接口偶发 504/超时，脚本按 `--retries`（默认 3 次）指数退避重试。
 - 订阅数会随时间变化，建议随模组增删一起重跑；页面上的数字即最近一次抓取结果。
+- **`merge_pans.py` 会保留 `subs`**：它的字段白名单、合并保留逻辑、回写模板三处都要有 `subs`，
+  少一处就会在「有变化才重写整条」时把订阅数抹掉（曾经踩过这个坑）。
+  标准顺序是：先跑 `merge_pans.py` 合并网盘链接，再跑 `fetch_dst_workshop_subs.py` 补订阅数。
 
 页面交互（`assets/js/ds-mods.js` 共用，单机版不受影响）：
 
@@ -170,7 +175,7 @@ python data_src/fetch_dst_workshop_subs.py --limit 5  # 试跑
   - `↓ 下载` → 倒序，按 `subs`（Steam 当前订阅数）高到低。
 - 方向跟着排序走、不单独切换；旁边的正序/倒序按钮只存在于单机版页面，行为未变。
 - 选择记在 `localStorage`（`mods-sort-preference`，值 `name` / `downloads`），方向不记忆。
-- 订阅数参与搜索：`10327254`、`1032.7万` 都能命中。
+- 订阅数参与搜索：`10327525`、`1032.8万` 都能命中。
 
 ## 6. 一致性自检
 

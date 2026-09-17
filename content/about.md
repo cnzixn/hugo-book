@@ -41,9 +41,3 @@ bookHidden: true
 - 本站为 **fan-made** 性质，与 Klei Entertainment 及官方发行商无关
 
 ---
-
-## 致谢
-
-
-- 感谢每一位投稿、反馈与赞助的朋友，是你们的支持让本站持续更新
-- 本站由 [Hugo](https://gohugo.io/) 构建，主题基于 [Hugo Book](https://github.com/alex-shpak/hugo-book/) 定制，部署在 [Cloudflare](https://www.cloudflare.com/) 提供的 Pages 服务（免费）。

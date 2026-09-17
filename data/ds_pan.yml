@@ -3048,43 +3048,43 @@ BM421(补丁):
 
 工具:
 - name: 工具
-- size: 0B
+- size: 0
 - url1: https://pan.baidu.com/s/1UgvWWK66yGqEkcEvFTY1hw?pwd=8xok
 - url2: https://pan.xunlei.com/s/VO_4qcd27eOeDwHFnquXTQZbA1?pwd=bh4z
 - url3: https://pan.quark.cn/s/34d24e4ab9ec?pwd=x91a
 # 框架:
 # - name: 框架
-# - size: 0B
+# - size: 0
 # - url1: https://pan.baidu.com/s/1Efa1BHQpRNJvZKvV-VowzQ?pwd=r3bt
 # - url2: https://pan.xunlei.com/s/VO_4qcaqDiGuCPwJyG95sDRaA1?pwd=kazz
 # - url3: https://pan.quark.cn/s/55af1d27223b?pwd=3ihu
 # 模组:
 # - name: 模组
-# - size: 0B
+# - size: 0
 # - url1: https://pan.baidu.com/s/1R6DylDnByXtntgHWiWlDgw?pwd=7cds
 # - url2: https://pan.xunlei.com/s/VO_4qcWQl_e5KfJk1xFcDqSxA1?pwd=k2ia
 # - url3: https://pan.quark.cn/s/223ab6519f19?pwd=986c
 # 游戏:
 # - name: 游戏
-# - size: 0B
+# - size: 0
 # - url1: https://pan.baidu.com/s/1dLdK-KGnCOhDwASrkNcZvg?pwd=nc7z
 # - url2: https://pan.xunlei.com/s/VO_4qcZopT1AEdEw-9Rr556TA1?pwd=ch3t
 # - url3: https://pan.quark.cn/s/353fb1693294?pwd=meff
 游戏:
 - name: 单机版
-- size: 0B
+- size: 0
 - url1: https://pan.baidu.com/s/1UWEidClcgPRLFVOHbtJNlg?pwd=svm6
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/f8b0305035d5?pwd=9veY
 LocalSend:
 - name: LocalSend
-- size: 0B
+- size: 0
 - url1: https://pan.baidu.com/s/1PhOEpp_JpVlzphWADtYH-g?pwd=imai
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/aff6e6ec6796?pwd=zKi5
 dst:
 - name: 饥荒联机版(手游)
-- size: 0B
+- size: 0
 - url1: https://pan.baidu.com/s/1qSL4bxgs4S5eE-QmJQAF2Q?pwd=t1i1
 - url2: https://pan.xunlei.com
 - url3: https://pan.quark.cn/s/b763a8f03435?pwd=MXhS

@@ -26,6 +26,8 @@
     {{- $bmCount = add $bmCount 1 -}}
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
+    {{- /* size 为 0 / 0B（没量到文件大小）时按空处理，列表里不显示「(0)」 */ -}}
+    {{- if in (slice "0" "0B" "0b" "0.0" "0KB" "0.00B") (printf "%v" $size) -}}{{- $size = "" -}}{{- end -}}
     {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
     {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
     {{- $xunleiUrl := index (where $itemData "url2" "ne" nil) 0 "url2" -}}

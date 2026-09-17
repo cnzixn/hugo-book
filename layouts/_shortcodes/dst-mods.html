@@ -19,6 +19,8 @@
     {{- $wsCount = add $wsCount 1 -}}
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
+    {{- /* size 为 0 / 0B（没量到文件大小）时按空处理，列表里不显示「(0)」 */ -}}
+    {{- if in (slice "0" "0B" "0b" "0.0" "0KB" "0.00B") (printf "%v" $size) -}}{{- $size = "" -}}{{- end -}}
     {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
     {{- /* Steam 订阅数（data/dst_pan.yml 的 subs 字段，由 data_src/fetch_dst_workshop_subs.py 抓取）
           缺失/非数字一律按 0 处理，保证前端排序时字段类型稳定 */ -}}

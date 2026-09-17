@@ -4,26 +4,26 @@
 
 数据来源：Steam 官方接口
     POST https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/
-返回字段（本次只取前两个）：
-    subscriptions          当前订阅数（仍在订阅的人数）→ 写入 `subs`，页面「按下载」排序用
-    lifetime_subscriptions 历史累计订阅次数 → 写入 `lifetime_subs`，仅作参考
+只取一个字段：
+    subscriptions  当前订阅数（仍在订阅的人数）→ 写入 `subs`，页面展示 +「↓ 下载」排序用
 
-写回格式（与原有 `- 字段: 值` 列表风格保持一致）：
+写回格式（与原有 `- 字段: 值` 列表风格保持一致，subs 插在 size 之前）：
     WS376333686:
     - name: 综合状态CombinedStatus
     - tags: 辅助、信息
-    - subs: 10327240
-    - lifetime_subs: 11324613
     - url1: https://pan.baidu.com/s/...
     - ...
+    - subs: 10327240
     - size: 357.32KB
 
 说明：
-  * 幂等：重复运行只更新已有 `- subs:` / `- lifetime_subs:` 行的值，行位置和字段顺序不变。
+  * 幂等：重复运行只更新已有 `- subs:` 行的值，行位置和字段顺序不变。
   * 同时补写 `data_src/dst_pan.json`（`pan_yml2json.py` 的产物），保持 yml/json 一致。
   * 默认同时处理 `data/dst_pan.yml` 与 `data_src/dst_pan.yml`（仓库里两份内容相同）。
+  * `data_src/merge_pans.py` 已同步支持保留 subs：先跑 merge 合并网盘链接，再跑本脚本补订阅数。
   * `--dry-run` 只打印结果不落盘；Steam 偶发 504/超时，脚本按 `--retries` 指数退避重试。
   * WS000000 不是有效工坊 ID，会被自动跳过（Steam 不会返回条目）。
+  * 历史遗留的 `- lifetime_subs:` 行已废弃，本脚本再次运行会自动清理。
 
 用法：
     python data_src/fetch_dst_workshop_subs.py              # 抓取并写回
@@ -54,7 +54,8 @@ DEFAULT_YML = [
 DEFAULT_JSON = [ROOT / "dst_pan.json"]
 API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/"
 BATCH_SIZE = 100        # Steam 单次请求上限
-SUB_FIELDS = ("subs", "lifetime_subs")
+SUB_FIELDS = ("subs",)              # 需要写入/更新的字段
+LEGACY_FIELDS = ("lifetime_subs",)  # 旧字段，遇到就顺手删掉
 
 KEY_RE = re.compile(r"^(?P<key>[^:\s-][^:]*):\s*$")
 FIELD_RE = re.compile(r"^\s*-\s*(?P<k>[A-Za-z0-9_]+):(?P<v>.*?)\s*$")
@@ -101,9 +102,9 @@ def split_blocks(lines):
 
 
 def patch_yml(path, subs_map, dry_run):
-    """把 subs/lifetime_subs 写回 yml：已有行原地更新，缺失行按 SUB_FIELDS 顺序插在 size 之前。
+    """把 subs 写回 yml：已有行原地更新，缺失行插在 size 之前；顺带清掉旧的 lifetime_subs 行。
 
-    返回 (新增行数, 值有变化的行数)；重复运行第二次起必然是 (0, 0)。
+    返回 (新增行数, 值有变化的行数, 清理的旧字段行数)；重复运行第二次起必然是 (0, 0, 0)。
     """
     # 注意：必须显式 newline="" —— 默认的通用换行模式会把 CRLF 读成 LF，
     # 写回时就变成纯 LF，整文件 diff 会被换行符污染。
@@ -116,20 +117,24 @@ def patch_yml(path, subs_map, dry_run):
 
     blocks = split_blocks(lines)
 
-    inserted, updated = 0, 0
+    inserted, updated, removed = 0, 0, 0
     out_blocks = []
     for key, block in blocks:
         if key not in subs_map:
             out_blocks.append(block)
             continue
         fields = subs_map[key]
-        # 先记下旧的 subs / lifetime_subs 值并删掉这些行，再统一插入到 size 之前
+        # 先记下旧的 subs 值，并把这些字段行（含已废弃的 lifetime_subs）整行删掉，
+        # 再统一按 SUB_FIELDS 插入到 size 之前，保证位置与字段顺序固定。
         old_values = {}
         stripped = []
         for line in block:
             m = FIELD_RE.match(line)
             if m and m.group("k") in SUB_FIELDS:
                 old_values[m.group("k")] = m.group("v").strip()
+                continue
+            if m and m.group("k") in LEGACY_FIELDS:
+                removed += 1
                 continue
             stripped.append(line)
         size_pos = len(stripped)
@@ -147,14 +152,14 @@ def patch_yml(path, subs_map, dry_run):
         out_blocks.append(stripped[:size_pos] + new_lines + stripped[size_pos:])
 
     body = nl.join([line for block in out_blocks for line in block]) + nl
-    if not dry_run and (inserted or updated):
+    if not dry_run and (inserted or updated or removed):
         with path.open("w", encoding="utf-8", newline="") as stream:
             stream.write(body)
-    return inserted, updated
+    return inserted, updated, removed
 
 
 def patch_json(path, subs_map, dry_run):
-    """同步写回 dst_pan.json（保持 order：subs 插在 size 之前）。"""
+    """同步写回 dst_pan.json（保持 order：subs 插在 size 之前，并清掉旧的 lifetime_subs）。"""
     if not path.exists():
         return False
     with path.open("r", encoding="utf-8") as stream:
@@ -165,20 +170,18 @@ def patch_json(path, subs_map, dry_run):
         entry = data.get(key)
         if entry is None:
             continue
-        if entry.get("subs") == fields["subs"] and entry.get("lifetime_subs") == fields["lifetime_subs"]:
+        if entry.get("subs") == fields["subs"] and not any(f in entry for f in LEGACY_FIELDS):
             continue
         changed = True
         rebuilt = OrderedDict()
         for field, value in entry.items():
-            if field in SUB_FIELDS:
+            if field in SUB_FIELDS or field in LEGACY_FIELDS:
                 continue
             if field == "size":
                 rebuilt["subs"] = fields["subs"]
-                rebuilt["lifetime_subs"] = fields["lifetime_subs"]
             rebuilt[field] = value
         if "subs" not in rebuilt:
             rebuilt["subs"] = fields["subs"]
-            rebuilt["lifetime_subs"] = fields["lifetime_subs"]
         data[key] = rebuilt
 
     if changed and not dry_run:
@@ -268,9 +271,8 @@ def main():
                 print(f"[缺失] {key} Steam 未返回该条目", file=sys.stderr)
                 continue
             subs = int(detail.get("subscriptions") or 0)
-            lifetime = int(detail.get("lifetime_subscriptions") or 0)
-            subs_map[key] = {"subs": subs, "lifetime_subs": lifetime}
-            print(f"  {key}  订阅 {subs:>10,}  累计 {lifetime:>10,}  {detail.get('title', '')}")
+            subs_map[key] = {"subs": subs}
+            print(f"  {key}  订阅 {subs:>10,}  {detail.get('title', '')}")
         if offset + BATCH_SIZE < len(fetch_keys):
             time.sleep(max(0, args.delay))
 
@@ -279,9 +281,10 @@ def main():
         return 1
 
     for target in yml_targets:
-        inserted, updated = patch_yml(target, subs_map, args.dry_run)
+        inserted, updated, removed = patch_yml(target, subs_map, args.dry_run)
         action = "预览" if args.dry_run else "写入"
-        print(f"[{action}] {display_path(target)}：新增 {inserted} 行，更新 {updated} 行")
+        tail = f"，清理旧字段 {removed} 行" if removed else ""
+        print(f"[{action}] {display_path(target)}：新增 {inserted} 行，更新 {updated} 行{tail}")
     for target in json_targets:
         changed = patch_json(target, subs_map, args.dry_run)
         action = "预览" if args.dry_run else "写入"
