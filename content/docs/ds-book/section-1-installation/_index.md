@@ -1,5 +1,5 @@
 ---
-title: "安装教程"
+title: "新人指引"
 weight: 10
 bookIcon: bi-signpost
 bookCollapseSection: false

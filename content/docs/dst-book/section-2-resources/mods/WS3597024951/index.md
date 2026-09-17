@@ -11,7 +11,7 @@ processing_status: "completed"
 
 ## 景熹家居
 
-已知问题：
+（移植版）已知问题：
 
 - 钢琴操作暂未支持...
 - 部分音效“播放异常”，例如：钢琴曲、汽车电台，详情请看 [《模组音效》](/p/sound) 。
@@ -27,6 +27,8 @@ processing_status: "completed"
 ---
 
 模组的网页版wiki：[--ModWiki--](https://wap.modwikis.com/mod?_id=695d178d53066f7643f484f6)
+
+祝大家玩得开心！喜欢的小伙伴可以B站搜索并关注：画画的景熹 https://space.bilibili.com/5258940 。
 
 ---
 
