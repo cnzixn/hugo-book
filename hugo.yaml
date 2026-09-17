@@ -81,7 +81,7 @@ menu:
       params:
         bookIcon: "bi-book"
     - name: "更新日志"
-      pageRef: "/changelog/"
+      pageRef: "/log/"
       weight: 10
       params:
         bookIcon: "bi-hourglass"
