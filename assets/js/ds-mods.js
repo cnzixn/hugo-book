@@ -21,7 +21,7 @@
    * 兼容旧值：以前存过 'asc' / 'desc' / 'id'，统一当作 'name'。
    */
   var DEFAULT_SORT_MODE = 'name';
-  var SORT_MODE_LABEL = { name: '名称', downloads: '下载' };
+  var SORT_MODE_LABEL = { name: '名称', downloads: '订阅' };
   var SORT_DEFAULT_DIR = { name: 'asc', downloads: 'desc' };
 
   /* ---- 网盘相关常量 ---- */
@@ -113,8 +113,9 @@
           searchOnly: dataEl.dataset.searchOnly === 'true',
           searchKeyword: dataEl.dataset.searchKeyword || '',
           currentDate: dataEl.dataset.currentDate || '',
-          // 是否启用「按下载(Steam 当前订阅数)」排序：仅联机版 dst-mods 打开
-          sortDownloads: dataEl.dataset.sortDownloads === 'true',
+          // 是否启用订阅数功能（列表展示 +「↓ 下载」排序）：仅联机版 dst-mods 打开，
+          // 由 shortcode 的 data-sort-downloads 属性注入
+          subs: dataEl.dataset.sortDownloads === 'true',
           imgBase: dataEl.dataset.imgBase || '/img/bm/',
           imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png',
           // 网盘直链策略：modal=点击在当前页弹框校验邮箱后新标签打开（页面不内嵌直链）；direct=直接输出直链
@@ -255,7 +256,7 @@
     var tagsHtml = buildTagsHtml(mod.tags);
     var on = cfg.panEnabled || panEnabled;
     // 订阅数只在本页开启排序时展示（单机版没有该字段，不渲染空文字）
-    var subsText = cfg.sortDownloads ? buildSubsText(mod.subs) : '';
+    var subsText = cfg.subs ? buildSubsText(mod.subs) : '';
     var subsTitle = subsText ? 'Steam 当前订阅数 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
 
     // 逐个网盘生成下载按钮；总开关关闭的网盘整条不渲染（连"暂无"灰按钮也不留）
@@ -701,19 +702,20 @@
     var showCountEl = document.getElementById('show-count');
     if (!modsList || !pager || !searchInput || !showCountEl) return;
 
-    // 「按下载」只在数据侧开了排序的页面（联机版）提供；没有该开关时始终按 ID
-    var sortDownloads = !!cfg.sortDownloads;
+    // 订阅数功能（列表展示 +「↓ 下载」排序）只在数据侧给了 subs 的页面（联机版）提供；
+    // 没有该开关时始终按 ID，沿用单机版原来的正序/倒序按钮
+    var hasSubs = !!cfg.subs;
 
-    // 排序按钮：联机版只有 #sort-mode（在按ID/按下载之间切换，方向各自固定）；
+    // 排序按钮：联机版只有 #sort-mode（在「名称 / 下载」之间切换，方向各自固定）；
     // 单机版没有 #sort-mode，用原来的 #sort-toggle（正序/倒序）。
-    var sortModeBtn = sortDownloads ? document.getElementById('sort-mode') : null;
-    if (sortDownloads && !sortModeBtn) return;
+    var sortModeBtn = hasSubs ? document.getElementById('sort-mode') : null;
+    if (hasSubs && !sortModeBtn) return;
 
-    var sortToggleBtn = sortDownloads ? null : document.getElementById('sort-toggle');
-    if (!sortDownloads && !sortToggleBtn) return;
+    var sortToggleBtn = hasSubs ? null : document.getElementById('sort-toggle');
+    if (!hasSubs && !sortToggleBtn) return;
 
     var filteredMods = cfg.searchOnly && !cfg.searchKeyword ? [] : cfg.allMods.slice();
-    var sortMode = sortDownloads ? loadSortMode() : 'id';
+    var sortMode = hasSubs ? loadSortMode() : 'id';
     var sortDir = 'asc';   // 仅单机版使用；联机版方向由 sortMode 固定
     var currentPage = 1;   // 1-based
 
@@ -872,14 +874,14 @@
     function applySort() {
       filteredMods.sort(function (a, b) {
         var byId = (a.id || '').localeCompare(b.id || '');
-        if (sortDownloads && sortMode === 'downloads') {
+        if (hasSubs && sortMode === 'downloads') {
           // （倒序）下载：固定订阅数高到低；数字相同的按 ID 升序兜底，保证分页结果稳定
           var diff = subsOf(b) - subsOf(a);
           if (diff !== 0) return diff;
           return byId;
         }
         // （正序）名称 = 按 ID 从小到大；单机版的倒序仍由正序/倒序按钮控制
-        return sortDir === 'desc' && !sortDownloads ? -byId : byId;
+        return sortDir === 'desc' && !hasSubs ? -byId : byId;
       });
     }
 

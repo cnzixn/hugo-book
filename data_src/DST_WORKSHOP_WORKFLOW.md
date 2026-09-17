@@ -176,6 +176,8 @@ python data_src/fetch_dst_workshop_subs.py --limit 5  # 试跑
 - 方向跟着排序走、不单独切换；旁边的正序/倒序按钮只存在于单机版页面，行为未变。
 - 选择记在 `localStorage`（`mods-sort-preference`，值 `name` / `downloads`），方向不记忆。
 - 订阅数参与搜索：`10327525`、`1032.8万` 都能命中。
+- 前端接线：shortcode 输出 `data-sort-downloads="true"`，`ds-mods.js` 读成配置字段 `cfg.subs`
+  （有则渲染图标下的订阅数、启用「名称 / 下载」按钮；没有就退回单机版的按 ID + 正序/倒序）。
 
 ## 6. 一致性自检
 
