@@ -50,6 +50,23 @@ KEY_RE = re.compile(r"^(?P<key>[^:\s-][^:]*):\s*$")
 FIELD_RE = re.compile(r"^\s*-\s*(?P<k>[A-Za-z0-9_]+):\s*(?P<v>.*?)\s*$")
 
 
+def unquote(value):
+    """
+    去掉 yml 里为 YAML 安全而加的成对引号，并还原转义。
+    例：`- name: "[Gorge]VictorianHUD"` → `[Gorge]VictorianHUD`
+    （merge_pans.py 写入时会按需加引号，这里必须对称处理，否则 JSON 名字带引号）
+    """
+    v = (value or "").strip()
+    if len(v) >= 2 and v[0] == v[-1] and v[0] in ("'", '"'):
+        inner = v[1:-1]
+        if v[0] == '"':
+            inner = inner.replace('\\"', '"').replace("\\\\", "\\")
+        else:
+            inner = inner.replace("''", "'")
+        return inner
+    return v
+
+
 def parse_yml(yml_path):
     """
     解析 pan yml 为 OrderedDict：
@@ -84,7 +101,9 @@ def parse_yml(yml_path):
             continue
         m_field = FIELD_RE.match(ln)
         if m_field and cur_item is not None:
-            cur_item[m_field.group("k")] = m_field.group("v")
+            # 去掉必要时加的成对引号（如 name: "[Gorge]VictorianHUD"），
+            # 否则输出的 JSON 里名字会带上引号
+            cur_item[m_field.group("k")] = unquote(m_field.group("v"))
 
     flush()
     return result

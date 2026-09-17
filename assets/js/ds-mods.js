@@ -13,6 +13,17 @@
   var SEARCH_DEBOUNCE_MS = 200;
   var STORAGE_SORT_KEY = 'mods-sort-preference';
 
+  /**
+   * 排序方式（localStorage 持久化），联机版只有两种，方向固定、不单独切换：
+   *   'name'      → 正序 · 名称：就是原来的按 ID 排序（ID 小到大），「名称」只是显示叫法
+   *   'downloads' → 倒序 · 下载：Steam 当前订阅数高到低
+   * 单按钮点一下在两者之间来回切，按钮上的箭头图标表示正序/倒序。
+   * 兼容旧值：以前存过 'asc' / 'desc' / 'id'，统一当作 'name'。
+   */
+  var DEFAULT_SORT_MODE = 'name';
+  var SORT_MODE_LABEL = { name: '名称', downloads: '下载' };
+  var SORT_DEFAULT_DIR = { name: 'asc', downloads: 'desc' };
+
   /* ---- 网盘相关常量 ---- */
   var DISK_ORDER = ['baidu', 'xunlei', 'quark'];
   var DISK_LABEL = { baidu: '百度网盘', xunlei: '迅雷网盘', quark: '夸克网盘' };
@@ -36,6 +47,44 @@
   }
   function setStorageItem(key, val) {
     try { localStorage.setItem(key, val); } catch (e) { /* 忽略存储失败 */ }
+  }
+
+  /**
+   * 读取排序方式：缺失/脏数据一律退回 'name'（正序名称）。
+   * 兼容旧值 'asc'/'desc'/'id' 与过渡期的 {"mode":..,"dir":..} 对象。
+   */
+  function loadSortMode() {
+    var raw = getStorageItem(STORAGE_SORT_KEY);
+    if (!raw) return DEFAULT_SORT_MODE;
+    if (raw === 'asc' || raw === 'desc' || raw === 'id') return 'name';
+    try {
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        if (SORT_MODE_LABEL[parsed.mode]) return parsed.mode;
+        if (parsed.mode === 'id') return 'name';
+      }
+    } catch (e) { /* 脏数据 → 默认 */ }
+    return SORT_MODE_LABEL[raw] ? raw : DEFAULT_SORT_MODE;
+  }
+
+  function saveSortMode(mode) {
+    setStorageItem(STORAGE_SORT_KEY, mode);
+  }
+
+  /**
+   * 订阅数格式化：10327254 → 1032.7万；152000000 → 1.52亿
+   * 与站内其它位置的「万/亿」记法保持一致，这里只用于展示，排序仍用原始数值。
+   */
+  function formatSubsCount(value) {
+    var num = typeof value === 'number' ? value : parseInt(value, 10);
+    if (!isFinite(num) || num <= 0) return '';
+    if (num >= 100000000) return trimZero((num / 100000000).toFixed(2)) + '亿';
+    if (num >= 10000) return trimZero((num / 10000).toFixed(1)) + '万';
+    return String(num);
+  }
+
+  function trimZero(text) {
+    return text.indexOf('.') === -1 ? text : text.replace(/\.?0+$/, '');
   }
 
   /**
@@ -64,6 +113,8 @@
           searchOnly: dataEl.dataset.searchOnly === 'true',
           searchKeyword: dataEl.dataset.searchKeyword || '',
           currentDate: dataEl.dataset.currentDate || '',
+          // 是否启用「按下载(Steam 当前订阅数)」排序：仅联机版 dst-mods 打开
+          sortDownloads: dataEl.dataset.sortDownloads === 'true',
           imgBase: dataEl.dataset.imgBase || '/img/bm/',
           imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png',
           // 网盘直链策略：modal=点击在当前页弹框校验邮箱后新标签打开（页面不内嵌直链）；direct=直接输出直链
@@ -153,6 +204,16 @@
   }
 
   /**
+   * 订阅数（Steam 当前订阅数）：0 / 缺失（已下架条目）直接不渲染。
+   * 显示成「12.3万」这种缩写，放在模组图标正下方的小字里；完整数字进 title。
+   */
+  function buildSubsText(subs) {
+    var num = typeof subs === 'number' ? subs : parseInt(subs, 10);
+    if (!isFinite(num) || num <= 0) return '';
+    return formatSubsCount(num) || String(num);
+  }
+
+  /**
    * WS 前缀数字 ID → Steam 创意工坊链接；其余本地 ID（BM…等）原样返回纯文本
    * 例：WS123456 → https://steamcommunity.com/sharedfiles/filedetails/?id=123456
    * （WS000000 之类无有效数字的 ID 不生成链接）
@@ -193,6 +254,9 @@
     var site = getSiteOrigin();
     var tagsHtml = buildTagsHtml(mod.tags);
     var on = cfg.panEnabled || panEnabled;
+    // 订阅数只在本页开启排序时展示（单机版没有该字段，不渲染空文字）
+    var subsText = cfg.sortDownloads ? buildSubsText(mod.subs) : '';
+    var subsTitle = subsText ? 'Steam 当前订阅数 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
 
     // 逐个网盘生成下载按钮；总开关关闭的网盘整条不渲染（连"暂无"灰按钮也不留）
     var actions = '';
@@ -210,9 +274,13 @@
       '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '">' +
         '<div class="item-main">' +
           '<div class="item-info">' +
-            '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
-              '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
-            '</button>' +
+            '<div class="item-thumb">' +
+              '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
+                '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
+              '</button>' +
+              /* 订阅数缩写成「12.3万」，放在图标正下方 */
+              (subsText ? '<span class="item-subs" title="' + subsTitle + '">' + subsText + '</span>' : '') +
+            '</div>' +
             '<div class="mod-name" role="link" tabindex="0" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=\'' + site + '/p/' + mod.id + '\'}">' +
               '<div class="mod-name-sub">' + mod.name + '</div>' +
               '<div class="mod-name-top">' +
@@ -631,16 +699,28 @@
     var header = document.getElementById('mods-header');
     var searchInput = document.getElementById('mod-search');
     var showCountEl = document.getElementById('show-count');
-    var sortToggleBtn = document.getElementById('sort-toggle');
-    if (!modsList || !pager || !searchInput || !showCountEl || !sortToggleBtn) return;
+    if (!modsList || !pager || !searchInput || !showCountEl) return;
+
+    // 「按下载」只在数据侧开了排序的页面（联机版）提供；没有该开关时始终按 ID
+    var sortDownloads = !!cfg.sortDownloads;
+
+    // 排序按钮：联机版只有 #sort-mode（在按ID/按下载之间切换，方向各自固定）；
+    // 单机版没有 #sort-mode，用原来的 #sort-toggle（正序/倒序）。
+    var sortModeBtn = sortDownloads ? document.getElementById('sort-mode') : null;
+    if (sortDownloads && !sortModeBtn) return;
+
+    var sortToggleBtn = sortDownloads ? null : document.getElementById('sort-toggle');
+    if (!sortDownloads && !sortToggleBtn) return;
 
     var filteredMods = cfg.searchOnly && !cfg.searchKeyword ? [] : cfg.allMods.slice();
-    var currentSort = getStorageItem(STORAGE_SORT_KEY) || 'asc';
+    var sortMode = sortDownloads ? loadSortMode() : 'id';
+    var sortDir = 'asc';   // 仅单机版使用；联机版方向由 sortMode 固定
     var currentPage = 1;   // 1-based
 
     if (cfg.searchKeyword) searchInput.value = cfg.searchKeyword;
 
-    updateSortButtons();
+    if (sortModeBtn) updateSortModeButton();
+    else updateSortDirButton();
     applyFilter();
 
     /* ---------- 工具 ---------- */
@@ -768,6 +848,10 @@
           var nameLower = (m.name || '').toLowerCase();
           if (idLower.indexOf(kw) !== -1 || kw.indexOf(idLower) !== -1) return true;
           if (nameLower.indexOf(kw) !== -1 || kw.indexOf(nameLower) !== -1) return true;
+          // 订阅数也参与搜索：完整数字（10327254）和「万/亿」缩写（1032.7万）都能命中
+          var subsNum = subsOf(m);
+          if (subsNum > 0 &&
+              (String(subsNum).indexOf(kw) !== -1 || formatSubsCount(subsNum).toLowerCase().indexOf(kw) !== -1)) return true;
           // 匹配标签（双向子串 + 支持数组或顿号/逗号分隔字符串）
           var tags = m.tags;
           if (tags) {
@@ -787,34 +871,82 @@
 
     function applySort() {
       filteredMods.sort(function (a, b) {
-        return currentSort === 'asc'
-          ? (a.id || '').localeCompare(b.id || '')
-          : (b.id || '').localeCompare(a.id || '');
+        var byId = (a.id || '').localeCompare(b.id || '');
+        if (sortDownloads && sortMode === 'downloads') {
+          // （倒序）下载：固定订阅数高到低；数字相同的按 ID 升序兜底，保证分页结果稳定
+          var diff = subsOf(b) - subsOf(a);
+          if (diff !== 0) return diff;
+          return byId;
+        }
+        // （正序）名称 = 按 ID 从小到大；单机版的倒序仍由正序/倒序按钮控制
+        return sortDir === 'desc' && !sortDownloads ? -byId : byId;
       });
     }
 
-    function updateSortButtons() {
+    function subsOf(mod) {
+      var num = typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10);
+      return isFinite(num) ? num : 0;
+    }
+    /** 每种排序固定的方向：（正序）名称 = asc，（倒序）下载 = desc */
+    function dirOfMode(mode) {
+      return SORT_DEFAULT_DIR[mode] || 'asc';
+    }
+
+    /**
+     * 联机版：单个按钮，只有两种排序，点一下来回切：
+     *   ↑ 名称（正序，= 按 ID 小到大） ⇄ ↓ 下载（倒序，Steam 订阅数高到低）
+     * 方向跟着排序走、不单独切换，所以按钮用「朝上/朝下箭头图标」表示正序/倒序。
+     */
+    function updateSortModeButton() {
+      var iconAsc = sortModeBtn.querySelector('.icon-asc');
+      var iconDesc = sortModeBtn.querySelector('.icon-desc');
+      var modeLabel = sortModeBtn.querySelector('.sort-mode-label');
+      var isDownloads = sortMode === 'downloads';
+      if (modeLabel) modeLabel.textContent = SORT_MODE_LABEL[sortMode] || SORT_MODE_LABEL.name;
+      // 倒序 = 图标朝下，正序 = 图标朝上
+      if (iconAsc) iconAsc.style.display = isDownloads ? 'none' : 'inline-block';
+      if (iconDesc) iconDesc.style.display = isDownloads ? 'inline-block' : 'none';
+      sortModeBtn.classList.toggle('is-active', isDownloads);
+      sortModeBtn.setAttribute('data-mode', sortMode);
+      sortModeBtn.setAttribute('data-dir', dirOfMode(sortMode));
+      sortModeBtn.setAttribute('aria-pressed', isDownloads ? 'true' : 'false');
+      sortModeBtn.setAttribute('title', isDownloads
+        ? '当前：倒序 · 下载（Steam 订阅数高到低），点击切换为正序 · 名称'
+        : '当前：正序 · 名称（ID 小到大），点击切换为倒序 · 下载（Steam 订阅数高到低）');
+    }
+
+    /** 单机版：沿用原有的正序/倒序按钮外观 */
+    function updateSortDirButton() {
+      if (!sortToggleBtn) return;
       var iconAsc = sortToggleBtn.querySelector('.icon-asc');
       var iconDesc = sortToggleBtn.querySelector('.icon-desc');
       var label = sortToggleBtn.querySelector('.sort-label');
-      if (currentSort === 'asc') {
-        if (iconAsc) iconAsc.style.display = 'inline-block';
-        if (iconDesc) iconDesc.style.display = 'none';
-        if (label) label.textContent = '正序';
-      } else {
-        if (iconAsc) iconAsc.style.display = 'none';
-        if (iconDesc) iconDesc.style.display = 'inline-block';
-        if (label) label.textContent = '倒序';
-      }
+      var isAsc = sortDir === 'asc';
+      if (iconAsc) iconAsc.style.display = isAsc ? 'inline-block' : 'none';
+      if (iconDesc) iconDesc.style.display = isAsc ? 'none' : 'inline-block';
+      if (label) label.textContent = isAsc ? '正序' : '倒序';
+      sortToggleBtn.setAttribute('data-sort', sortDir);
+      sortToggleBtn.setAttribute('title', '当前' + (isAsc ? '正序' : '倒序') + '，点击切换');
     }
 
     /* ---------- 事件 ---------- */
-    sortToggleBtn.addEventListener('click', function () {
-      currentSort = currentSort === 'asc' ? 'desc' : 'asc';
-      setStorageItem(STORAGE_SORT_KEY, currentSort);
-      updateSortButtons();
-      applyFilter();
-    });
+    if (sortModeBtn) {
+      sortModeBtn.addEventListener('click', function () {
+        // 只有两种排序，来回切：名称（正序） ⇄ 下载（倒序）
+        sortMode = sortMode === 'downloads' ? 'name' : 'downloads';
+        saveSortMode(sortMode);
+        updateSortModeButton();
+        applyFilter();
+      });
+    }
+
+    if (sortToggleBtn) {
+      sortToggleBtn.addEventListener('click', function () {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        updateSortDirButton();
+        applyFilter();
+      });
+    }
 
     var searchTimer = null;
     searchInput.addEventListener('input', function () {

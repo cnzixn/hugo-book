@@ -1,4 +1,6 @@
 """
+From: 26.09.17 https://b.225228.xyz
+
 KTEX 贴图转换工具，支持 DXT5 / ASTC8x8 / ASTC6x6 格式。
 
 免责：

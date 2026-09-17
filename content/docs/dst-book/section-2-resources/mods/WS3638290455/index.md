@@ -17,4 +17,17 @@ processing_status: "completed"
 
 原页面包含详细的操作说明、按键设置和问题排查步骤；实际菜单入口与可生成内容可能随版本变化，建议以工坊页面的当前说明为准。
 
+### 署名（Credits）
+
+| 分工 | 作者 |
+| --- | --- |
+| 代码 | C.J.B. |
+| 物品与 bug 修复 | GaRAnTuLA |
+| DST 版本 | Skull |
+| bug 修复 | TheMightyPikachu、Electroely |
+| UI 与代码优化 | Tendy |
+| 美术设计与更新 | 乐十画（Le Shi Hua） |
+| 传送、代码改进与修复 | Alyssa |
+| 代码优化与中文翻译 | 呼吸（Hu Xi） |
+
 [查看创意工坊原页面](https://steamcommunity.com/sharedfiles/filedetails/?id=3638290455)

@@ -20,6 +20,11 @@
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
     {{- $tags := index (where $itemData "tags" "ne" nil) 0 "tags" -}}
+    {{- /* Steam 订阅数（data/dst_pan.yml 的 subs 字段，由 data_src/fetch_dst_workshop_subs.py 抓取）
+          缺失/非数字一律按 0 处理，保证前端排序时字段类型稳定 */ -}}
+    {{- $subs := index (where $itemData "subs" "ne" nil) 0 "subs" | default 0 -}}
+    {{- if not (findRE `^\d+$` (printf "%v" $subs)) -}}{{- $subs = 0 -}}{{- end -}}
+    {{- $subs = int $subs -}}
     {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
     {{- $xunleiUrl := index (where $itemData "url2" "ne" nil) 0 "url2" -}}
     {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
@@ -30,7 +35,7 @@
     {{- $hasBaidu := gt (len (findRE `^https://pan\.baidu\.com/s/` $baiduUrl)) 0 -}}
     {{- $hasXunlei := gt (len (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl)) 0 -}}
     {{- $hasQuark := gt (len (findRE `^https://pan\.quark\.cn/s/` $quarkUrl)) 0 -}}
-    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags "hasBaidu" $hasBaidu "hasXunlei" $hasXunlei "hasQuark" $hasQuark -}}
+    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags "subs" $subs "hasBaidu" $hasBaidu "hasXunlei" $hasXunlei "hasQuark" $hasQuark -}}
     {{- if eq $panMode "direct" -}}
       {{- /* 直链模式才把真实 url 写进 JSON（原代码保留，切回 direct 即恢复） */ -}}
       {{- if not (findRE `^https://pan\.baidu\.com/s/` $baiduUrl) -}}{{- $baiduUrl = "" -}}{{- end -}}
@@ -62,16 +67,19 @@
       <div class="sort-info">
         <span>共计 <span id="show-count">0</span> / {{ $wsCount }} 模组</span>
       </div>
-      <button id="sort-toggle" class="sort-btn" data-sort="asc">
+      {{/* 单个排序按钮，只有两种排序：
+           图标↑ + 名称 = 正序（按 ID 小到大，「名称」只是叫法）；图标↓ + 下载 = 倒序（订阅数高到低） */}}
+      <button id="sort-mode" class="sort-btn sort-mode-btn" type="button" data-mode="name" data-dir="asc"
+              title="当前：正序 · 名称（ID 小到大），点击切换为倒序 · 下载（Steam 订阅数高到低）">
         <svg class="icon-asc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path>
-          <path d="m3 17 3 3 3-3"></path><path d="M6 18V4"></path>
-        </svg>
-        <svg class="icon-desc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path>
           <path d="m3 7 3-3 3 3"></path><path d="M6 4v14"></path>
         </svg>
-        <span class="sort-label">正序</span>
+        <svg class="icon-desc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path>
+          <path d="m3 17 3 3 3-3"></path><path d="M6 18V4"></path>
+        </svg>
+        <span class="sort-mode-label">名称</span>
       </button>
     </div>
     <div class="search-box">
@@ -87,6 +95,7 @@
        数据也改为独立 data-src URL fetch（不内嵌大 JSON 到 HTML） */}}
 <script id="mods-data" type="application/json"
         data-current-date="{{ $currentDate }}"
+        data-sort-downloads="true"
         data-pan-mode="{{ $panMode }}"
         data-pan-baidu-enabled="{{ $panSw.baidu }}"
         data-pan-xunlei-enabled="{{ $panSw.xunlei }}"

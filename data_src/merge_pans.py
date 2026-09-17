@@ -29,6 +29,15 @@
   仅把 txt 里新出现的 WS编号追加到文件末尾。
 * 编码一律 utf-8。
 * 迅雷链接（url2）如果当前 txt 没有对应数据源，则统一写占位：https://pan.xunlei.com
+* 空行 / 注释行无害：txt 与 yml 解析前都会滤掉「纯空白行」和「整行注释」（`#` 开头），
+  所以可以随意加空行、加分组标题，例如：
+      # xxxxx，注释信息
+  行尾注释（`WS1.名字.zip\t10MB\t# 备注`）也被天然兼容——第1行按 tab 切分后只取前两段。
+* 缺行有害：过滤只处理空行 / 注释行，**补不回「整行缺失」**。若某条记录少了第3行（提取码），
+  后续三元组会整体串位，脚本不报错但会产出脏数据（表现为 key 变成 URL、size 变成 0B）。
+  因此修改 txt 后请确认每条记录仍是完整的 3 行。
+* yml 里的注释**不会保留**：回写时按固定格式重写（只输出 key + name/tags/url1~url3/size）。
+  想把说明长期留存，请写在 txt 侧或另外记文档。
 """
 
 import os
@@ -45,6 +54,58 @@ XUNLEI_PLACEHOLDER = "https://pan.xunlei.com"
 
 # 支持的 txt 来源后缀（{prefix}-{SOURCE}.txt）
 KNOWN_SOURCES = ("baidu", "quark")
+
+# 可接受的「整行注释」前缀（只看行首，允许前置空白；含全角＃，防中文输入法误打）
+# 匹配到这种行会被直接丢弃，不参与 3 行一组的切分，例如：`# xxxxx，注释信息`
+COMMENT_PREFIXES = ("#", "＃")
+
+
+# ---------- YAML 标量安全处理 ----------
+# 裸写会破坏 YAML 的字符：行首指示符（[ { * & ! | > % @ ` # , 引号）。
+# 反例：`- name: [Gorge]VictorianHUD` 的 [ 是流式序列起始符，Hugo 加载 data/ 时会直接报
+#   failed to load data: "dst_pan.yml:128:16": value is not allowed in this context
+# 导致整站构建失败。工坊标题里带 [DST]/[Forge]/[Gorge] 前缀的模组都会踩到。
+_QUOTE_HEAD_CHARS = "[]{}*&!|>%@`#,'\""
+
+
+def yaml_scalar(value):
+    """
+    把值写成 YAML 安全标量：只在必要时加双引号，普通值（中文名、URL、大小）保持原样，
+    避免整份文件被无谓改写。需要加引号的情况：
+      * 行首是 YAML 指示符：[ { * & ! | > % @ ` # , 引号
+      * 含 ": "（冒号+空格）或以 ":" 结尾
+      * 含 " #"（空格+井号，YAML 会当成行内注释）
+      * 首尾有空白、含反斜杠，或本身为空
+    """
+    v = "" if value is None else str(value)
+    if (
+        v == ""
+        or v[0] in _QUOTE_HEAD_CHARS
+        or v != v.strip()
+        or ": " in v
+        or v.endswith(":")
+        or " #" in v
+        or "\\" in v
+    ):
+        return '"' + v.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    return v
+
+
+def unquote(value):
+    """
+    去掉 yaml_scalar 加上的成对引号并还原转义（读取 yml 时使用）。
+    没有这一步，读回 `"[Gorge]VictorianHUD"` 会与 txt 里的裸名比对不上，
+    导致每次运行都误判为「有更新」并反复重写。
+    """
+    v = (value or "").strip()
+    if len(v) >= 2 and v[0] == v[-1] and v[0] in ("'", '"'):
+        inner = v[1:-1]
+        if v[0] == '"':
+            inner = inner.replace('\\"', '"').replace("\\\\", "\\")
+        else:
+            inner = inner.replace("''", "'")
+        return inner
+    return v
 
 
 def discover_prefixes():
@@ -73,6 +134,12 @@ def parse_pan_txt(txt_path):
     """
     解析 百度/夸克 txt，返回 { ws_id: {url, size, name, pwd} }
     name 去掉尾部 .zip；size 原样保留（如 "127.24MB"）。
+
+    解析方式：先滤掉空行与整行注释，再按 3 行一组切分（文件名行 / URL 行 / 提取码行）。
+      * 有「空行」或「注释行（`#` 开头）」是安全的 —— 滤掉之后行号依然连续，组不会错位，
+        所以可以在 txt 里自由插入分组标题，例如 `# xxxxx，注释信息`。
+      * 有「缺行」是不安全的 —— 行数变了，后面的组全部串位；末尾不足 3 行的残片被丢弃，
+        两种情况都不会抛异常，只会静默少解析/解析错，需人工核对 txt。
     """
     result = {}
     if not os.path.exists(txt_path):
@@ -82,14 +149,22 @@ def parse_pan_txt(txt_path):
     with open(txt_path, "r", encoding="utf-8") as f:
         lines = [ln.rstrip("\r\n") for ln in f.readlines()]
 
-    # 去掉空行
+    # 去掉纯空白行（含只含 tab/空格的行）：
+    # 这样条目之间、条目内部插入空行都不会让 3 行一组的切分错位。
+    # 注意：这里只能滤掉「存在的空行」，无法补回「整行缺失」——见函数 docstring。
     lines = [ln for ln in lines if ln.strip() != ""]
 
+    # 去掉整行注释（如 "# xxxxx，注释信息"）：
+    # 注释行同样不参与 3 行一组的切分，所以 txt 里可以放分组标题、来源说明等。
+    # 只认「行首」注释；行尾注释（…zip\t10MB\t# 备注）会被 tab 切分自然忽略。
+    lines = [ln for ln in lines if not ln.lstrip().startswith(COMMENT_PREFIXES)]
+
+    # 每 3 行一组；不足 3 行的末尾残片直接忽略（i + 2 < len(lines) 为假时退出）
     i = 0
     while i + 2 < len(lines):
-        line1 = lines[i]      # 文件名行
-        line2 = lines[i + 1]  # URL 行
-        line3 = lines[i + 2]  # 提取码行
+        line1 = lines[i]      # 文件名行：{MOD_ID}.{中文名}.zip\t{大小}\t
+        line2 = lines[i + 1]  # URL 行：百度 https://pan.baidu.com/s/…?pwd=… 或夸克 https://pan.quark.cn/s/…
+        line3 = lines[i + 2]  # 提取码行：{提取码}\t分享成功
 
         # 第1行：按 tab 拆，第0段是 "WSxxx.name.zip"
         parts1 = line1.split("\t")
@@ -168,8 +243,11 @@ def parse_existing_yml(yml_path):
             result[cur_key] = cur_item
 
     for ln in lines:
-        if ln.strip() == "":
-            continue  # 跳过空行
+        # 跳过空行与整行注释（`#` 开头）：条目之间、条目内部插空行或写 `# 说明` 都不影响解析
+        # 注释行必须显式挡掉——`# xxx: yyy` 这种没有前导 `-` 的注释能命中 key_re，
+        # 会被误当成一个条目 key 写回 yml。
+        if ln.strip() == "" or ln.lstrip().startswith(COMMENT_PREFIXES):
+            continue
         m_key = key_re.match(ln)
         if m_key:
             flush()  # 写掉上一个条目
@@ -178,7 +256,8 @@ def parse_existing_yml(yml_path):
             continue
         m_field = field_re.match(ln)
         if m_field and cur_item is not None:
-            cur_item[m_field.group("k")] = m_field.group("v")
+            # 去掉 yaml_scalar 写入时可能加的引号，保证与 txt 侧裸值可比对
+            cur_item[m_field.group("k")] = unquote(m_field.group("v"))
 
     # 文件结束时 flush 最后一条
     flush()
@@ -283,21 +362,23 @@ def write_yml(yml_path, merged_map):
     """
     按固定格式写回 yml（key + 字段行），条目之间空一行分隔。
     可选字段：tags 非空时输出，空则省略。
+    所有字段值都经 yaml_scalar() 处理：只在必要时加引号（名字以 [ 开头等），
+    普通值保持原样，避免无谓地改写整份文件。
     不使用 PyYAML，避免用户装依赖。
     """
     lines = []
     items = list(merged_map.items())
     for idx, (ws, info) in enumerate(items):
         lines.append(ws + ":")
-        lines.append("- name: " + info.get("name", ""))
+        lines.append("- name: " + yaml_scalar(info.get("name", "")))
         # tags 插在 name 之后、url1 之前（保持逻辑分组：元信息 → 网盘链接）
         tags_val = info.get("tags", "")
         if tags_val:
-            lines.append("- tags: " + tags_val)
-        lines.append("- url1: " + info.get("url1", ""))
-        lines.append("- url2: " + info.get("url2", ""))
-        lines.append("- url3: " + info.get("url3", ""))
-        lines.append("- size: " + info.get("size", "0B"))
+            lines.append("- tags: " + yaml_scalar(tags_val))
+        lines.append("- url1: " + yaml_scalar(info.get("url1", "")))
+        lines.append("- url2: " + yaml_scalar(info.get("url2", "")))
+        lines.append("- url3: " + yaml_scalar(info.get("url3", "")))
+        lines.append("- size: " + yaml_scalar(info.get("size", "0B")))
         # 条目之间空一行（末尾不追加多余空行，这里简单处理：除最后一条都加空行）
         if idx != len(items) - 1:
             lines.append("")
@@ -308,7 +389,7 @@ def write_yml(yml_path, merged_map):
     with open(yml_path, "w", encoding="utf-8") as f:
         f.write(content)
 
-    print("[OK] 写入完成: " + yml_path)
+    print("[OK] 写入完成: " + str(yml_path))
 
 
 def sync_from_data(prefix):

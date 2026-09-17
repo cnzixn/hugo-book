@@ -89,8 +89,16 @@
   background: var(--gray-100);
 }
 .sort-btn svg { stroke: currentColor; }
+/* 默认只显示朝上箭头（正序）；朝下箭头由 JS 在切到「倒序」时显示 */
 .sort-btn .icon-desc { display: none; }
 .sort-btn .sort-label { font-size: var(--font-size-smaller); }
+
+/* 排序按钮（仅联机版有 #sort-mode）：单个按钮在「按ID 正序 / 按下载 倒序」之间切换 */
+.sort-mode-btn .sort-mode-label { font-size: var(--font-size-smaller); }
+.sort-mode-btn.is-active {
+  border-color: var(--color-accent-note);
+  background: var(--gray-100);
+}
 
 /* ---------- 列表 ---------- */
 .mods-list {
@@ -147,6 +155,33 @@
   gap: 0.5rem;
 }
 .item-info > * + * { margin-left: 0.5rem; }
+
+/* 图标 + 下方订阅数（如「12.3万」）：整块与右侧下载按钮居中对齐 */
+.item-thumb {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+.item-subs {
+  margin-top: 2px;
+  max-width: 100%;
+  font-size: 0.625rem;
+  line-height: 1.2;
+  color: var(--gray-500);
+  white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
 
 /* 文字区：垂直两行，整体一个横向滚动条 */
 .mod-name {
@@ -414,6 +449,7 @@
   .mod-name-top { font-size: 0.6875rem; }
   .mod-name-sub { font-size: 0.875rem; }
   .action-btn { width: 32px; height: 32px; }
+  .item-subs { font-size: 0.5625rem; }
   .mods-pager { gap: 0.3rem; }
   .mods-pager > * + * { margin-left: 0.3rem; }
   .pager-btn {

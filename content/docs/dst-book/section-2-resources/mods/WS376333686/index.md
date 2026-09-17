@@ -17,4 +17,6 @@ processing_status: "completed"
 
 许多状态栏和 HUD 模组会将它作为依赖或兼容目标。安装后请根据需要在模组配置中选择要显示的内容。
 
+**署名**：原模组由 Kiopho（Always On Status）、Soilworker（Season Clock）、hotmatrixx（Better Moon）制作；本模组作者完全重写了全部代码，以获得更好的兼容性与表现。
+
 [查看创意工坊原页面](https://steamcommunity.com/sharedfiles/filedetails/?id=376333686)

@@ -1,3 +1,4 @@
+-- From: 26.09.17 https://b.225228.xyz
 -- 手机端通用径向轮盘。
 -- 在 modmain 用 modimport("xxx/radial_wheel.lua") 导入。
 -- 其他模组复用时，只需修改下面的 RADIAL_WHEEL_CONFIG：

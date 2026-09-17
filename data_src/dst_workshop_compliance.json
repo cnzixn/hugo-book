@@ -1,13 +1,13 @@
 {
-  "checked_at": "2026-09-09T07:46:30.766375+00:00",
+  "checked_at": "2026-09-17T14:01:18.766913+00:00",
   "source": "dst_pan.json",
   "processed_manifest": "dst_workshop_processed.json",
   "note": "clear 仅表示未检测到明确禁令，仍需人工核对原描述和联系作者；error/no-description 不应视为许可。",
   "summary": {
-    "total": 34,
+    "total": 74,
     "prohibited": 0,
-    "clear": 32,
-    "no_description": 1,
+    "clear": 70,
+    "no_description": 3,
     "error": 1,
     "invalid_id": 1,
     "skipped_existing": 32
@@ -36,6 +36,18 @@
       "description": "Tired of chasing after bosses or want to know if they're near? Then look no further.\r\n\r\n[h1]What this mod does[/h1]\r\nThis mod adds a player-like indicator to bosses to know if they're lurking around, so that you can go and smack them in their face - or run away from them before they get too close.\r\n\r\nThis indicator can display bosses up to 3 - 4 screens away, their distance being related to the size of their icon (larger icon = closer).\r\n\r\nCurrently the following bosses are tracked:[list]\r\n[*]Deerclops\r\n[*]Dragonfly\r\n[*]Bearger\r\n[*]Moose/goose\r\n[*]Antlion\r\n[*]Ancient Guardian\r\n[*]Toadstool (both cap and actual boss)\r\n[*]Klaus\r\n[*]Loot Stash[/list]\r\n\r\nIf you find a bug, have a suggestion or just like this mod, feel free to leave a comment.",
       "error": "",
       "time_updated": 1504335443
+    },
+    {
+      "id": "WS1157975551",
+      "name": "更多地图图标ExtendedMapIcons",
+      "title": "Extended Map Icons",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=1157975551",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Add more icons to the map. Includes all the mobs, basic tools, flowers, gold nuggets, rocks, flints, and more.\r\nIt have 123 mobs icons (includes all monsters of vanilla, RoG and Shipwrecked).\r\n\r\n[img] https://i.imgur.com/wpIJYTU.png [/img]\r\n\r\n[h1]Request for changes![/h1]\r\n\r\n[h1]Report any bug![/h1]\r\n\r\n[h1]Donate skins if want to support developer![/h1]\r\n\r\n[h1]Credits to:[/h1]\r\nLeo's base mod: \r\nhttp://steamcommunity.com/sharedfiles/filedetails/?id=703451582&searchtext=Extended+Map+Icons.\r\n...and...\r\nWhere's My Beefalo mod: \r\nhttp://steamcommunity.com/sharedfiles/filedetails/?id=222103064&searchtext=where+is+my\r\n...and...\r\nDarkXero for collaborate with bug fixing.\r\n\r\n[h1]Don't Starve + RoG + Shipwrecked version:[/h1] http://steamcommunity.com/sharedfiles/filedetails/?id=1152443900",
+      "error": "",
+      "time_updated": 1511754988
     },
     {
       "id": "WS1185229307",
@@ -110,6 +122,18 @@
       "time_updated": 1788108606
     },
     {
+      "id": "WS1909182187",
+      "name": "能力勋章",
+      "title": "能力勋章 Functional Medal",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=1909182187",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1]Brief Introduction[/h1]\r\nAddition of the Medal System, you can use the cartographer's desk to make various medals.\r\n\r\nFunctional Medal is an extended mod with the theme of \"growth\". It adds a new type of prop \"medal\" on the basis of the original game.\r\nDifferent medals represent different abilities. Some medals can let you have the abilities of other roles, some medals can greatly improve your work efficiency, and some medals can bring you the power to turn the world around. Although the ability brought by the medal is strong, it is not easy to obtain. You need to experience all kinds of adventures in the eternal continent and taste the ups and downs of island survival before you can get the growth you deserve.\r\nIn addition, there are more extended content you have never seen before~\r\n\r\n[h1]Mod Document[/h1]\r\nDue to the limited space and for the convenience of maintenance, I have made a more detailed mod introduction page for this mod. For those who need to view the introduction of props in mod and update the log, please visit the following link~\r\n[url=https://www.guanziheng.com/]Introduction page of Functional Medal[/url]",
+      "error": "",
+      "time_updated": 1789315988
+    },
+    {
       "id": "WS1992293314",
       "name": "NightmareHUD",
       "title": "[DST] Nightmare HUD",
@@ -120,6 +144,18 @@
       "description": "[h1][b]Please, if you are going to use any drawing or anything from the art of this HUD, credits the real artists who made it!![/b][/h1]\r\n\r\n[h1][b]HUD Updated Guys!! Enjoy!![/b][/h1]\r\n[h1][b]Fast Equipament COMPATIBILITY[/b][/h1]\r\n[h1][b]Using now HUD Skins library by CunningFox![/b][/h1]\r\n\r\n[h1][b]Re-skins the entire HUD of Don't Starve Together with a Nightmare HUD theme![/b][/h1]\r\n[b] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[/b]\r\n[b]''Wrap yourself in the nightmare. Embrace it.''[/b]\r\n[b] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[/b]\r\n[h1][b]Current HUDs:[/b][/h1]\r\n[list]\r\n[*][b]Crafting Tabs, Skin Container[/b]\r\n[*][b]Chests, Chester and Hutch[/b]\r\n[*][b]Sanity, Hunger and Health[/b]\r\n[*][b]Wet Meter, Beaverness Meter and Boat Meter[/b]\r\n[*][b]Clocks, Temperatures and Moon Phases[/b]\r\n[*][b]Map[/b]\r\n[*][b]Inventory[/b]\r\n[*][b]Backpack, Piggyback, Insulated Pack, Chef Pouch and Krampus Sack[/b]\r\n[*][b]Celestial Portal (While Building)[/b]\r\n[*][b]Warly Portable Seasoning Station[/b]\r\n[*][b]Enlightenment Meter (Lunacy Meter)[/b]\r\n[*][b]Wendy's Sisturn - OBS: The texture is so small, cose that the pixelate... KLEI's Fault hehehe[/b]\r\n[*][b]Pearl Tab added to HUD[/b]\r\n[*][b]Walter Tab and Icons now added to HUD[/b]\r\n[/list]\r\n[b] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[/b]\r\n[h1][b]100% compatible with Combined Status Mod! (By: rezecib)[/b][/h1]\r\n[b] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[/b]\r\n[*][b]Version 1.0 - Mod Launch[/b]\r\n\r\n[b]Version 1.1 - Some textures impruvement and compatibility with Wendy Rework update.[/b]\r\n\r\n[b]Version 1.2 - Some impruvemenst and bug fixes.[/b]\r\n\r\n[b]Version 1.3 - Fixed the arrow indicator in the integrated backpack layout.[/b]\r\n\r\n[b]Version 1.4 - Added the Status Wathgrithr Meter[/b]\r\n\r\n[h1][b]Version 1.5 - New March 2022 QoL Update Added Compatibility with \"Fast Equipament\" too![/b][/h1]\r\n\r\n[b]Version 1.8 - Some impruvements and added some textures![/b]\r\n\r\n[b]Version 1.9 - Crafting Menu updated, Wanda and Wonkey icons added, WX Wet Meter now working with Combined Status[/b]\r\n\r\n[h1][b]Version 2.0 - Some Texture Impruvements and added the CunningFox's HUD Skins library!![/b][/h1]\r\n\r\n[b]Version 2.1 - Added new morsel icon from Wilson's Beard[/b]\r\n\r\n[b] - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -[/b]\r\n[h1][b]CHINESE:[/b][/h1]\r\n\r\n[h1][b]重做饥荒的整个皮肤界面为暗黑主题[/b][/h1]\r\n\r\n[b]把自己包裹在噩梦里。拥抱它。[/b]\r\n\r\n[h1][b]当前 HUD：[/b][/h1]\r\n[b]制作选项卡，皮肤容器\r\n箱子、切斯特和哈奇\r\n精神、饥饿和血量\r\n看不懂（Wet Meter, Beaverness Meter and Boat Meter）\r\n时钟、温度和月相\r\n地图\r\n库存\r\n背包，猪皮背包，绝缘包，厨师袋和小偷背包\r\n天上门户（建筑时）\r\n战时便携式调味站\r\n启蒙仪表（光度计）[/b]\r\n\r\n[h1][b]100% 兼容组合状态模式！（By：REZECIB）[/b][/h1]\r\n\r\n[b][url=https://forums.kleientertainment.com/forums/topic/122045-tutorial-creating-custom-hud]This mod was updated using HUD Skins library by CunningFox[/url][/b]",
       "error": "",
       "time_updated": 1788108553
+    },
+    {
+      "id": "WS2074508776",
+      "name": "自动开门AutoDoor",
+      "title": "Auto Door",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2074508776",
+      "status": "no-description",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "",
+      "error": "",
+      "time_updated": 1784986058
     },
     {
       "id": "WS2226345952",
@@ -158,6 +194,30 @@
       "time_updated": 1705570179
     },
     {
+      "id": "WS2328604820",
+      "name": "镰刀Scythe",
+      "title": "Scythe",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2328604820",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Add 2 harvest tools (scythe and golden scythe) to the game.\r\nHarvest your crop easily.\r\n\r\nMain feature:\r\n-Harvest faster\r\n-Allow area harvest\r\n-Allow area damage\r\n\r\nOther feature:\r\n-seasoning buffable\r\n-immune to thorns\r\n\r\nExtra function:(set in config options)\r\n-low chance to get an extra drop from harvest\r\n-increase number of harvest of transplanted plant before wither\r\n-plants harvested with scythe get a small growth boost\r\n\r\nMost languages are translated by google\r\n\r\nThis mod is inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=537902048][DST]-Scythes[/url] created by Captain_M\r\n\r\nIf you want to add your language to the mod, post your translation below. I will put them into the mod [strike]one day[/strike].\r\n\r\n[hr][/hr]\r\n[h1]How to use the mod in dedicated server?[/h1]\r\nOpen the \"mods\" folder. You will see a \"dedicated_server_mods_setup.lua\". Double click and open it using notepad. \r\nStart a new line, type: \r\nServerModSetup(\"2328604820\")\r\nwhere workshop-2328604820 is this mod's file name. (no need to input \"workshop-\". [b]number only[/b])\r\nfor mod (workshop-xxxxxxxx), you may type ServerModSetup(\"xxxxxxxx\") in each new line.\r\n\r\nOr if you get a mods collection, you may type this instead:\r\nServerModCollectionSetup(\"#######\")\r\nwhere ####### is the collection id. You may right click any empty space in the collection page and copy the page link. The collection id would be the number string after \" /?id= \". All mods in the collection will be automatically downloaded.\r\n\r\n[hr]Detailed data[/hr]\r\n[list]\r\n[*]Plant that can be area pick by scythe:\r\n[table]\r\n[tr]\r\n[th]non-configable[/th]\r\n[th]grass, sapling, bush berry, reeds, cactus, stone fruit bush, light bulb, banana tree, etc\r\nany farm plants,\r\nany modded plants, as well as any modded farm plants[/th]\r\n[/tr]\r\n[tr]\r\n[th]Configable,\r\ndefaulted on[/th]\r\n[th]lureplant, kelp under water, fig, lichen[/th]\r\n[/tr]\r\n[tr]\r\n[th]Configable,\r\ndefaulted off[/th]\r\n[th]mushroom, mushroom farm, barnacle, drying rack, bee box[/th]\r\n[/tr]\r\n[/table]\r\n\r\nOther details:\r\n[*]Feature:\r\nHoney seasoning buff: double the harvesting radius\r\nOversized Protection buff: you will get a temporary buff allow you passing through the oversized crops after you harvest them\r\nExtra damage to plant: deal 1.5 times damage to \"plant\" (eg: eye plant; \"Harvest\" eye plant with one hit)(This option is not compatible with some info mod. You may turn the option off.)\r\nMightiness: Gain 1 mightiness for each 5 plants harvested\r\n\r\n[*]Pick Mode:\r\n\"Single Species\": only same species will be picked in 1 harvest\r\n\"All Pickable\": all nearby plant will be picked\r\n\"Combine\": hold spacebar to pick all species, single click to harvest 1 species\r\n\r\n[*]Extra function: (won't activate unless you turn it on)\r\nExtra item chance: 10%\r\nNo. of pick before withered: doubled\r\nGrowth boost: 10%\r\n\r\n[*]More about extra item:\r\nIf the target is farm plant, it will drop seed but not product.\r\nIf your farm plant has highest pressure level, it won't drop any extra seed.\r\nIf your farm plant is oversized, it drop 1 non-oversized product.\r\n*I want the extra functions be an icing on the main feature so I set their effect to be relatively lower.\r\n**You may refer to these functions and add your own custom function. You may ask other modders you know, or me [strike]never[/strike] for help.\r\n\r\n[*]Some console command: (affect current game only, not until next play)\r\n[list]\r\n[*]Allow item(tools on the ground) under cursor can do area pick action:\r\nc_select():AddComponent(\"areapicker\")\r\n[*]Change the harvest radius of the item(tools on the ground) under cursor to 10(number can changeable):\r\nc_select().components.areapicker:SetRadius(10)\r\n[*]Set growth boost to 1(100%)(number changeable)(0.1 for 10%, 1.1 for 110%, etc.):\r\nTUNING.SCYTHE.GROWTH_MULTIPIER = 1\r\n[*]Set no. of harvest (before wither) multiply by 10(number changeable):\r\nTUNING.SCYTHE.EXTRAPICK_MULTIPIER = 10\r\n[*]Set chance of getting extra item to 2(200%)(number changeable)(0.1 for 10%, 1.1 for 110%, etc.):\r\nTUNING.SCYTHE.EXTRAITEM_CHANCE = 2\r\n[/list][/list]\r\n\r\n[hr][/hr]\r\n\r\n[h1]170623 Update[/h1]\r\nNew config: Mightiness. Gain mightiness after harvest\r\nNew config: Shadow Reaper*\r\n[list]\r\n[*]*Modded(default). Shadow Reaper do area harvest as modded scythe\r\n[*]*Unchange. Not making change on shadow reaper's harvest action\r\n[*]*Official. Modded scythe do harvest action like shadow reaper\r\n[/list]\r\n\r\nScythe will do harvest action like shadow reaper if it failed to preform its harvest action\r\n\r\nHolding spacebar no longer walk towards plants that are too far from the player**\r\n[list]\r\n[*]**this change is for keeping the code independent from offical code update\r\n[*]**also make the code cleaner\r\n[/list]\r\n",
+      "error": "",
+      "time_updated": 1764252706
+    },
+    {
+      "id": "WS2336105249",
+      "name": "再次烹饪CrockpotRepeater",
+      "title": "Crockpot Repeater",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2336105249",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Lets you repeat the last crockpot recipe you did by pressing the \"Cook\" button while the crockpot is empty.\r\n\r\nHolding CTRL when opening a crockpot lets you instantly cook the last recipe you cooked.\r\n\r\nAlso works for Warly's Portable Seasoning Station.\r\n\r\nFor controllers, you can use this mod to use this one.\r\nhttps://steamcommunity.com/sharedfiles/filedetails/?id=1706782853\r\nAll you need to do is press the START button while the inventory is open and the crockpot is empty.",
+      "error": "",
+      "time_updated": 1632065872
+    },
+    {
       "id": "WS2398672953",
       "name": "精灵公主Musha",
       "title": "[DST]Musha完整版",
@@ -182,6 +242,30 @@
       "time_updated": 1740596437
     },
     {
+      "id": "WS2484725102",
+      "name": "升级箱子UpgradeableChest",
+      "title": "Upgradeable Chest",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2484725102",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "upgrade your chest with boards.\r\n\r\nLarger content, same space.\r\n\r\n\r\n\r\n\r\nWoddie and Lucy rate this 5 stars.\r\n\r\n[hr][/hr]\r\n[h1]Q&A[/h1]\r\n\r\n[h1]How Can I Upgrade?[/h1]\r\n1. Put at least 1 upgrade material in all the outermost slots.\r\n2. Close the container.\r\n\r\nDegrade:\r\n1. Clear your chest\r\n2. Put 1 hammer into the chest\r\n3. Close the container\r\n4. It will consume 5 uses, trade for half of the upgrading material\r\n\r\n\r\n[h1]How Large Can The Chest Be?[/h1]\r\nHere is few options allow you to choose how many times it could update. How large? Check the last option! It is infinite!\r\n[spoiler]in fact not but you may never reach the upper limit[spoiler]even you hit the limit, I can easily top up the limit. wanna give it a try?[/spoiler][/spoiler]\r\n\r\n\r\n[h1]Do The Mod Break The Balance?[/h1]\r\nCertainly not.\r\nA normal chest has 9 slots and cost 3 boards. i.e. 3 slots for each boards\r\n\r\nWith this mod,\r\nThe 5x5 chest cost a total 11 boards with a total 25 slots, i.e. 25 / 11 = 2.2 slots per boards.\r\nThe 7x7 chest cost a total 27 boards with a total 49 slots, i.e. 49 / 27 = 1.8 slots per boards.\r\n\r\nThat means for each upgrade, you have to trade more boards for less slots.\r\n\r\n\r\n[h1]Why there is no option under UI setting? [/h1]\r\nIt is not able to adjust UI setting in worldgen menu. You must visit mod screen in main menu for setting.\r\nie. Main Menu → Mods → Server Mods → Upgradable Chest\r\n\r\nI hope UI setting could could be set by each client. All client should follow the setting from server host if I do not make it a client option. For example, if the server host turn the \"Ice Box Leftward\", all clients are forced on even they don't want to. That's why I make them a client option which each client follow their own setting than server's setting. Making it a client option will hide it from worldgen menu. You can only tune the options from main menu.\r\n\r\n\r\n[h1]Why I cannot upgrade the chest?[/h1]\r\nTest if it works with no other mods, and with default config. option of the mod. \r\nHere are some useful console commands for your test:\r\n[table]\r\n[tr]\r\n[th]spawn a new chest[/th]\r\n[th]c_spawn(\"treasurechest\")[/th]\r\n[/tr]\r\n[tr]\r\n[th]give you 10 boards[/th]\r\n[th]c_give(\"boards\", 10)[/th]\r\n[/tr]\r\n[tr]\r\n[th]upgrade the nearest chest to 7x7[/th]\r\n[th]c_selectnear(\"treasurechest\") c_sel().components.chestupgrade:SetChestLv(7)[/th]\r\n[/tr]\r\n[/table]\r\n\r\nIf it fails, comment below. Otherwise, check the following Q&A\r\n\r\n\r\n[h1]Is the mod conflict with other mods? How do I know which mod it is?[/h1]\r\nIf you fail to upgrade the container, check to see if you install these mods.\r\nHere are some kind of mods that may not compat with this mod:\r\n1. ALL mods that enlarge chest storage\r\n2. SOME of the mods that add new containers to the game\r\n3. SOME mods that add a new items which can hold/ store/ trade/ delete things in one of its slots\r\n\r\n\r\n[hr][/hr]\r\n[h1]What is needed in other container?[/h1]\r\nAfter version 4.0, you can upgrade 4 more containers, i.e. ice box, salt box, dragonfly chest, fish box.\r\nHere are the materials needed:\r\n\r\n[table]\r\n[tr]\r\n[th]Ice Box[/th]\r\n[th]1 gears in each top-most slots, 1 cut stone in each other outermost slots[/th]\r\n[/tr]\r\n[tr]\r\n[th]Salt Box[/th]\r\n[th]1 salt crystal in each outermost slots, and 1 blue gem in the center-most slot[/th]\r\n[/tr]\r\n[tr]\r\n[th]Dragonfly Chest[/th]\r\n[th]1 boards in each outermost slots[/th]\r\n[/tr]\r\n[tr]\r\n[th]Fish Box[/th]\r\n[th]1 rope in each outermost slots[/th]\r\n[/tr]\r\n[/table]\r\n\r\n[h1]Row/Column Upgrading Mode[/h1]\r\nA new upgrading mode is added in version 7.0. Turn it on in [b]Other Functions: Upgrade Mode[/b]\r\nIdea From: ♛ EmuLegs\r\n[table]\r\n[tr][th]Mode[/th][th]Detail[/th][/tr]\r\n[tr][th]normal mode[/th][th]The mode what we are using. Refer to the above for more info.[/th][/tr]\r\n[tr][th]expensive mode[/th][th]A more expensive and complicated mode. Put the upgrading items to all the right-most slots will extend horizontally. Put them to all the bottom-most slots will extend vertically. The items are listed below[/th][/tr]\r\n[tr][th]complex mode[/th][th]Turn both of the above on.[/th][/tr]\r\n[tr][th]OTHER NEW MODE[/th][th]Welcome to command below if you want your cool idea installed. I will implant them to the mode if I like the idea.[/th][/tr]\r\n[/table]\r\n\r\n[table]\r\n[tr]\r\n[th]Ice Box[/th]\r\n[th]1 gears in first position of the targeted slots, 1 cut stone in each other targeted slots[/th]\r\n[/tr]\r\n[tr]\r\n[th]Salt Box[/th]\r\n[th]1 blue gem in first position of the targeted slot, 1 salt crystal in each other targeted slots[/th]\r\n[/tr]\r\n[tr]\r\n[th]Dragonfly Chest[/th]\r\n[th]1 boards in each targeted slots[/th]\r\n[/tr]\r\n[tr]\r\n[th]Fish Box[/th]\r\n[th]1 rope in each targeted slots[/th]\r\n[/tr]\r\n[/table]\r\n\r\n[h1]Pageable Upgrade[/h1]\r\nYou may upgrade the chest to make it \"pageable\". The feature has yet finalized. Welcome to discuss below.\r\nThe idea is from mod [url=https://steamcommunity.com/sharedfiles/filedetails/?id=936440913]Pageable containers[/url] by Potter_Lee. \r\n*****Remind: This mod is supposed not compatible with his mod. You may test and tell me if they can work together.\r\n\r\nAfter you have upgraded the container to the MAX levels. Put the upgrading items to ALL the slots in FIRST page. \r\nThe upgrading items are the most-common-used upgrade item for its normal upgrade. ie. 1 cut stone for all slots in first page, NO gears is needed.\r\n\r\n[h1]Backpack Upgrade[/h1]\r\nMore or less the same as pageable upgrade. Put the items into first n slots and unequip the backpack. Where n equal to the total number of slots of the non-upgraded backpack. Up to 3 pages\r\n[table]\r\n[tr][th]pack[/th][th]item[/th][th]slot[/th][/tr]\r\n[tr][th]Backpack[/th][th]rope[/th][th]8[/th][/tr]\r\n[tr][th]Insulated Pack[/th][th]electrical doodad[/th][th]8[/th][/tr]\r\n[tr][th]Spice Pack[/th][th]nitre[/th][th]6[/th][/tr]\r\n[tr][th]Piggyback[/th][th]pig skin[/th][th]12[/th][/tr]\r\n[tr][th]Krampus Sack[/th][th]rope[/th][th]14[/th][/tr]\r\n[/table]\r\n\r\n*Special: Krampus Sack is allowed to upgrade 4 extra pages if waxpaper is used.\r\n\r\n\r\n[hr][/hr]\r\nUpdate Log:\r\n[*]Add Config: Magician's Container(default on)\r\n\r\nfix:\r\n[*]unable to reach the max lv for some container\r\n[*]the flip page button is not fit to some of the backpack slots\r\n",
+      "error": "",
+      "time_updated": 1771838702
+    },
+    {
+      "id": "WS2640834455",
+      "name": "伊蕾娜",
+      "title": "伊蕾娜",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2640834455",
+      "status": "no-description",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "",
+      "error": "",
+      "time_updated": 1652378673
+    },
+    {
       "id": "WS2675609101",
       "name": "泰拉棱镜(光棱剑)",
       "title": "Terraprisma",
@@ -192,6 +276,30 @@
       "description": "[h1] Summons a magic sword to fight for you. [/h1]\r\n [img]https://i.loli.net/2018/08/01/5b6119111327b.gif[/img]\r\n\r\n[url=https://www.bilibili.com/video/BV1vARDYLE1M/?share_source=copy_web&vd_source=10c2539b4e272f8f8043a5f73a6e58e9] Video [/url]\r\n\r\n[img]https://raw.githubusercontent.com/MSIsunny/images/refs/heads/main/terraprisma_attack1.png[/img]\r\n[img]https://raw.githubusercontent.com/MSIsunny/images/refs/heads/main/terraprisma_attack2.png[/img]\r\n[img]https://raw.githubusercontent.com/MSIsunny/images/refs/heads/main/terraprisma_attack1.gif[/img]\r\n\r\n[hr] [/hr]\r\nI'm back\r\n2024.10.19: Optimized some code. It is possible to set whether or not to attack automatically within the game. The magic sword spawns a glare trail when attacking.",
       "error": "",
       "time_updated": 1749839604
+    },
+    {
+      "id": "WS2784048339",
+      "name": "储藏室(新地窖)",
+      "title": "Storeroom (New)",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2784048339",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Update from original mod https://steamcommunity.com/sharedfiles/filedetails/?id=623749604\r\n\r\nThe fix no longer affects SaltBox and Tin FishBox.\r\n\r\nremove collision.\r\n\r\n2.7.0 Update:\r\n1. Support chestupgrade_stacksize upgrade, after upgrade, the SortOut function will not be used;\r\n2. When setting only player destruction, the bear badger will no longer be able to slap out items, including other creatures slapping.\r\n3. Support setting the upper limit of the number of days for returning to freshness.\r\n\r\n2.6.8 Update:\r\n1.Add SortOut.\r\n2.Add Container Drag, Alt+RMouseDrag, Minus Reset.\r\n\r\n2.6.6 update:\r\n1.Compatible with the new tech bar.\r\n2.Model changes.\r\n3.Removed the snow effect and replaced the building material marble with pigskin.",
+      "error": "",
+      "time_updated": 1785488927
+    },
+    {
+      "id": "WS2873533916",
+      "name": "行为队列ActionQueueRB3",
+      "title": "ActionQueue RB3",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2873533916",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "This mod is an updated version of ActionQueue RB2\r\n[list]\r\n[*]Added actions related to \"Reap what you sow\"\r\n[*]Fixed Tall Palmcone trees compatible\r\n[*]Fixed a snazzy pitchfork compatible\r\n[*]Added Erase paper action\r\n[*]Added Ocean trawler raise action\r\n[*]Added Ocean trawler lower action\r\n[*]Compatible with New drying rack\r\n[*]And so on (Additional bug fixes and compatible patches)\r\n[/list]\r\n\r\nSupported new languages: Korean, Chinese.\r\n[list]\r\n[*]한국어를 지원합니다.\r\n[*]支持中文\r\n[/list]\r\n\r\n\r\n\r\neXiGe's ActionQueue Reborn Original mod here:\r\nhttps://steamcommunity.com/sharedfiles/filedetails/?id=1608191708",
+      "error": "",
+      "time_updated": 1786948437
     },
     {
       "id": "WS2904741144",
@@ -206,6 +314,30 @@
       "time_updated": 1672754674
     },
     {
+      "id": "WS2948410295",
+      "name": "即刻洞察InstantlyInsights",
+      "title": "Instantly Insights",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2948410295",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Your character instantly receives all 15 Insight points and unlocks the affinity path when joining a world/server.\n\n[img]https://i.imgur.com/9tKDrP4.gif[/img]",
+      "error": "",
+      "time_updated": 1776372991
+    },
+    {
+      "id": "WS2964299587",
+      "name": "伤害显示",
+      "title": "伤害显示(Show Damage)",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=2964299587",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "调用了饥荒官方的弹出数字函数，就是熔炉模式里的伤害数字动画。\r\n\r\n它是一个服务器模组\r\n\r\n\r\nReferences the official \"ShowPopupNumber\" function, which is the same as the damage numbe animation in \"The Forge\" mode.\r\n\r\n\r\nAnd it is a server mod",
+      "error": "",
+      "time_updated": 1757592744
+    },
+    {
       "id": "WS2987343164",
       "name": "防卡两招RR",
       "title": "fangkaRR",
@@ -216,6 +348,18 @@
       "description": "防卡两招RR，追加清理列表，清理周期5天，不会全部清理完，保留一定数值；\r\n集成垃圾桶功能，现在四本（魔法二本）可以清理全图垃圾了；\r\n养成东西放箱子里的好习惯吧，原作者@大大果汁、@白茶。\r\n1、追加清理影甲、影刀、影心、触手尖刺、触手皮（喜欢刷又不捡）；\r\n2、追加清理万圣节、冬季盛宴BOSS挂饰、普通挂饰、垃圾等；\r\n3、追加清理所有蓝图、广告、浮标、草图等；\r\n4、追加清理所有贝壳钟、部分草皮等；\r\n5、追加清理海盗木剑、海盗头巾、金斧头、金稿子等工具；\r\n6、追加清理鱼人，蜜蜂相关，鱼妹玩家不要开此mod；\r\n7、追加取消所有树木循环生长。",
       "error": "",
       "time_updated": 1740694368
+    },
+    {
+      "id": "WS3036671204",
+      "name": "彩色耐久度ColouredPercent",
+      "title": "Coloured Percent",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3036671204",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Changes the colour of the percent text in equipment based on durability to be more visible, or simply for preference! Configureable.\r\n\r\n\r\n\r\n[h3]Hey, you![/h3]\r\nIf you like what I do, please consider [url=https://ko-fi.com/atobaazul]supporting me on Ko-fi![/url]",
+      "error": "",
+      "time_updated": 1696684510
     },
     {
       "id": "WS3138571948",
@@ -230,6 +374,30 @@
       "time_updated": 1777616357
     },
     {
+      "id": "WS3289112324",
+      "name": "超级堆叠上限",
+      "title": "Super Stack Size",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3289112324",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1]Super Stack Size[/h1]\r\n\r\n[b]📦Customize the stack size of items📦[/b]\r\n\r\nCustomize stack size of all stackable items. Options include 40 64 99 100 200 300 500 800 999 9999. The default is 99.\r\n\r\n[b]🦌Make more items and creatures stackable🦌[/b]\r\n\r\nIncluding all birds, spiders, fish, small animals, shadowheart, deer_antler etc.\r\n\r\n[b]🐦Compatible with dedicated servers🐦[/b]\r\n\r\nWorks on both dedicated servers and player hosts\r\n\r\n[b]Update Log[/b]\r\n1.2 update:\r\nUpdated for Wortex's soul stack size, it's a independent config value, Now souls above 20 will not be discarded, the max stack size will be the same as the mod setting\r\n\r\n\r\nIf you found any bugs🐛 , please go to [url=https://github.com/Nilyang404/Super-Stack-Size] Github [/url] or leave a message here\r\n\r\nThanks for any feedback",
+      "error": "",
+      "time_updated": 1746538618
+    },
+    {
+      "id": "WS3322398925",
+      "name": "快餐FastFood",
+      "title": "Fast Food [4]",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3322398925",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1] Fast food [/h1]\r\n\r\n[b]\r\n1. Tomato pie 3 tomatoes +1 meat or 2 tomatoes +2 meat or 3 meat 1 Tomato health +5, hunger +65, Sanity +25. Less rot. 20 in a group\r\n\r\n2. Fried fries 4 potatoes Health -10, Hunger + 75, sanity + 20. Less rot. 40 sets\r\n\r\n3. Sushi skewers (any type of shredded kelp + small fish meat >= 3) + any piece of fish health = 30, hunger = 50, sanity = 25 in rot, 20 groups.\r\n\r\n4. Pizza Tomatoes + Eggs =4 Health +13, Hunger +150, Sanity +27. Rotting, in groups of ten. [/b]\r\n\r\n\r\n[h1] Source map [/h1]\r\n\r\n[url=https://captainskolot.itch.io/30-fast-food-asset-pixel-art] itch.io [/url]\r\n\r\nWelcome to download and purchase.\r\n\r\n\r\n[h1] Source code [/h1]\r\n\r\nThe project has to follow the [url=https://www.gnu.org/licenses/gpl-3.0.en.html] GPL3.0 [/url] agreement\r\n\r\nRepository [url=https://github.com/F-y77/Fast-Food] Github [/url]\r\n\r\n",
+      "error": "",
+      "time_updated": 1725519431
+    },
+    {
       "id": "WS3322803908",
       "name": "云霄国度AbovetheClouds",
       "title": "Above the Clouds - Hamlet in DST",
@@ -242,6 +410,30 @@
       "time_updated": 1784025534
     },
     {
+      "id": "WS3337737173",
+      "name": "小红帽lake",
+      "title": "blacksouls 小红帽",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3337737173",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h3]新增随从小小魄罗[/h3]\r\n\r\n魄罗受到白兔小姐的帮助来到了永恒领域箱庭，只是模样发生了一些变化…\r\n\r\n[img]https://steamuserimages-a.akamaihd.net/ugc/2408955968503148022/EB4DC4974BC3F59BDD79A3433E01AEE7E67C3599/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false[/img]\r\n\r\n通过阅读 童话《小红帽》来召唤或召回\r\n\r\n小小魄罗500血量30伤害    受到神秘的兔子怀表保护（缓慢恢复生命值，单次受到伤害最大为30点）\r\n\r\n--会主动嘲讽敌人（一定程度解决战斗时读魔法书频繁被打断的情况）\r\n\r\n--可以帮忙砍树和挖矿\r\n\r\n小红帽使用新绿之力 王之号令也可以同时对魄罗生效（王之号令持续期间魄罗受到单次最大伤害降为20）\r\n\r\n--可以右键命令魄罗等待或跟随\r\n\r\n--魄罗死亡后需要一天的冷却才可以再次召唤\r\n\r\n小小魄罗死亡有1%的概率掉落彩蛋物品兔子的怀表（暂时没有任何效果）\r\n魄罗可以在水上行走(为了在海上也能随叫随到...但看着确实有些违和。以后可能会想办法改善)\r\n\r\n\r\n新增童话书  \"童话《小红帽》\"（用来召唤或召回魄罗）\r\n新增材料童话残页（用来合成童话书。目前只有《小红帽》…后续更新会添加更多童话书）\r\n\r\n新增魔法书 镇魂歌\r\n镇魂歌 7次使用次数。使用后30秒内无法被杀死\r\n\r\n修复了使用冰结的魔弹后温度 潮湿度变化异常的bug\r\n\r\n\r\n[h3]人物简介[/h3]\r\n\r\n蕾克\r\n\r\n三维 200 200 200\r\n基础移速1.1\r\n\r\n暖和的帽子：       自带高寒冷抗性\r\n无感症：              一定的基础免伤，50%精神下降抵抗\r\n小刀：                 开局自带一把可以升级的小刀\r\n魔法书：              可以制作独特的魔法书\r\n\r\n\r\n[h3]物品[/h3]\r\n\r\n“小刀”：                无耐久  34伤害   装备时增加20%移速  \r\n“惨剧”：                无耐久  44伤害   装备时增加25%移速  每次攻击命中回复1点精神1点生命\r\n“红之惨剧”：         无耐久  54伤害   装备时增加30%移速  每次攻击命中回复2点精神2点生命 造成伤害为真实伤害\r\n\r\n\r\n[h3]魔法书[/h3]\r\n魔法书大部分无耐久 但每次使用需消耗精神值，若精神值不足则无法发动\r\n\"王之号令\"：         半天内增加50%伤害 50%防御 (可使魄罗限伤降至20)          消耗90 san\r\n\"新绿之力\"：         恢复50%最大生命值 (对魄罗也生效)                                     消耗100 san\r\n\"猛毒之雾\"：         范围内持续造成最大生命百分比的伤害                                 消耗80 san\r\n\"冰结的魔弹\"：     范围内冻结敌人  可以灭火                                                    消耗40 san\r\n\"镇魂歌“：             30秒内无法死亡                                                                   七次使用耐久\r\n\r\n特别鸣谢：\r\n因本人完全不懂代码 >_< ，在编写过程中参考了许多mod，在此特别感谢各位大佬的辛勤付出！如有不便之处请联系我修改\r\n范围施法参考 Little red riding hood小红帽\r\n真实伤害机制参考 棱镜\r\n小人形象 蜜仆\r\n命令随从功能  宠物升级成长系统\r\n特别感谢在创作过程中提供支持与帮助的大佬们！\r\n(酥签  雨莹)真的非常感谢！！\r\n\r\n本人QQ 2022485446\r\n\r\n[h3]历史更新[/h3]\r\n\r\n更新了两套皮肤\r\n\r\n“爱丽丝”\r\n[img]https://steamuserimages-a.akamaihd.net/ugc/2464123430264037382/1829F8135F1566BB538740B082F6FDECC6D2365E/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false[/img]\r\n\r\n一代小裙子\r\n[img]https://steamuserimages-a.akamaihd.net/ugc/2464123430264093363/290641FA7D2D6BEFAFBF0048FE690F229EDE3D47/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false[/img]\r\n\r\n修复了在背包使用\"冰结的魔弹\"和\"猛毒之雾\"时崩溃的BUG\r\n\r\n未来计划\r\n[strike]准备做两套皮肤  最理想的目标是把魄罗也做出来，可以一起战斗之类的... [/strike]\r\n准备添加一些其他人物有关的道具或装备。一些特殊效果的童话书，以及完善台词等....如果有想法或建议欢迎在评论区提出~\r\n ..缓慢更新中...如果喜欢请给我点个赞吧！您的支持是我继续制作的动力（ ≧ ∇ ≦ ）\r\n本模组由单人创作，精力有限...多语言支持等可能要等到内容完全完善后再研究...敬请谅解\r\nThis mod was created by a single person, and the author's energy is limited Multi language support may need to wait until the content is fully developed before adapting Please understand",
+      "error": "",
+      "time_updated": 1730465080
+    },
+    {
+      "id": "WS3341044868",
+      "name": "骨架扩充SkeletonsPlus",
+      "title": "Skeletons Plus",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3341044868",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Did you ever find it strange how every survivor leaves the same skeleton behind, especially the non-human ones? Well, this mod fixes that! Now every DST survivor will have their own unique skeleton, how spooky!\r\n\r\nDon't like some of the skeletons? Don't worry! All of them can be disabled individually in the configuration options. Additionally, some skeletons can be configured to have different drops, like WX-78's dropping Scrap or Wormwood's dropping Living Logs!\r\n\r\nCredits:\r\nClumsyPenny - Code\r\n[X: @milanjorim7] - Artist, Mod idea",
+      "error": "",
+      "time_updated": 1727771183
+    },
+    {
       "id": "WS3371086303",
       "name": "闪亮战利品ShinyLoot",
       "title": "Shiny Loot",
@@ -252,6 +444,18 @@
       "description": "[img]https://i.imgur.com/9tKDrP4.gif[/img]\r\n\r\n[h1][b]ㅤ  ㅤㅤㅤSome things are valuable, make them stand out![/b][/h1]\r\n[img]https://i.imgur.com/nnw28uF.png[/img]\r\n\r\n[list]\r\n[*]Adds a highligh effect to valuable recently dropped loot, like boss drops, unknown blueprints and rare loot.\r\n\r\n[*]You may disable the sound effect, change the effect duration and choose which items will have the effect in the mod settings.\r\n\r\n[*]Client-side mod.\r\n[/list]\r\n\r\n\r\n[b]SETTINGS:[/b]\r\n\r\n[table]\r\n    [tr]\r\n        [th][b]NAME[/b][/th]\r\n        [th]MEANING[/th]\r\n        [th]DEFAULT[/th]\r\n    [/tr]\r\n    [tr]\r\n        [td][b]Effect Sound[/b][/td]\r\n        [td]Enable or disable the highlight sound effect.[/td]\r\n        [td]Enabledㅤㅤ[/td]\r\n    [/tr]\r\n    [tr]\r\n        [td][b]Effect Duration[/b]ㅤㅤㅤ[/td]\r\n        [td]Choose the highlight duration. Options: 5 to 120 seconds.ㅤㅤㅤㅤ[/td]\r\n        [td]30 secondsㅤㅤ[/td]\r\n    [/tr]\r\n    [tr]\r\n        [td][b]Item Settings[/b][/td]\r\n        [td]Enable or disable the effect for a specific item.[/td]\r\n        [td]Enabled[/td]\r\n    [/tr]\r\n[/table]\r\n\r\n[hr]\r\n🧱 Machine Simplified Chinese translation. Please reach out if you'd like to translate this mod.\r\n\r\n🌟 Mod idea by [b][url=https://steamcommunity.com/id/Kynoox/]Kyno[/url][/b].\r\n\r\n[hr]\r\n[b]Search Tags:[/b] shiny loot, highlight, boss, blueprint, effect, fx, leonidas iv.",
       "error": "",
       "time_updated": 1751246750
+    },
+    {
+      "id": "WS3383078008",
+      "name": "简易存储",
+      "title": "Simple Storage",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3383078008",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1]Connect your chests together and use a terminal to access them[/h1]\r\n\r\n[hr] [/hr]\r\n[h2]The terminal has filtering, sorting, and searching functions (supporting English and Chinese Pinyin).[/h2]\r\n[img]https://s2.loli.net/2024/12/12/hMxeZQgtp3EiqvY.png[/img]\r\n\r\n[hr] [/hr]\r\n[h2]1. Storage terminal[/h2]\r\nBuilding, unlocked by SCIENCE-2, belongs to prototype/storage.\r\n[h3]After placement, connect chests within a radius of 15, and you can click to open the terminal for access.[/h3]\r\n\r\nThe storage terminal will integrate all nearby crafting stations.\r\n\r\n[hr] [/hr]\r\n[h2]2. Wireless terminal (Optional Disable)[/h2]\r\nItem, unlocked by SCIENCE-2, belongs to storage.\r\n[h3]You can bind a storage terminal to allow you to access your chests at home even from outside.[/h3]\r\n\r\n[hr] [/hr]\r\n\r\n[img]https://i.loli.net/2018/08/01/5b6119111327b.gif[/img]\r\n[h2]Thank you for your likes.[/h2]",
+      "error": "",
+      "time_updated": 1770805135
     },
     {
       "id": "WS3439927311",
@@ -278,6 +482,114 @@
       "time_updated": 1782824740
     },
     {
+      "id": "WS3470733756",
+      "name": "不再耕地",
+      "title": "Soil Retainer",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3470733756",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[i]Farming players rejoice! No more repeated tilling![/i]\r\nㅤㅤㅤㅤㅤㅤㅤㅤㅤ ㅤㅤ[img]https://i.loli.net/2019/03/22/5c94527d1e71d.gif[/img]\r\n\r\n[h1]Are you tired of the tedious process of re-tilling after each harvest?[/h1]\r\n[img]https://i.imgur.com/umkGzRZ.gif[/img]\r\nHaving to till your soil again after harvesting crops? That's such a waste of time!\r\nNow, you can do it once and for all, focusing solely on planting and harvesting!\r\nThis mod keeps soil in a tilled state after harvesting crops.\r\n[h1]No More Tilling![/h1]\r\n[h2]Once and Done![/h2]\r\nAfter harvesting crops, the land remains in a tilled state.\r\nNo need to take out your hoe again, saving you tons of time and tool durability!\r\n[img]https://i.imgur.com/gL4GzXO.gif[/img]\r\nMake your farm management easy, even if you're not a plant expert (no offense intended)\r\n[img]https://i.imgur.com/4QPqgiD.gif[/img]\r\n[h2]Compatible with all planting systems:[/h2]\r\nWorks with regular farmland, farm crops, flower pots, and all tillable land!\r\nPerfect compatibility with other farming and planting mods!\r\n[h2]Note:[/h2]\r\n- Server-side mod\r\n- Does not affect game balance\r\n[i]I actually thought of this mod while browsing forums. The original Soil Retainer mod was suddenly taken down, so I tried making this one myself. I hope it helps everyone![/i]\r\n[h2]Thanks for playing![/h2]\r\n[img]https://i.imgur.com/cY1bBKL.png[/img]",
+      "error": "",
+      "time_updated": 1762513440
+    },
+    {
+      "id": "WS3485366151",
+      "name": "横板技能施法",
+      "title": "Horizontal Skill Casting",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3485366151",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1][b]Horizontal Skill Casting[/b][/h1]\r\n[i]Rewrites character skill wheels into a [b]horizontal layout[/b], with highly customizable [b]hotkey bindings[/b] and [b]instant casting[/b].[/i]\r\n\r\n[img]https://i.postimg.cc/FKn0rY03/SKILL5.gif[/img]\r\n\r\n[h2][b]What does this mod do?[/b][/h2]\r\n[list]\r\n[*][b]Horizontal layout:[/b] Replaces the original radial skill wheel with a horizontal skill bar, positioned above the inventory by default\r\n[*][b]Stays open:[/b] The wheel remains open after using a skill; right-click again or use the closing hotkey to close it\r\n[*][b]Free dragging:[/b] Drag the wheel anywhere with the right mouse button, press the middle mouse button to reset, and save its position automatically\r\n[*][b]Adaptive scaling:[/b] Automatically follows the game's HUD scale setting\r\n[*][b]Hotkeys for every character:[/b] Assign dedicated hotkeys to supported character skills\r\n[*][b]Instant casting:[/b] Cast directly with a hotkey and skip target selection\r\n[*][b]Continuous casting:[/b] Automatically re-enter targeting after casting and support holding a hotkey for repeated casts\r\n[*][b]Cooldown display:[/b] Shows cooldown timers for Willow and Wendy, while skill wheels display skill availability\r\n[/list]\r\n\r\n[h1]Supported Characters[/h1]\r\n[list]\r\n[*][b]Maxwell[/b] - Shadow spells + [b]Codex refueling[/b] + Top Hat hotkey\r\n[*][b]Wendy[/b] - Abigail commands + [b]Rile/Soothe toggle[/b] + Elixir basket hotkey\r\n[*][b]Willow[/b] - Fire spells + [b]automatic fire attacks[/b] + Fire absorption hotkey + Cooldown timer\r\n[*][b]Walter[/b] - Woby command wheel + [b]dash hotkey[/b] + Double-click dash toggle + Right-click mounting\r\n[*][b]Winona[/b] - [b]Remote command wheel[/b]\r\n[*][b]Wickerbottom[/b] - [b]Horizontal book wheel[/b], with an option to switch back to the original radial wheel\r\n[*][b]Wigfrid[/b] - [b]Instant battle songs[/b] / song switching hotkeys + Lightning spear and shield attacks + Landing marker\r\n[*][b]WX-78[/b] - [b]Shielding Circuit hotkey[/b] + One-click haunting of the nearest backup body\r\n[/list]\r\n\r\n[img]https://i.postimg.cc/FRMMyDtp/spell3.gif[/img]\r\n[img]https://i.postimg.cc/6QmJ3BYD/spell1.gif[/img]\r\n[img]https://i.postimg.cc/76JvJjRb/spell2.gif[/img]\r\n[img]https://i.postimg.cc/nrq60BpJ/spell4.gif[/img]\r\n[img]https://i.postimg.cc/KcLSGSLH/spell5.gif[/img]\r\n[img]https://i.postimg.cc/9FRGVwjT/15.gif[/img]\r\n\r\n[hr][/hr]\r\n\r\n[h2][b]Hotkey Bindings[/b][/h2]\r\n[list]\r\n[*][b]Custom bindings:[/b] Assign dedicated hotkeys to skills for every supported character\r\n[*][b]Instant casting:[/b] Enable all skills, disable all skills, or configure each skill individually\r\n[*][b]Continuous casting:[/b] Hold a hotkey to cast repeatedly; right-click to cancel targeting\r\n[*][b]Modifier keys:[/b] Selected features support Alt, Ctrl, and Shift modifiers\r\n[*][b]Avoid conflicts:[/b] All hotkeys can be customized to avoid conflicts with other mods\r\n[/list]\r\n\r\n[h2][b]Character-Specific Features[/b][/h2]\r\n[list]\r\n[*][b]Willow:[/b] [b]Automatic fire attacks[/b] — automatically equips a lighter when attacking burnable targets, then restores the previous weapon; configurable HP threshold, fire absorption hotkey, and cooldown display\r\n[*][b]Wigfrid:[/b] Three battle songs with [b]instant casting[/b] and switching hotkeys; lightning spear/shield attack hotkey; [b]landing marker[/b] and cooldown status display\r\n[*][b]Walter:[/b] Dash hotkey; [b]double-click dash toggle[/b]; right-click to mount or dismount Woby\r\n[*][b]Maxwell:[/b] [b]Codex refueling hotkey[/b]; shadow spell hotkeys; Top Hat hotkey\r\n[*][b]WX-78:[/b] Shielding Circuit hotkey; one-click [b]haunting[/b] of the nearest backup body\r\n[/list]\r\n\r\n[b]All hotkeys can be customized to avoid conflicts with other mods.[/b]\r\nThe mod also improves WX-78 right-click module action synchronization when client-side mods add or modify actions such as Sonic or Shielding.\r\n\r\n[h1][b]Settings and Usage[/b][/h1]\r\n[list]\r\n[*]Open [b]Pause Menu → Settings → Controls → Horizontal Casting[/b]\r\n[*]All hotkey and feature options are located at the top of the list\r\n[*]Click [b]Apply[/b] after making changes\r\n[*]After switching wheel styles, reopen the skill wheel to see the new layout\r\n[*]This is a client-side mod; other players usually do not need to install it\r\n[/list]\r\n\r\n[h1][b]Notes[/b][/h1]\r\n[list]\r\n[*][b]Horizontal layout:[/b] Skills are arranged dynamically according to the skills currently available\r\n[*][b]Hotkey setup:[/b] Configure each character's hotkeys before using them\r\n[*][b]Instant casting:[/b] Works when casting through hotkeys; enable all, disable all, or configure skills individually\r\n[*][b]Continuous casting:[/b] When enabled, manually targeted spells re-enter targeting after casting; right-click cancels targeting\r\n[*][b]Cooldown display:[/b] Willow and Wendy support cooldown timers; other characters mainly display skill availability\r\n[*][b]Willow fire attack HP threshold:[/b] Requires a server-side health display mod to check target HP; otherwise the target is always ignited\r\n[/list]\r\n\r\n[h1][b]Too Many Hotkeys?[/b][/h1]\r\nOpen [b]Pause Menu → Settings → Controls → Horizontal Casting[/b] to find all hotkey settings.\r\n\r\n[hr][/hr]\r\n\r\nIf you have questions or find a bug, I will try to fix it as soon as possible.\r\nFor easier troubleshooting, please provide the [b]crash log[/b], the [b]specific situation that triggered the issue[/b], and a list of your [b]enabled mods[/b].",
+      "error": "",
+      "time_updated": 1789212642
+    },
+    {
+      "id": "WS3490072866",
+      "name": "暗影武器CheckmateArsenal",
+      "title": "Checkmate Arsenal",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3490072866",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[b]Which chesspiece shall reward you ?[/b]\r\n\r\nDark Sword and Night Armor no more ! Tier 3 Shadow Pieces now drop exclusive, terrrrifying objects... as they were originally intended to !\r\n\r\nUse their abilities wisely, or descend into madness with them :\r\n\r\n\r\n[img]https://i.imgur.com/AKgJNGZ.png[/img]\r\n[h1]Tenebrous Reach (Knight)[/h1]\r\n[i]Strike death into enemy lines with this long, swift lance :[/i][list]\r\n[*]68 melee damage, 200 durability, increased range but slower attack speed\r\n\r\n[*][b]Shadow Strike :[/b]\r\nLunge forward and deal +34 extra damage for each new target hit on the way\r\nBehaves as a teleport 2 tiles ahead\r\n2 seconds cooldown, uses half durability on targets hit during lunge.\r\n\r\n[*]Grants +50% movement speed post-strike, decreasing over 4 seconds\r\n[*]-10 sanity/min when equipped, and -2.5 sanity on lunge[/list]\r\n\r\n[img]https://i.imgur.com/fbobKJs.png[/img]\r\n[h1]Nocturne Bat (Bishop)[/h1]\r\n[i]Summon a swarm to harass foes and empower the weapon attacks :[/i][list]\r\n[*]25.5 melee damage, 80 durability\r\n\r\n[*][b]Shadow Bat Swarm :[/b]\r\nEvery 10 seconds, melee attack becomes a ranged shadow bat swarm, chasing its target and dealing damage regularly around for the cooldown duration\r\n\r\nAttacking enemies within the swarm doubles the weapon melee damage, and prevents durability loss.\r\n\r\n[*]-10 sanity/min when equipped, -5 sanity on summon\r\nShadow bats have a strong insanity aura[/list]\r\n\r\n[img]https://i.imgur.com/UqZwv37.png[/img]\r\n[h1]Revenant Helm (Rook)[/h1]\r\n[i]Vanish into the shadows, and return with a monstrous snap :[/i][list]\r\n[*]75% damage absorption, 725 armor durability\r\n\r\n[*][b]Shadow Snap :[/b]\r\nUse the helmet to warp away for a maximum of 2 seconds\r\nIf chosen so, erupt back within 3 tiles to perform a 306 damage bite AoE around you\r\n5 seconds cooldown, uses 2% of armor from warping, biting or not.\r\n\r\n[*]Ability can be interrupted by attackers until warp is completed\r\n[*]-10 sanity/min when equipped, -10 sanity from warping[/list]\r\n\r\n\r\n[h1]Perform combos ![/h1]\r\nShadow Pieces are fought together... so their loot also comes with situational bonuses when used together ! Get dancing with these moves to make the the most out of your arsenal :\r\n\r\n[b]Tenebrous Reach :[/b]\r\n- Swarm chasing speed is doubled for the duration of the post Shadow Strike speedboost\r\n- Increase Shadow Snap cast-range by 3 tiles and refresh Shadow Strike speedboost post-bite\r\n[b]Nocturne Bat :[/b]\r\n- Enemies hit with a Shadow Strike within the swarm uses twice less durability\r\n- Landing a Shadow Snap within the swarm halves the helm durability loss during its cooldown\r\n[b]Revenant Helm :[/b]\r\n- While on cooldown, the Shadow Strike ability deals 34 more damage\r\n- Outside of cooldown, bat swarm size and range grows by 33%\r\n\r\n\r\n[b](Most stats and boss loot are configurable !)[/b]\r\n\r\n[img]https://i.imgur.com/yNzONH2.gif[/img]\r\n[h1]For Next Updates :[/h1][list]\r\n[*]We plan on adding 'Possessed' version of these items post-shadow-rift, allowing to refresh their durability, and improve their abilities altogether.\r\n[*]Stay sharp ! There should be much more to come [/list]\r\n\r\n\r\n\r\n[h1]Mod Version : 1.1.9[/h1]\r\n> [url=https://steamcommunity.com/sharedfiles/filedetails/changelog/3490072866]Full update changelogs[/url]\r\n\r\n[b]Dev Team & Credits - Follow and help us on Ko-fi to support our creative work ♥️[/b][list]\r\n[*][url=https://steamcommunity.com/id/admantoine]ADM[/url] - code - https://ko-fi.com/cherryteam\r\n[*][url=https://steamcommunity.com/id/feything/]FeyThing[/url] - art - https://ko-fi.com/feything\r\n[*][url=https://steamcommunity.com/profiles/76561198112484063/]Notka[/url] - icon[/list]\r\n\r\n[b]Special Thanks & Contributors[/b][list]\r\n[*][url=https://steamcommunity.com/id/woshirt123123123]大蜥蜴 - For the Chinese translation[/url]\r\n[/list]\r\n",
+      "error": "",
+      "time_updated": 1771440944
+    },
+    {
+      "id": "WS3494615834",
+      "name": "三倍采集",
+      "title": "Triple Harvest 三倍采集 (n-fold)",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3494615834",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Picking, chopping trees, digging and mining can give you multiple rewards.\r\nAnd, with a small chance of finding rare treasures. \r\n\r\n- This module will make the game easier, it is recommended to choose to use it according to personal preference.\r\n\r\n----\r\n\r\n\r\n[h1]Multiplier settings[/h1]\r\nFlexible multiplier configuration.\r\n[h3]General multipliers: ×1, ×2, ×3, ×5 [/h3]\r\n- Default: ×3\r\n\r\n[h3]Each resource supports: General multiplier, ×1, ×2, ×3, ×5 [/h3]\r\n- Default: General multiplier\r\n\r\n\r\n[img]https://images.steamusercontent.com/ugc/18126186092339875022/E07A879D0D899D89E4AA0C2F3845192B2CA20C34/[/img]\r\n\r\n[h1]Resource categories[/h1]\r\n[img]https://images.steamusercontent.com/ugc/10702642861711051461/93AA161B6984803C72A79904E21B4F54E62EE299/[/img]\r\n\r\n[h1]Lucky Drop[/h1]\r\nExtremely low probability, harvest rich resources and surprising treasures.\r\n- Probability：0.1%\\0.3%...10%; Default: 2%\r\n\r\n[i]If you don't like it, you can choose to disable it within the module configuration page. [/i]\r\n[img]https://images.steamusercontent.com/ugc/12336839033153778940/FDE3A5F448FC3A9C3F44B281EFA62FF7922364DB/[/img]\r\n\r\n[spoiler] Wendy gave a good review because she was unhappy. [/spoiler]\r\n\r\n[img]https://images.steamusercontent.com/ugc/18126186092339875022/E07A879D0D899D89E4AA0C2F3845192B2CA20C34/[/img]\r\n\r\n[h1]How to Enable Modules & Configure Modules[/h1]\r\nHey! If this is your first [b]Don't Starve Together[/b] mod, welcome to the modding world!\r\n\r\nAnd, I hope this quick guide helps:\r\n[u][url=https://images.steamusercontent.com/ugc/15160993731291725028/530A866A966188A793CB366B988F078DD250D95E/] Click -> How to enable and Configure Modules? [/url][/u]\r\n\r\n[img]https://images.steamusercontent.com/ugc/18126186092339875022/E07A879D0D899D89E4AA0C2F3845192B2CA20C34/[/img]\r\n\r\nEnjoy your game!",
+      "error": "",
+      "time_updated": 1757490657
+    },
+    {
+      "id": "WS3507292297",
+      "name": "建筑对齐增强StructureAlignmentPro",
+      "title": "Structure Alignment Pro",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3507292297",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Structure Alignment Plus has undergone a major refactoring for coherence and extensibility and will now be Structure Alignment Pro \"[BETA]\". More features are planned.\r\n\r\nI recommend changing the default Structure Alignment toggle key bind to avoid conflict with quick drop and other mods. I personally bind it to the key to the immediate right of left shift.\r\n\r\nSeeking general feedback, more specifically on categories, interfacing, and mod compatibility. I do not have a controller to test with so will need detailed visuals/descriptions of what currently happens vs. what is expected/desired.\r\n\r\n[h3]Modified Controls[/h3]\r\nLeft-click does not examine while heavy lifting or holding the force attack control.\r\nRight-click actions do not get target blocked. (e.g. can direct plant on tilled soil)\r\nRight-click actions will use target position if force attack control is held. (e.g. star stacking)\r\nItem use actions are not target blocked by containers. (e.g. placing or drawing on Mini Signs does not get target blocked by containers)\r\nRight-clicking with a deployable item in the active item slot to an invalid position does not return it to inventory unless the force attack control is held.\r\nDigging turf or placing to tile will go for less walking distance unless the force attack control is held.\r\nItems can be deployed from inventory when the force attack control is held.\r\n\r\n[h3]Features[/h3]\r\nPlacement can show the tile outline for a given position.\r\nPlacement will use assigned grid sizes based on context.\r\nGrid placers will align to boats when standing on boats unless the force attack control is held.\r\nItems can get a grid placer for dropping. ([url=https://steamcommunity.com/sharedfiles/filedetails/?id=2431691504]related mod[/url])\r\nItems can be quick dropped to contextual positions.\r\nMod options can be updated from the pause menu. Grid options can be manually refreshed by entering ClearAxisAlignmentGrids(true) in local console.\r\nWendy's graves can be placed without a skeleton.\r\n\r\n[h3]Crop Placement[/h3]\r\nIntegrated positions (cycled with grid cycle control) from [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2302837868]Snapping Tills[/url] for tilling and direct planting, including Gorge mod.\r\nSupports all tools and mods that allow for tilling or direct planting.\r\nSnaps to [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3276915747]Onboard Gardens[/url].\r\n4x4 will prefer using valid tile closer to the player.\r\nToggling alignment will give access to grids, where 6x6 can be used to compact loose soil.\r\nIf you choose to use mods based on the original Snapping Tills, the built-in features will be inactive and the grid will no longer appear when direct planting seeds.\r\n\r\n[h3]Indicators[/h3]\r\nIgnitable objects (tile outline on inspect)\r\nLightning rods (basic range)\r\nW.O.B.O.T. work radius",
+      "error": "",
+      "time_updated": 1789336648
+    },
+    {
+      "id": "WS3556247959",
+      "name": "显示攻击范围DisplayAttackRange",
+      "title": "Display Attack Range [fixed]",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3556247959",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "--- this mod fixes the crash that [Display Attack Range]( https://steamcommunity.com/sharedfiles/filedetails/?id=2078243581 ) experiences with great depth worms ---\r\n\r\nShows the attack range of mobs when they are targeting a player. The display will change color when they attack. Configuration options:\r\n\r\nRed, Green, Blue: Adjust the RGB color that shown for attack.\r\n\r\n--- the following three configs have not been tested and may not work ---\r\n\r\nRange appearance: Select range appearing while targeting player or during attack phase.\r\n \r\nType of Range: Select range type to be attack range, hit range, or switch between both.\r\n\r\nDisplay Projectile Range: Select to display the range of projectile.",
+      "error": "",
+      "time_updated": 1756191365
+    },
+    {
+      "id": "WS356930882",
+      "name": "帐篷无限耐久InfiniteTentUses",
+      "title": "Infinite Tent Uses",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=356930882",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Simple mod that makes tents infinitely durable (aka sets the amount of uses to an unreasonably high number). \r\n\r\nConfigure how many uses your tents have if you so wish, default setting is infinite.\r\n\r\nNow with Siestas, too.\r\n",
+      "error": "",
+      "time_updated": 1593542799
+    },
+    {
+      "id": "WS3589904780",
+      "name": "箱子的菜单",
+      "title": "Chest's Menu",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3589904780",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Add a function menu to chests with the following features (all toggleable):\r\n\r\n== Buttons can be hidden when opening container with broom equipped ==\r\n\r\nLock: Locks slots - items in locked slots cannot be taken by other functions\r\n-- Mouse: Middle click on a slot (lock icon appears when active)\r\n\r\n1.Dry: Add, replace, or take meat/jerky from drying racks\r\n\r\n2.Cook: Automatically cook the last prepared dish\r\nEnhanced setting: Searches nearby containers if ingredients are missing from inventory\r\n\r\n3.Store: Transfer identical items from inventory to chest\r\n\r\n4.Sort: Sort chest contents by quantity (high to low), Combine with Lock for custom sorting\r\n\r\n5.Collect: Pick up identical items from the ground nearby\r\n\r\n6.Put In: Store items from inventory, Containers with ≤6 slots only show this button\r\n\r\n7.Merge: Combine identical items from nearby structures into the chest\r\n\r\n8.Clean: Drop all items from the chest\r\n\r\n9.Refresh: Restore item freshness to 100%\r\n\r\n10.Roast: Cook food, turn logs into charcoal, heat thermal stones\r\n\r\n11.Cool: Reduce thermal stone temperature\r\n \r\n12.Restore: Restore book durability\r\n\r\n13.Perish: Freshness drops to 0\r\n\r\nController:\r\n\r\nContainer lock: Y button\r\n\r\nInventory lock: D-pad Up\r\n\r\nOpen/close menu: B button（Select a slot first）\r\n\r\nSwitch buttons: Bumper\r\n\r\nBackpack in inventory: Press Y to toggle buttons when inventory is selected",
+      "error": "",
+      "time_updated": 1788521096
+    },
+    {
+      "id": "WS3590648641",
+      "name": "简易全球定位",
+      "title": "简易全球定位",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3590648641",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "全球定位很好用，但是对于电脑性能不佳的玩家来说，能省则省。\r\n\r\n简易全球定位，只有如下功能（降低电脑性能消耗）：\r\n1. 在地图上显示玩家的图标（指南针）\r\n2. 共享地图（月眼守卫）\r\n\r\n关于模组配置项：\r\n1. 可以在配置项中关闭共享地图的功能（给不想要共享地图的玩家使用，主要是作者本人）\r\n\r\n[hr][/hr]\r\n如果你觉得这个模组不错的话，请点个免费的赞吧，非常感谢！",
+      "error": "",
+      "time_updated": 1762326011
+    },
+    {
       "id": "WS3597024951",
       "name": "景熹家居",
       "title": "JingXi Furniture",
@@ -290,6 +602,30 @@
       "time_updated": 1788937013
     },
     {
+      "id": "WS3606056931",
+      "name": "状态变化显示",
+      "title": "Stat Change Display(2026 Optimized Version)",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3606056931",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "----Preface----\r\nWhen AFK in the game with god mode enabled in the original mod, numbers would keep popping up continuously. So I optimized the original mod and added many new features.\r\n\r\n----Mod Description----\r\nThree Attributes Change Display\r\n\r\nOriginal mod:  https://steamcommunity.com/sharedfiles/filedetails/?id=1876137475\r\n\r\n----Mod Optimization Features----\r\n1. Added auto fade out effect for text\r\n2. Only display text when values actually change\r\n3. Code optimization\r\n4. Added color for numbers\r\n\r\n----Changelog----\r\n1.0 Mod released\r\n1.1 Now you can disable colored font\r\n\r\n---- My Other Mods ----\r\nScreen Effects Disabler  https://steamcommunity.com/sharedfiles/filedetails/?id=3493401504\r\nI want to become a master of Vilo https://steamcommunity.com/sharedfiles/filedetails/?id=3605772713\r\nAdjust Pet Size https://steamcommunity.com/sharedfiles/filedetails/?id=3365218633\r\nAuto Unequip 3.0 https://steamcommunity.com/sharedfiles/filedetails/?id=3363332852\r\n\r\nPlease report any bugs directly in the comments section.",
+      "error": "",
+      "time_updated": 1776423696
+    },
+    {
+      "id": "WS3621180063",
+      "name": "温暖龙鳞石",
+      "title": "Scaled Stone",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3621180063",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Add a recipe for Scaled Stone, which is a Thermal Stone with 90°C. Give it something can turn it into Scaled Ice Stone\r\nSet difficulty in settings. Yellow gem and opal gem to update it. Defeat Dragonfly to unlock",
+      "error": "",
+      "time_updated": 1768665331
+    },
+    {
       "id": "WS362175979",
       "name": "虫洞标记WormholeMarks",
       "title": "Wormhole Marks [DST]",
@@ -300,6 +636,18 @@
       "description": "Changes wormholes icons on mini map to colored icons.\r\nEvery pair of worlmholes get its color icons after you use one of the wormhole. \r\nCan support up to 22 pairs of wormholes.\r\n\r\nIf colors of the icons are not visible enough you can enable Draw over FoW in mod configuration option. \r\nThis will draw icons over fog of war on minimap, but will also make them visible for everyone on the server, even for people that didn't explore that area of the map.\r\n\r\n[url=http://steamcommunity.com/workshop/filedetails/?id=522041414]Try other mods[/url]\r\n\r\n",
       "error": "",
       "time_updated": 1454327710
+    },
+    {
+      "id": "WS3624411781",
+      "name": "储物包StorageBags",
+      "title": "Storage Bags",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3624411781",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h3]Just Like The Bundles from Minecraft![/h3] \r\nThis mod allows you to craft [b]Slurper Bag[/b] in the game that can store up to a stack's worth of mixed item types within itself in a single inventory slot.\r\nContents inside will also receive -25% spoilage rate.\r\n\r\nCraftable at shadow manipulator using 2 slurper pelts, 1 rope, 2 nightmare fuels.\r\n\r\n(there were supposed to be more bags but it was hard for me to come up with the designs)\r\n\r\n[h3]Misc[/h3]\r\nIn the [b]mod configuration[/b] you can also allow the [b]Soul Jar[/b] to use its unique action.",
+      "error": "",
+      "time_updated": 1774475846
     },
     {
       "id": "WS3638290455",
@@ -326,6 +674,30 @@
       "time_updated": 1777190572
     },
     {
+      "id": "WS3708333377",
+      "name": "十二符咒",
+      "title": "十二符咒/Twelve_Charms",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3708333377",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "十二生肖符咒玩法。\r\n■ 基本流程\r\n1）制作并装备「符咒容器」，将符咒放入栏内即可生效被动；主动技能一般对符咒使用右键（或按游戏内提示）。\r\n2）十二符咒主要通过「击杀指定生物」概率掉落；最终概率 = 单项基础概率 × 全局倍率（均可在本模组配置中调整）。\r\n\r\n符咒不可被带离世界（下线掉落在原地）、可以正常携带跳世界\r\n修复适配六格装备 符咒容器需要 枯萎的格罗姆花\r\n\r\n■ 获取途径（击杀掉落对应符咒）\r\n\r\n· 鼠符 → 鼹鼠\r\n· 牛符 → 皮弗娄牛\r\n· 虎符 → 浣猫\r\n· 兔符 → 兔人\r\n· 龙符 → 龙蝇\r\n· 蛇符 → 水獭\r\n· 马符 → 发条骑士\r\n· 羊符 → 伏特羊\r\n· 猴符 → 火药猴\r\n· 鸡符 → 火鸡\r\n· 狗符 → 猎犬\r\n· 猪符 → 猪人\r\n\r\n\r\n■ 各符咒能力概要\r\n鼠：攻击时概率10%从目标额外掉物；主动可令附近雕像化为对应巨兽。\r\n牛：更耐打与输出向加成；主动为范围内友方施加牛力加持。\r\n虎：体温趋向舒适；主动为附近玩家短时恒温。🐯 重点新功能 · 虎符拓展符咒容器\r\n兔：移速加成；主动为地图选点传送。\r\n龙：火焰相关防护与升温向被动，可选攻击点燃；主动为瞄准方向爆破类龙息。\r\n蛇：难被当作目标；主动对附近敌人施加剧毒。\r\n马：持续回血、中毒免疫等生存向被动；主动范围治疗友方并处理地面掉落物耐久等。\r\n羊：受击短窗减伤类被动；主动使敌人迷魂、定身/冰冻类控制。\r\n猴：不易成为首要目标（先出手会暂时失效）；主动将范围内生物变形为小型生物一段时间。\r\n鸡：装备可踏水；主动令附近玩家获得限时踏水/飞行类能力。\r\n狗：低血量保护与拦截致死类被动；主动范围复活灵魂。\r\n猪：攻击附带额外伤害；主动向所选方向发射激光扫射。\r\n\r\n符咒数值、冷却等未作平衡处理，可能过于影响平衡\r\n※ 具体数值、冷却与范围建议先阅读符咒检查说明与模组配置。",
+      "error": "",
+      "time_updated": 1787635149
+    },
+    {
+      "id": "WS3739258809",
+      "name": "快速采集QuickPick+",
+      "title": "Quick Pick+",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3739258809",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1]Quick Pick+[/h1]\r\nRemoves the harvest animation from grass, saplings, berry bushes and almost everything else, so they get picked [b]instantly[/b], like pulling a carrot. Everything the mod speeds up on foot now also works while riding a beefalo or Walter's Woby.\r\n\r\n[hr][/hr]\r\n[h1]Features[/h1]\r\n[list]\r\n[*][b]Pick almost everything instantly[/b] — No more harvest animation.\r\n[*][b]Works while riding![/b] — Vanilla forces the slow pick when you're mounted, this mod restores quick pick, so [b]Walter can grab plants right off Woby's back[/b] (works on Beefalo too).\r\n[*][b]Works while riding a Beefalo or Woby[/b] — Picking plants and flowers, grabbing items off the ground, harvesting dryers, farms and crock pots. All fast while mounted.\r\n[*][b]You can now collect Lureplant meat while mounted[/b] — The action didn't even appear on a mount before.\r\n[*][b]Compatible with Walter's Furry Forager[/b] — Unlike older quick-pick mods, this one does [b]not[/b] break Woby's foraging. You still get the extra food from the skill.\r\n[*][b]Quick Farm Harvest[/b] — All farm crops and farm weeds now pick instantly, generated from the game's own plant tables so future vegetables are covered automatically.\r\n[*][b]Adds quick pick for new resources[/b] — Monkeytail, banana bush, cave banana tree, juicy berry bush, mandrake and lureplants, tumbleweeds, ocean vines, tallbird eggs, lunar grotto light flowers, ruins stalker berries and bulbs, withered cave flowers, glommer's statue flower, junk piles and ocean flotsam, rifts' ancient trees. Keeping the main ones like grass, saplings, berry bushes, reeds, spiky bush, cave light flowers, mushrooms, glow berry, stone fruit, bull kelp, carrot, moon sapling and more.\r\n[/list]\r\n\r\n[hr][/hr]\r\n[h1]Configuration[/h1]\r\n[list]\r\n[*][b]Quick Pick While Riding[/b] — Quick pick while mounted on Woby or a Beefalo.\r\n[*][b]Quick Pick Cactus or Lichen[/b]\r\n[*][b]Quick Pick Wormwood's Plant[/b]\r\n[*][b]Quick Harvest[/b] — From crock pots, drying racks and farms.\r\n[*][b]Quick Plant[/b] — Planting seeds in tilled farm soil is now instant.\r\n[*][b]Quick Talk to Plants[/b] — Tending farm plants to make them happy is instant.\r\n[*][b]Quick Eat[/b] — Meats and other slow foods now eat as fast as berries.\r\n[*][b]Quick Cook on Fire[/b] — Cook food on the fire pit instantly.\r\n[/list]\r\n\r\n[hr][/hr]\r\n[h1]Feedback[/h1]\r\nFeedback is very welcome! If you run into a bug, a mod conflict, or have an idea for a feature to add, please leave a comment below. I'll do my best to keep the mod working and up to date. If you're enjoying it, a positive rating helps a lot!\r\n\r\n[hr][/hr]\r\n[h1]Credits & License[/h1]\r\nBased on [url=https://github.com/jupitersh/dst-mod-quick-pick]\"Quick Pick\" by 辣椒小皇纸[/url].\r\nReleased under the [url=https://www.gnu.org/licenses/gpl-3.0.en.html]GNU General Public License v3[/url], same as the original work.",
+      "error": "",
+      "time_updated": 1789602907
+    },
+    {
       "id": "WS3741973557",
       "name": "轰雷丨饥困荒野",
       "title": "",
@@ -336,6 +708,30 @@
       "description": "",
       "error": "",
       "time_updated": 0
+    },
+    {
+      "id": "WS3749466078",
+      "name": "种植助手PlantingHelper",
+      "title": "[client]  Planting Helper",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3749466078",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[h1]Planting Helper[/h1]\r\nA client-side batch-planting tool. Plants grass, saplings, bushes and trees in grid\r\n\r\n[hr][/hr]\r\n\r\n[h2]How to use[/h2]\r\n[olist]\r\n[*]Hold any plantable item (grass tuft, sapling, berry bush, etc.). A grid preview appears at your cursor — [b]green[/b] = plantable, [b]red[/b] = blocked. The current size (e.g. [b]3x4[/b]) is shown right below the preview.\r\n[*][b]Ctrl + Mouse Wheel[/b] — change the number of rows (Y).\r\n[*][b]Alt + Mouse Wheel[/b] — change the number of columns (X).\r\n[*][b]Right-click[/b] — plant the entire field at once.\r\n[/olist]\r\n\r\n[h2]Smart planting[/h2]\r\n[list]\r\n[*]Automatically uses matching plants from your [b]hands, inventory and backpack[/b].\r\n[*]snake style pathing, then retries and fills any gaps (such as the tile you happened to be standing on).\r\n[*]While planting, the grid locks in place and shows live progress: the current tile is highlighted and finished tiles clear out.\r\n[*]Stops when the field is done — or when you run out of stuff to plant.\r\n[*]Want out? Just press a movement key — the batch cancels instantly.\r\n[/list]\r\n\r\n[h2]Indicator light & settings[/h2]\r\n[list]\r\n[*]A small wooden tab appears beside the crafting button while you hold a plantable. Its light shows the status: [b]yellow[/b] (ready), [b]fast yellow[/b] (resizing the grid), [b]green[/b] (planting), [b]solid green[/b] (done), [b]red[/b] (can't plant here).  [b]fast red[/b] (interrupted, really cant, stop asking).\r\n[*][b]Click the tab[/b] to open the settings window:\r\n[list]\r\n[*][b]Grid Snapping[/b] — on / off (lock plants to a fixed world grid).\r\n[*][b]Spacing[/b] — 1 to 5 (gap between plants).\r\n[/list]\r\n[*]Your settings are saved and restored between sessions.\r\n[*]Grid size is remembered as well — and after (5,10,20,NEVER) minutes without planting it quietly resets to 1x1, so picking up a plant never flashes a huge preview in your face.\r\n[/list]\r\n\r\n[h2]Notes[/h2]\r\n[list]\r\n[*]Compatible with [b]Geometric Placement[/b] — it sync with GP setting and uses the same world grid (square grid only, for now)\r\n[*][b]Client-side only[/b]\r\n[*]Works on plantable plants, trees, twigs and bushes. Structures and other deployables are intentionally ignored.\r\n[/list]\r\n\r\n[h2]Why this exists[/h2]\r\nDraw upon [b]To Do Chores[/b] and [b]ActionQueue RB3+[/b], blended with my own UI design cuz im sick of press so many buttons and those menu overlap on eachother i dont know how to close them\n\n[hr][/hr]\n\nDo u like stuff i made? Help me go further with Ko-fi!\n[url=https://ko-fi.com/nnnous][img]https://raw.githubusercontent.com/N0USx1/NOUS-Publishes/main/assets/kofi-support.png[/img][/url]",
+      "error": "",
+      "time_updated": 1783357281
+    },
+    {
+      "id": "WS3753595508",
+      "name": "沃姆伍德物品栏HUD",
+      "title": "沃姆伍德 物品栏HUD",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3753595508",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "【与植物息息相关，食物能填饱他的肚子，但无法治愈他的心】\r\n\r\n【希望花花能陪伴你度过每一个困难的夜晚】\r\n\r\n创作者：见yi一\r\n劳烦大家在 B 站点点关注，真的很需要，谢谢大家！\r\n\r\n这个模组后续还有很多计划，请大家耐心等待。也希望大家能点一点免费的赞，这对我非常重要！\r\n\r\n·这是一个能让你的物品栏开花的本地客户端美化模组，任何角色都可以使用。\r\n·调整界面的按钮是一朵可以移动的小红花，可以自行拖动调整位置。\r\n\r\n【新增内容 2026/7/6】\r\n·新增模板功能，内置多套花花搭配方案，可以快速切换使用。\r\n·新增中英文界面切换功能。\r\n·新增更多植物种类，提供更丰富的装饰选择。\r\n\r\n————————————————————————————————————————\r\n\r\n【Closely connected to plants, food may fill his stomach, but it cannot heal his heart.】\r\n\r\n【May these little flowers stay with you through every difficult night.】\r\n\r\nCreator: Jianyi\r\nPlease follow me on Bilibili if you can. Your support really means a lot. Thank you!\r\n\r\n\r\nI still have many plans for this mod, so please wait patiently. A free like would also help me a lot!\r\n\r\n· This is a local client-side cosmetic mod that lets flowers bloom around your inventory. It can be used with any character.\r\n· The settings button is a movable little red flower. You can drag it freely to adjust its position.\r\n\r\n【Update 6/7/2026】\r\n· Added the template feature, with several built-in flower layout presets that can be quickly switched and applied.\r\n· Added Chinese / English interface switching.\r\n· Added more plant types for richer decoration options.",
+      "error": "",
+      "time_updated": 1784001161
     },
     {
       "id": "WS3755481449",
@@ -374,6 +770,18 @@
       "time_updated": 1787361560
     },
     {
+      "id": "WS3775474571",
+      "name": "青蛙都摔死了",
+      "title": "Frogs Fell to Death...",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3775474571",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "It must hurt to fall from such a high place...\r\n\r\nWhen it rains Frog Rain now, all the frogs will fall to death, with toggle options in mod settings.\r\nVersion 2.0: More customizable options! Now you can independently adjust: ① the remaining health of two types of frogs after landing. ② whether the two types of frogs drop loot upon falling.\r\nVersion 3.0: New Mode: Hard Landing Mode! In this mode, the remaining health of the two types of frogs will be determined based on whether the land where they land is hard. You can freely configure it in the mod settings! \r\n• Hard land: various types of wooden land, stone land, etc.\r\n• Soft land: various types of grassland land, sandy land, fungal land, etc.",
+      "error": "",
+      "time_updated": 1786263677
+    },
+    {
       "id": "WS3776018992",
       "name": "九格装备栏",
       "title": "Nine Equipment Slots",
@@ -410,6 +818,54 @@
       "time_updated": 1788767823
     },
     {
+      "id": "WS3795852397",
+      "name": "Kyno的滤镜ColorCubes",
+      "title": "Kyno's Color Cubes",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=3795852397",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[img]https://i.imgur.com/sKqdqP2.png[/img]\r\n[list]\r\n[*]Adds new [b]Color Cubes[/b] for each Season and Full Moon!\r\n[i]Color Cubes from the DLCs are not included, please refer to the mod below.[/i]\r\n\r\n[*]Each Season and Full Moon is configured independently.\r\n[/list]\r\n[img]https://i.imgur.com/DzIvPEs.png[/img]\r\n[img]https://i.imgur.com/m7XMFeM.jpeg[/img]\r\n[img]https://i.imgur.com/txJ96aM.jpeg[/img]\r\n[img]https://i.imgur.com/LiPUJoG.png[/img]\r\n[list]\r\n[*][b]Credits[/b]:\r\n[*][b][url=https://steamcommunity.com/profiles/76561198367734754]Fliphe[/url][/b] - Mod icon.\r\n[*][b][url=https://steamcommunity.com/id/thallyssc]Thalz[/url][/b] - Mod screenshots.\r\n[*][b][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2803841740]Modular Color Cubes Mod[/url][/b] - Original idea and inspiration.\r\n[/list]\r\n[list]\r\n[*]Need Help? Found a bug? Issues with the mod? Suggestions? Head to our Discord and have a chat with us! Our Discord:[url=https://discord.gg/jjNr4Vvutn] Click Here to join![/url]\r\n\r\n[*]Want to support my work? My[url=https://ko-fi.com/kynoox] Ko-fi Page[/url][b]Tips not needed, always appreciated[/b].\r\n[/list]\r\n[img]https://i.imgur.com/LiPUJoG.png[/img]",
+      "error": "",
+      "time_updated": 1788575822
+    },
+    {
+      "id": "WS380423963",
+      "name": "可开采的宝石MineableGems",
+      "title": "Mineable Gems",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=380423963",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "Server side mode (only). Tag: \"mineable gems\"\r\nConfigurable.\r\n\r\nGives boulders a chance to drop gems.\r\n\r\n-----\r\nUses proper API style. New updates of the game won't affect the mod (99.999%). Maximum compatibility with any other existing and future mods. Stealable code (compatible with itself). Please, send me screenshot if you have a crash (but it's impossible).\r\n\r\n",
+      "error": "",
+      "time_updated": 1460087721
+    },
+    {
+      "id": "WS661253977",
+      "name": "死亡不掉落DontDropEverything",
+      "title": "Don't Drop Everything",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=661253977",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "If You like this, give a thumbs up!\r\n[img=http://images.akamai.steamusercontent.com/ugc/309991266634219774/CC3EAA33CE2659B1824BD02E852DBE8C820C73DC/][/img]\r\n\r\nHint: When a player dies, The player must have amulets, A will drop.\r\n\r\nPlayers into a state of the soul after death, not drop all the items.\r\n\r\n[url=http://steamcommunity.com/sharedfiles/filedetails/?id=664113547][img=http://images.akamai.steamusercontent.com/ugc/275092284528761829/DABCF28D34CA7F9C92AC28E573594037B8492878/][/img][/url]\r\n\r\n",
+      "error": "",
+      "time_updated": 1597029317
+    },
+    {
+      "id": "WS764204839",
+      "name": "自动血量适配AutomaticHealthAdjust",
+      "title": "Automatic Health Adjust",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=764204839",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "This mod automatically adjusts the health of mobs depending on the number of active players, everytime a player joins or leaves.\r\n\r\nDefault is DS values for 1 player, and DST values for 6 players. \r\n(for 2,3,4,5 players , health will be between those values of course)\r\nAnd in case for some reason you have more than 6 players, it will be higher than DST values!\r\n\r\nHas setting to set min/max value for the number of players the mod should calculate with:\r\nSo if you are playing with 4+ players, but want max health values for 3, then you can set max to 3.\r\nOr if you play with 2+ players, but want at least health values for 4 players, you can set min to 4.\r\nOr set it both to 6 if you always want to play with values for 6 players.\r\nBy default it is disabled.\r\n\r\nCave and Overworld are separated. \r\nSo if one player is in cave and one in Overworld, both worlds will have health values for 1 player.\r\n\r\nMore Customization:\r\nin the customsettings.lua you can define your own health function!\r\n\r\nSpecial case for crabking(-claws):\r\nIf a player joins/leaves during a fight against crab king, his health wont change. If you want to update his health according to new number of players, you have to leave and activate him again.\r\n\r\n[url=http://steamcommunity.com/profiles/76561198102311542/myworkshopfiles/?appid=322330] [h1][u]Also take a look at other mods I made, see my workshop ;)[/u][/h1] [/url]\r\n\r\n[u]You can change the values to anything you like, but by default they are:[/u] (1 and 6 players values)\r\n{AncGuardian={2500, 10000}, Ancient_Sentrypede={600, 1200}, Ancient_Guard_Tower={2000, 6000}, Antlion={3000, 6000}, Bearger={3000, 6000}, Bearger_Armored={4000, 8000}, Beefalo={500, 1000}, Beeguard={100, 180},\r\n Beequeen={3000, 22500}, Brightshade={500, 1000}, Brightshade_Vine={100, 200}, Bunnyman={200, 400}, Buzzard={125, 250}, Celestial_Champion1={2000, 10000}, Celestial_Champion2={2600, 13000}, Celestial_Champion3={2800, 14000},\r\n Celestial_Revenant={2000,8000}, Celestial_Scion={3500,16000}, Clockworks={300, 900}, Crabking={3000, 12000}, Crabking_Claw={100, 500}, Deer={350, 700}, DeerGem={750, 1500}, Deerclops={2000, 4000}, Deerclops_Crystal={3000,6000}, Dragonfly={3500, 27500}, \r\n Eye_of_Terror={2000,5000}, Eye_of_Terror_Mini={150,200}, Eye_of_Terror_Twin1={4000,10000}, Eye_of_Terror_Twin2={4000,10000}, Ewecus={400, 800}, Fused_Shadeling={625, 1250}, Frostjaw={4000, 8000}, Gnarwail={500, 1000}, Grassgator={500, 1000}, Icker={300, 600}, InkBlight_Jitters={500, 1000}, InkBlight_Rasp={600, 1200}, InkBlight_Rictus={400, 800}, InkBlight_Shriek={400, 800}, Klaus1={2000, 10000}, Klaus2={5440, 27440}, Koalefant={500, 1000},\r\n Krampus={200, 300}, Lavae={250, 500}, Lord_Fruit_Flies={900, 1500}, Lurking_Nightmare={400, 850}, Malbatross={1500, 5000}, Marotter={175, 350}, Merm={250, 500}, Moose={3000, 6000}, Mosling={350, 525}, Mush_Gnome={300, 600}, Nightmare_Werepig={2000,10000}, Ornery_Chest={400,950},\r\n Pig_Guard={300, 600}, Pig={250, 500}, Poisonedtree={12, 18}, Powder_Monkey={100, 200}, Prime_Mate={200, 350}, Rabbitking={800, 2000}, Royal_Rabbit_Enforcer={150, 400},  RLobster={1500, 3000}, Rockjaw={500, 1000}, Saladmander={450, 900}, Sea_Weed={250, 500}, Shadow_Bishop1={250, 800},\r\n Shadow_Bishop2={800, 2500}, Shadow_Bishop3={2500, 7500}, Shadow_Knight1={300, 900}, Shadow_Knight2={900, 2700}, Shadow_Knight3={2700, 8100}, Shadow_Rook1={350, 1000},\r\n Shadow_Rook2={1000, 4000}, Shadow_Rook3={4000, 10000}, Shootius={1500, 3000}, Skeleton_A={6000, 16000}, Skeleton={2000, 4000}, Slurtle={600, 1200},\r\n Spider_dropper={200, 400}, Spider_healer={200, 400}, Spider_hider={150, 225}, Spider_spitter={175, 350}, Spider_warrior={200, 400}, Spiderqueen={1250, 2500}, Tallbird={400, 800}, Teenbird={300, 600}, Tentacle_pillar={500, 750}, Terramite={140, 280},\r\n Toadstool={7500, 52500}, ToadstoolMisery={11111, 99999}, Treeguard={2000, 3000}, Voaltgoat={350, 700}, Walrus={150, 300}, ['W.A.R.B.O.T.']={4500, 22500}, Warg={600, 1800}, Warg_Possessed={1500, 3000},  Werepig={350, 525}, Worm={450, 900}, Great_Depths_Worm={1500, 5000},}\r\n\r\n\r\n\r\n[b]FAQ:[/b]\r\n[b]1)[/b]Does this mod also changes other mob behaviours, like rage or so?\r\n-> No, it only changes health, nothing more. Most special skills of mobs depend on a percentage of health, so they will still work fine.\r\nIf you still want a mod that adjusts all special skills of all mobs, depending on the number of players, then please write such a mod and we could make it dependend on my mod, so yours changes skills and my changes health.\r\nI won't write such a mod myself, because it is ALOT of work and I don't know all the sepcial skills good enough for this.\r\n[b]2) Attention[/b]: When disabling this mod on existing world, the max health won't change back to normal on first loading! Close the world and load it a second time without the mod should fix the max health, but the current health might be stuck at former max health. I don't know a solution for this, because there is no way to \"fix\" this, with an disabled mod and as far as I know there is no \"unloading mod code\" to solve this.\r\n\r\n\r\nIf I one day do not update this mod anymore (eg. within 2 months and do not reply to any comments), I allow everyone to take my code and upload a updated version. Of course with credits by emtnioning me and linking to the original.\r\nThis is true for all my mods!",
+      "error": "",
+      "time_updated": 1783774843
+    },
+    {
       "id": "WS780009141",
       "name": "查找容器Finder",
       "title": "Finder",
@@ -420,6 +876,30 @@
       "description": "Highlights nearby containers that contain necessary items. Helps to manage storages of two and more chests and other containers without burden to search items manually or remember them.\r\n\r\nThis mod is also available for Don't Starve (Vanilla/RoG/SW) [url=http://steamcommunity.com/sharedfiles/filedetails/?id=779832792]here[/url].\r\n\r\nChinese: 突出显示附近包含必要项目的容器。 有助于管理两个和更多的箱子和其他容器的存储，无需负担手动搜索项目或记住它们。[url=http://steamcommunity.com/sharedfiles/filedetails/?id=779832792]单人版的这个[/url]\r\n\r\nSpanish: Hace hincapié en los contenedores cercanos que contienen los elementos necesarios. Ayuda a gestionar el almacenamiento de dos o más cofres y otros recipientes sin tener que buscar los elementos de forma manual o recordarlos\r\n\r\nArabic: يسلط الضوء على الحاويات المجاورة التي تحتوي على المواد الضرورية. تساعد على إدارة المخازن من اثنين وأكثر من صدورهم وغيرها من الحاويات دون عبء للبحث بنود يدويا أو تذكرها.\r\n\r\nGerman translation by Zephyr: Markiert naheliegende Kisten und andere Lagermöglichkeiten welche die Gegenstände enthalten die für ein Crafting-Rezept benötigt werden. Designt um dir das Suchen nach bestimmten Items zu erleichtern\r\n\r\nRussian: Подчеркивает близлежащие контейнеры, которые содержат необходимые вещи. Помогает управлять запасами двух и более контейнеров без необходимости поиска предметов вручную или вспомнить их.\r\n\r\nPortuguese translation by thiago_thepower: Destaca os recipientes próximos que contenham itens necessários. Ajuda a gerenciar o armazenamento em dois ou mais baús e outros recipientes sem necessidade de procurar itens manualmente ou de se lembrar deles.\r\n\r\n\r\n\r\nControls\r\n\r\nWhen ingredients are hovered in crafting menu or an item is held by cursor this mod automatically highlights nearby containers that have items of the same type. Doesn't require special controls.\r\n\r\n\r\nCompatibility\r\n\r\nShould be compatible with everything:\r\nDon't Starve Together\r\nDon't Starve\r\nReign Of Giants\r\nShipwrecked\r\n([url=http://steamcommunity.com/sharedfiles/filedetails/?id=779832792]Link to the DS/RoG/SW version[/url])\r\n",
       "error": "",
       "time_updated": 1476358517
+    },
+    {
+      "id": "WS836583293",
+      "name": "物品信息",
+      "title": "Item Info",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=836583293",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[b]This is a CLIENT mod. Can be used on any server![/b]\r\n\r\nInspired by the popular mods Display Food Values & Detailed Tooltips, I bring you Item Info.\r\n\r\n[h1]What this mod does[/h1]\r\nIt displays items' values when hovering over them (hunger, sanity, health, spoilage, insulation [winter/summer], light remaining time, waterproof %, sanity gain/min, uses left, damage and armor including planar) via little icons and a value.\r\n\r\n\r\nAdditionally, it can display your equipped items on a panel on the right (configurable), so that you always know your spear's uses, your armor's hp left, or when your torch is going to run out of fuel.\r\n\r\n[h1]Configuration Options[/h1]\r\nThe default config is just fine, but if you wanna tweak it, here it is:\r\n\r\n    Info scale: Sets the tooltip's info scale.\r\n    Time format: Change between hours:minutes:seconds and in-game days.\r\n    Perish info: Set if you only want to see spoilage time, stale time and then spoilage time, or both.\r\n    Show info hands/body/head: If you want to see your equipped items' info.\r\n    Equipped Scale: Set the equipped item's scale, if you think they're too big or too small.\r\n    Show prefab name: If you want to know your items' debug spawn name.\r\n    Show background: If you wanna see a huge, interface-blocking background behind your equipped items.\r\n    Margin bottom/right: To position the equipped item info.\r\n\r\n\r\n[h1]How to install[/h1]\r\nJust subscribe to the mod. That's it. This mod displays info in a different way to all others, so no need to replace fonts nor anything like that.\r\n\r\n[h1]Notes[/h1]\r\nLike other mods, this mod calculates values based on the item's current percent and the base item max values, so the following values might not be 100% exact: perish time, stale time, fuel time, clothes remaining time, uses left, hambat damage.\r\n\r\nController is supported as of version 0.2\r\n\r\n[h1]Current issues[/h1]\r\nThere's a bug related to modcomponentactions which only happens on modded servers triggered by the way this mod spawns a base item to check its stats. It has been fixed for a while but if you run into this let me know.\r\nNew characters after Wortox aren't fully supported yet (foods they won't eat, food bonuses, damage bonuses, etc). I might make some internal changes to add support for them & modded ones someday™\r\n\r\n\r\n[h1]Latest changes[/h1]\r\nFixed crash when hovering over merm tools and upgraded merm tools.\r\nUpdated info to show planar damage/armor.\r\nUpdated spoilage calc to support Polar Bearger Bin.\r\nUpdated Wolfgang damage to support his mighty meter.\r\n\r\n\r\nIf you find a bug, have a suggestion or just like this mod, feel free to leave a comment.\r\nIf the mod ever breaks please add me as a friend and nag me every day till I fix it.",
+      "error": "",
+      "time_updated": 1787540785
+    },
+    {
+      "id": "WS949808360",
+      "name": "卡尼猫",
+      "title": "Carney",
+      "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/?id=949808360",
+      "status": "clear",
+      "explicit_prohibition": false,
+      "matched_snippets": [],
+      "description": "[url=http://steamcommunity.com/sharedfiles/filedetails/?id=950485476][Click here for the single-player version][/url]\r\n\r\n[hr][/hr]\r\n\r\n[img]https://i.loli.net/2020/10/23/yi5E6p3ZHlvGYAh.jpg[/img]\r\n\r\nTraveling Carney Cat\r\nPossesses agile combat skills\r\nUpgrade by walking and eating fish, with no level cap!\r\nEasy to obtain increased gathering and killing drop multipliers\r\nCan craft convenient and practical hats, shortswords, and backpacks\r\n——Even death can't stop me from leveling up by walking!!\r\n\r\n[hr][/hr]\r\n\r\n[h1]Initial Attributes:[/h1]\r\n[img]https://i.loli.net/2020/10/23/VNiFLMuI14KPtGQ.png[/img]\r\nEach stat starts at 100, with a 25% movement speed bonus\r\nStats increase with level\r\nCold-sensitive - enters cold state earlier\r\n\r\n[hr][/hr]\r\n\r\n[h1]Infinite Leveling:[/h1]\r\nExperience points (exp) to level up\r\nPress J to view level and experience points\r\n\r\nGaining experience points gradually while walking\r\nGain experience points at a 1:1 ratio with monster's health when killing monsters\r\nEating fish dishes grants a large amount of experience points and additionally restores sanity\r\n\r\nThe experience cap increases with level\r\nLeveling up increases stat caps, with each level granting +2 Hunger limit, +1 Sanity limit, and +1 Health limit\r\nAlso affects character skills and significantly restores health (20%)\r\nNo level cap\r\n\r\n[hr][/hr]\r\n\r\n[h1]Active Skills:[/h1]\r\n[h3]——Dodge - Press R[/h3]\r\nA small jump at the moment of pressing, entering an invincible state, negating all damage\r\nA very short acceleration effect at the moment of pressing\r\nDodge has no cost\r\nCharacter level affects the duration of the invincible state\r\n[img]https://i.loli.net/2020/10/23/4dvQWGoiqOBEyZr.gif[/img]\r\n\r\n[h3]——Charge - Press Z[/h3]\r\nEmpower the equipped item\r\nEnhance the next attack by a certain multiplier, consuming 5 hunger after the attack\r\nThe charged state also emits a small range of light\r\nCharacter level affects the damage multiplier of charge\r\nCancel charge when switching or unequipping the item\r\n[img]https://i.loli.net/2020/10/23/q5FJ89pcGVahdHs.gif[/img]\r\n\r\n[h3]——Ice Pillar/Blast - Press C[/h3]\r\nConsume 15 hunger to create an ice pillar on the ground\r\nCreatures within range will be slowed down and the temperature will drop sharply\r\nPress C again to detonate at the location of the ice pillar\r\nCauses damage to creatures within range, with more creatures leading to higher damage\r\nDamage can be enhanced by the \"Charge\" skill\r\nCharacter level affects the damage of the blast\r\n[img]https://i.loli.net/2020/10/23/JHsFeaxRSVy1Kbp.gif[/img]\r\n\r\n[h1]Passive Skills:[/h1]\r\n[h3]——Gathering[/h3]\r\nThe higher the character level, the easier it is to obtain more items when gathering\r\nAn additional item is gained every 35 levels\r\nThe higher the character level, the easier it is to obtain more drops when killing\r\nThe probability is level/100, and after level 100, it is fixed at double drops\r\n[h3]——Pet Never Hungry[/h3]\r\nSummoned pets will not be hungry, and you will never hear the pet's hungry howl\r\n\r\n[hr][/hr]\r\n\r\n[h1]Exclusive Crafting:[/h1]\r\n[h3]——White Beret[/h3]\r\n[img]https://i.loli.net/2020/10/23/tBzAmUDTHYgEr34.png[/img]\r\nBorn with one, brain recovery +3 per minute, warmth 120, durability is the same as the Walrus Hat\r\n\r\n[h3]——Breeze Dagger[/h3]\r\n[img]https://i.loli.net/2020/10/23/wkfY3s18eGJSrgq.png[/img]\r\nIncreases movement speed by 25%, base attack power 27\r\nHas a faster attack speed\r\nThere is a 30% chance to deal double damage with a critical hit\r\nInserting a dog tooth will automatically consume one dog tooth to repair 100% durability when low on durability\r\nAt 0 durability, there is a 100% critical hit, but the downside is a stumble\r\nEnhance with gold blocks, each 5 gold increases attack power by 1\r\n——As long as I pay, I am the boss\r\n\r\n[h3]——Nylon Backpack[/h3]\r\n[img]https://i.loli.net/2020/10/23/y12GLDOYtf9SWpN.png[/img]\r\nCapacity of 14 slots\r\nWarmth equals that of a Horned Hat (240), rain resistance 20%\r\n\r\n[hr][/hr]\r\n\r\n[h1]V2.0.0 Major Update:[/h1]\r\n\r\n[h3]New - Learning Device[/h3]\r\n[img]https://s2.loli.net/2024/09/30/u5TeCBwiR4KZQno.png[/img]\r\nA versatile tool\r\nEquip and right-click to open\r\nInsert different tools to learn different functions and efficiencies\r\nCurrently supports learning functions: chop, chisel, dig, hammer, net, paddle, hoe, burn, fork, fresh water fishing, increase movement speed, teleport\r\nInsert gold blocks to speed up work (100 blocks to max)\r\nRemoving the item cancels the corresponding function\r\n\r\n[h3]New - HuHu minifan[/h3]\r\n[img]https://s2.loli.net/2024/09/17/yIDXixptmeAQgL2.png[/img]\r\nSpeed increase by 15%\r\nEquipped allows walking on water，can extinguish fire\r\nSlowly restores the freshness of surrounding items and adjusts the temperature of surrounding characters while running\r\nFeeding any food adds durability based on the absolute value of hunger and health, and durability can exceed the limit\r\nFeeding is in stacks, and the effects of the food will take effect after feeding, such as glowing berries\r\n\r\n[h3]New - Fluffy Ear Hat[/h3]\r\n[img]https://s2.loli.net/2024/09/17/yhIG72Yg38F1Sf5.png[/img]\r\nMade with a White Beret and a Walrus Hat\r\nWarmth equals that of a Horned Hat (240), brain recovery 9 points per minute, durability equals that of a Walrus Hat\r\nAdditional 3 item slots, can be filled with fur items, enhancing warmth when inserted\r\n\r\n[h3]New - Encyclopedia of Everything Cat Edition[/h3]\r\n[img]https://s2.loli.net/2024/09/17/PqNLZfApa9OXykt.png[/img]\r\nReading grants inspiration points, which can accumulate\r\nWith points, unlock Science Two, Magic Two, and Navigation Technology\r\nUnlocking a new technology reduces points by 1\r\nCompared to the Grandma Edition, the benefit is knowing which technology is not unlocked\r\n\r\n[h3]New - Quiet Whistle[/h3]\r\n[img]https://s2.loli.net/2024/09/25/GqTyYCfenvkbaH7.png[/img]\r\nUsing it causes a small treasure house to emerge from the ground, a private cloud box, 15 slots\r\nDifferent players see different items stored when opened\r\nWhen closed, the items inside are preserved like they are packed with wrapping paper, permanently fresh\r\nSwitching worlds does not affect the items stored inside\r\n\r\n[h3]New - Experience Retention[/h3]\r\n[img]https://s2.loli.net/2024/09/17/2sUwGqKNktxYRPC.png[/img]\r\nAfter reselecting or turning into a monkey, a shadow is left on the spot, which can only be picked up by oneself at first, and can be given to others after being picked up by oneself\r\nAfter picking up, only the Carney Cat character can use it, and using it adds the experience points in the shadow to the current Carney Cat character\r\nThe durability of the shadow represents the experience points and level\r\n\r\n[h3]Change - Breeze Short Sword[/h3]\r\nCan upgrade in stacks with gold\r\nSeparate upgrade and repair, equipped allows right-clicking to open and insert dog teeth, automatically consumes one dog tooth to repair 100% durability when low on durability\r\nAt 0 durability, there is a 100% critical hit, but the downside is a stumble\r\nUpgrading with gold no longer changes the short sword's durability limit\r\nAxe function removed\r\n\r\n[h3]Change - Other[/h3]\r\nSkill Ice Pillar/Blast: Ice Pillar's freshness restoration function removed.\r\nWhite Beret: Upgrading with Walrus Hat function removed.\r\nEffects: Optim\r\nized jump and level-up effects.\r\n\r\n[h3]Optimization - BUG Fixes[/h3]\r\nFixed room crash.\r\nFixed crash when dismantling mushroom farms with a disintegration wand.\r\nFixed slow attack speed of Breeze Short Sword with delay compensation enabled.\r\nMultiple times gathering supports Monkey Grass, Banana Bush, and Shadow Harvester.\r\nPlayers can gain experience if they hit the monster within 5 seconds before it dies.\r\n\r\n[hr][/hr]\r\n\r\nSpecial Thank!!:\r\n\r\nPotter_Lee\r\nJason Brock\r\ncivetcat\r\nStar Cat Music\r\nUnder_brush\r\n",
+      "error": "",
+      "time_updated": 1731853812
     }
   ]
 }
