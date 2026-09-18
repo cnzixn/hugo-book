@@ -10,6 +10,8 @@
 #   - layouts/_partials/docs/icon.html 补 xmlns 后发布为 /icons/<名>.svg 供 <img> 用
 # 注意：图标名必须唯一；YAML 重复键会解析失败（旧模板 dict 是后写覆盖前者）
 
+bi-tencent-pd: |-
+  <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><line x1="38" y1="20" x2="28" y2="85"/><line x1="70" y1="20" x2="60" y2="85"/><line x1="20" y1="38" x2="85" y2="38"/><path d="M15 65 H45 L60 85"/><line x1="65" y1="65" x2="80" y2="65"/></svg>
 
 bi-cloud-download: |-
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
