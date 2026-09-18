@@ -72,16 +72,19 @@
   <div class="sort-controls">
     <div class="sort-header">
       <div class="sort-info">
-        <span>共计 <span id="show-count">0</span> / {{ $bmCount }} 模组</span>
+        {{/* 计数口径与联机版一致：本页条数 / 符合搜索条件的模组总数（跨页合计）。
+            两个数字都由 ds-mods.js 写入：renderList 写本页条数、applyFilter 写总数；
+            无搜索时总数即全部模组数，所以不再依赖 shortcode 里的 $bmCount。
+            没搜索时「本页」两字隐藏（.sort-count 是否带 has-query，由 JS 控制）。 */}}
+        <span class="sort-count"><i class="sort-page-lead">本页 </i><span id="show-count-page">0</span> / <span id="show-count">0</span> 个模组</span>
       </div>
-      <button id="sort-toggle" class="sort-btn" data-sort="asc">
-        <svg class="icon-asc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path>
-          <path d="m3 17 3 3 3-3"></path><path d="M6 18V4"></path>
-        </svg>
-        <svg class="icon-desc" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path>
-          <path d="m3 7 3-3 3 3"></path><path d="M6 4v14"></path>
+      {{/* 单机版只有「正序 / 倒序」两种（按 ID 排），按钮外观与联机版的 #sort-mode 一致：
+           同样的 .sort-gray-btn 灰框样式；箭头只放一个，方向靠 CSS 旋转 180°（.is-flipped）表示，
+           切换时图形与间距逐像素相同，不会有任何横向抖动。
+           两个模组页的排序按钮因此长得一样，只是文案不同（正序/倒序 vs 名称/下载）。 */}}
+      <button id="sort-toggle" class="sort-btn sort-gray-btn" data-sort="asc" title="当前正序（ID 小到大），点击切换倒序">
+        <svg class="sort-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5"/>
         </svg>
         <span class="sort-label">正序</span>
       </button>

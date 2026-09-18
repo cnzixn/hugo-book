@@ -5,20 +5,6 @@ layout: landing
 
 # 饥荒模组手册 {anchor=true}
 
-从安装到排错，从资源获取到模组开发，这里汇总了你在《饥荒》手游版本最实用的资料。
-
-
-
-
-<div class="btn-row">
-{{<button href="/docs/ds-book/">}} <img src="/img/icons/ds_icon.webp" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
-{{</button>}}
-{{<button href="/docs/dst-book/">}} <img src="/img/icons/dst_icon.webp" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
-{{</button>}}
-</div>
-
-<!-- {{< button href="/sponsor/" class="btn-block btn-sponsor" >}}<span class="book-sponsor-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/></svg></span> 赞助支持 · 请我喝杯奶茶{{< /button >}} -->
-
 -----
 
 {{% columns %}}
@@ -36,5 +22,17 @@ layout: landing
   - 结构理解、脚本编写与自制内容实践
 
 {{% /columns %}}
+
+-----
+
+
+
+<div class="btn-row">
+{{<button href="/docs/ds-book/">}} <img src="/img/icons/ds_icon.webp" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-单机版
+{{</button>}}
+{{<button href="/docs/dst-book/">}} <img src="/img/icons/dst_icon.webp" alt="" width="20" height="20" style="vertical-align: middle; margin-right: 6px;"> 手游-联机版
+{{</button>}}
+{{<button href="/sponsor/" class="btn-sponsor">}}<span class="book-sponsor-icon" ><svg viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/></svg></span> 请我喝杯奶茶{{</button>}}
+</div>
 
 -----

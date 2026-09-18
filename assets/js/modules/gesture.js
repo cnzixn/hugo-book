@@ -307,6 +307,23 @@
   }
 
   /**
+   * 点遮罩关闭抽屉后，把焦点从 #menu-control / 遮罩上摘掉
+   *
+   * 为什么需要：遮罩是 <label for="menu-control">，点它 = 激活 checkbox。
+   * Safari（含 iOS）把 label 视为可聚焦元素，点完会把焦点留在它/checkbox 上，
+   * 于是留下系统默认的蓝色 focus ring —— 表现就是「点菜单外面有个蓝色 hover 效果」。
+   * CSS 里已经抹掉 outline / tap-highlight（custom.css），这里再把焦点挪走做双保险。
+   */
+  function blurMenuControl() {
+    var ctrl = getMenuControl();
+    try { if (ctrl && ctrl.blur) ctrl.blur(); } catch (e) { /* 忽略 */ }
+    var active = document.activeElement;
+    if (active && active.classList && active.classList.contains('book-menu-overlay') && active.blur) {
+      try { active.blur(); } catch (e) { /* 忽略 */ }
+    }
+  }
+
+  /**
    * 打开菜单（对外 API，保留旧接口）
    */
   function openMenu() {
@@ -336,6 +353,23 @@
   }
 
   /**
+   * 触摸是否发生在「右下角浮动按钮」上（#theme-switcher：主题切换 / 返回顶部，且可拖动）
+   *
+   * 为什么必须排除：这个按钮自己消费横向手势（按住往右拖是挪位置），
+   * 而抽屉手势是「正文任意位置起手、按方向判定」——不排除的话，
+   * 在按钮上往右拖会同时被判成抽屉手势，一拖就把菜单拉出来（2026-09 实测问题）。
+   * 只认这一个元素，其余区域（包括菜单里的按钮）照旧。
+   */
+  function isInsideFloatingButton(node) {
+    var el = node;
+    while (el && el !== document) {
+      if (el.id === 'theme-switcher') return true;
+      el = el.parentNode;
+    }
+    return false;
+  }
+
+  /**
    * 触摸开始：正文任意位置都能起手拉抽屉（和主题老行为一致，只按方向判定，
    * 不限定左边缘）；打开态同样是任意位置都能拖动收回
    */
@@ -349,6 +383,8 @@
 
     // 唯一不参与的区域：自身要消费横向手势的横向滚动容器（图片轮播 / 横向表格 / 代码块）
     if (isInsideHorizontalScroller(e.target)) return;
+    // 右下角浮动按钮同样不参与：它自己处理横向拖动（见 isInsideFloatingButton 注释）
+    if (isInsideFloatingButton(e.target)) return;
 
     menuWidth = measureMenuWidth();
     if (!menuWidth) return;
@@ -394,7 +430,7 @@
         return;
       }
       // 拖动状态挂在 body 上：CSS 里既要管 .book-page/.book-menu，
-      // 也要管 body 直接子元素 #theme-switcher / #back-to-top 的层级
+      // 也要管 body 直接子元素 #theme-switcher（主题/返回顶部二合一按钮）的层级
       document.body.classList.add('bk-dragging');
     }
     if (axis !== 'x') return;
@@ -512,7 +548,19 @@
     if (ctrl) {
       addSafeListener(ctrl, 'change', function () {
         if (!dragging) clearOffset();
+        /* 抽屉被关掉（点遮罩 / 点菜单按钮）时把焦点摘掉，避免残留蓝色 focus ring */
+        if (!ctrl.checked) blurMenuControl();
       });
+    }
+
+    /* 遮罩：鼠标按下时不抢焦点（focus ring 就不会出现）。
+       不 preventDefault 的话，点击的默认行为会先给 label/checkbox 聚焦；
+       touch 端由上面的 change 回调兜底。 */
+    var overlay = document.querySelector ? document.querySelector('.book-menu-overlay') : null;
+    if (overlay) {
+      addSafeListener(overlay, 'mousedown', function (e) {
+        if (e.cancelable !== false) e.preventDefault();
+      }, { passive: false });
     }
 
     // 视口变化（横竖屏切换 / 键盘弹出）后残留的 px 位移会和新宽度对不上，直接清掉
@@ -532,7 +580,8 @@
     init: init,
     isMobile: isMobile,
     openMenu: openMenu,
-    closeMenu: closeMenu
+    closeMenu: closeMenu,
+    blurMenuControl: blurMenuControl
   };
 
 })(window);

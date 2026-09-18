@@ -1,5 +1,5 @@
 ---
-title: "饥荒 - 手游联机版"
+title: "手游 - 联机版"
 weight: 2
 bookCollapseSection: true
 bookIcon: dst_icon.webp

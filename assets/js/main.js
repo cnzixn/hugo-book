@@ -33,14 +33,13 @@
     }
 
     wrapInit('Gesture', window.Gesture);
+    /* 右下角多功能按钮：主题切换 + 返回顶部（原 BackToTop 模块已合并进来） */
     wrapInit('ThemeSwitcher', window.ThemeSwitcher);
-    wrapInit('BackToTop', window.BackToTop);
 
     // 按钮悬停样式（通过 JS 添加类，避免依赖 custom.css 中的选择器）
     var style = document.createElement('style');
     style.textContent = [
-      '#theme-switcher:hover,',
-      '#back-to-top:hover {',
+      '#theme-switcher:hover {',
       '  border-color: var(--primary) !important;',
       '  background: var(--entry) !important;',
       '}'

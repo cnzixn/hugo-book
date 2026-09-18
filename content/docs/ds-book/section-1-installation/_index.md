@@ -13,7 +13,7 @@ bookCollapseSection: false
 ## 安装步骤
 -----
 
-> [!TIP]
+> [!WARNING]
 > - 安卓玩家请使用 `MT管理器` 签名并安装 `apk` 安装包。  
 > - 苹果玩家请搜索“TrollStore ”、“LiveContainer”相关教程。  
 

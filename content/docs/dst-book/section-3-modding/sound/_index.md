@@ -10,7 +10,9 @@ aliases:
 
 官方的 Don't Starve Mod Tools ，在“库”里面能搜到。
 
-`D:\Program\steam\steamapps\common\Don't Starve Mod Tools\mod_tools\FMOD_Designer`
+```plaintext
+D:\Program\steam\steamapps\common\Don't Starve Mod Tools\mod_tools\FMOD_Designer
+```
 
 
 ### 手机版

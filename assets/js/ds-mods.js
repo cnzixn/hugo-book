@@ -5,6 +5,11 @@
  *
  * 分页渲染：每次只渲染当前页数据，底部提供页码导航；
  * 不再使用“瀑布流”（滚动到哨兵自动追加加载）。
+ *
+ * 命名约定（重要）：
+ *   代码里叫 subs / 订阅数（Steam 的 subscriptions 字段），
+ *   但**页面上一律对外显示为「热度」**（图标下方数字、title、排序按钮提示都不写「订阅」），
+ *   避免不必要的麻烦。新增文案时请沿用「热度」这个说法。
  */
 (function (global) {
   'use strict';
@@ -15,14 +20,14 @@
 
   /**
    * 排序方式（localStorage 持久化），联机版只有两种，方向固定、不单独切换：
-   *   'name'      → 正序 · 名称：就是原来的按 ID 排序（ID 小到大），「名称」只是显示叫法
-   *   'downloads' → 倒序 · 下载：Steam 当前订阅数高到低
+   *   'name' → 正序 · 名称：就是原来的按 ID 排序（ID 小到大），「名称」只是显示叫法
+   *   'subs' → 倒序 · 热度：按 subs 字段（Steam 当前订阅数）从高到低
    * 单按钮点一下在两者之间来回切，按钮上的箭头图标表示正序/倒序。
-   * 兼容旧值：以前存过 'asc' / 'desc' / 'id'，统一当作 'name'。
+   * 兼容旧值：'asc' / 'desc' / 'id' 当作 'name'；早期存过的 'downloads' 当作 'subs'。
    */
   var DEFAULT_SORT_MODE = 'name';
-  var SORT_MODE_LABEL = { name: '名称', downloads: '订阅' };
-  var SORT_DEFAULT_DIR = { name: 'asc', downloads: 'desc' };
+  var SORT_MODE_LABEL = { name: '名称', subs: '热度' };
+  var SORT_DEFAULT_DIR = { name: 'asc', subs: 'desc' };
 
   /* ---- 网盘相关常量 ---- */
   var DISK_ORDER = ['baidu', 'xunlei', 'quark'];
@@ -51,17 +56,20 @@
 
   /**
    * 读取排序方式：缺失/脏数据一律退回 'name'（正序名称）。
-   * 兼容旧值 'asc'/'desc'/'id' 与过渡期的 {"mode":..,"dir":..} 对象。
+   * 兼容旧值：'asc'/'desc'/'id' → 'name'；'downloads'（旧名字）→ 'subs'；
+   * 以及过渡期的 {"mode":..,"dir":..} 对象。
    */
   function loadSortMode() {
     var raw = getStorageItem(STORAGE_SORT_KEY);
     if (!raw) return DEFAULT_SORT_MODE;
     if (raw === 'asc' || raw === 'desc' || raw === 'id') return 'name';
+    if (raw === 'downloads') return 'subs';
     try {
       var parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
         if (SORT_MODE_LABEL[parsed.mode]) return parsed.mode;
         if (parsed.mode === 'id') return 'name';
+        if (parsed.mode === 'downloads') return 'subs';
       }
     } catch (e) { /* 脏数据 → 默认 */ }
     return SORT_MODE_LABEL[raw] ? raw : DEFAULT_SORT_MODE;
@@ -72,8 +80,9 @@
   }
 
   /**
-   * 订阅数格式化：10327254 → 1032.7万；152000000 → 1.52亿
+   * 热度数字格式化：10327254 → 1032.7万；152000000 → 1.52亿
    * 与站内其它位置的「万/亿」记法保持一致，这里只用于展示，排序仍用原始数值。
+   * （数据字段是 Steam 的 subscriptions → 代码里叫 subs「订阅数」，页面上一律显示「热度」）
    */
   function formatSubsCount(value) {
     var num = typeof value === 'number' ? value : parseInt(value, 10);
@@ -205,8 +214,8 @@
   }
 
   /**
-   * 订阅数（Steam 当前订阅数）：0 / 缺失（已下架条目）直接不渲染。
-   * 显示成「12.3万」这种缩写，放在模组图标正下方的小字里；完整数字进 title。
+   * 热度数字（数据来自 Steam subscriptions）：0 / 缺失（已下架条目）直接不渲染。
+   * 显示成「12.3万」这种缩写，放在模组图标正下方的小字里；完整数字进 title（写成「热度 <数字>」）。
    */
   function buildSubsText(subs) {
     var num = typeof subs === 'number' ? subs : parseInt(subs, 10);
@@ -255,9 +264,10 @@
     var site = getSiteOrigin();
     var tagsHtml = buildTagsHtml(mod.tags);
     var on = cfg.panEnabled || panEnabled;
-    // 订阅数只在本页开启排序时展示（单机版没有该字段，不渲染空文字）
+    /* 订阅数只在本页开启排序时展示（单机版没有该字段，不渲染空文字）。
+       title 里对外统一叫「热度」，不写「订阅」——避免不必要的麻烦（见文件顶部命名约定）。 */
     var subsText = cfg.subs ? buildSubsText(mod.subs) : '';
-    var subsTitle = subsText ? '当前订阅数 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
+    var subsTitle = subsText ? '热度 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
 
     // 逐个网盘生成下载按钮；总开关关闭的网盘整条不渲染（连"暂无"灰按钮也不留）
     var actions = '';
@@ -279,7 +289,8 @@
               '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
                 '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
               '</button>' +
-              /* 订阅数缩写成「12.3万」，放在图标正下方 */
+              /* 热度缩写成「12.3万」：浮在图片左下角（绝对定位，不占位，
+                 这样图片才能一直顶到卡片的上/左/下三边） */
               (subsText ? '<span class="item-subs" title="' + subsTitle + '">' + subsText + '</span>' : '') +
             '</div>' +
             '<div class="mod-name" role="link" tabindex="0" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=\'' + site + '/p/' + mod.id + '\'}">' +
@@ -700,14 +711,19 @@
     var header = document.getElementById('mods-header');
     var searchInput = document.getElementById('mod-search');
     var showCountEl = document.getElementById('show-count');
+    /* 本页条数：showCountEl 是「符合条件总数」，这个才是当前页实际条数 */
+    var pageCountEl = document.getElementById('show-count-page');
+    /* 计数容器：有搜索词时给它加 .has-query，用于显示「本页」前缀 */
+    var countBoxEl = document.querySelector('.sort-count');
     if (!modsList || !pager || !searchInput || !showCountEl) return;
 
     // 订阅数功能（列表展示 +「↓ 下载」排序）只在数据侧给了 subs 的页面（联机版）提供；
     // 没有该开关时始终按 ID，沿用单机版原来的正序/倒序按钮
     var hasSubs = !!cfg.subs;
 
-    // 排序按钮：联机版只有 #sort-mode（在「名称 / 下载」之间切换，方向各自固定）；
-    // 单机版没有 #sort-mode，用原来的 #sort-toggle（正序/倒序）。
+    // 排序按钮：两个模组页各有一个，外观统一（.sort-gray-btn 灰框），只是文案与行为不同
+    //   #sort-mode   → 联机版：「名称 / 下载」两态切换（有订阅数数据时才有意义）
+    //   #sort-toggle → 单机版：「正序 / 倒序」切换（按 ID 排）
     var sortModeBtn = hasSubs ? document.getElementById('sort-mode') : null;
     if (hasSubs && !sortModeBtn) return;
 
@@ -731,8 +747,19 @@
       return Math.ceil(filteredMods.length / PAGE_SIZE);
     }
 
+    /**
+     * 计数口径（工具栏「本页 N / 共 M 个模组」）：
+     *   本页条数 = 当前这一页实际渲染的条数（翻页会变，最后一页可能不足 PAGE_SIZE）
+     *   总数     = 符合当前搜索条件的模组数（跨页合计；无搜索时即全部模组数）
+     * 两个数字分别由 renderList / applyFilter 驱动写入，元素缺失时静默跳过（兼容旧页面）。
+     */
     function updateShowCount() {
-      showCountEl.textContent = filteredMods.length;
+      if (showCountEl) showCountEl.textContent = filteredMods.length;
+    }
+
+    function updatePageCount(pageCount) {
+      if (!pageCountEl) return;
+      pageCountEl.textContent = pageCount;
     }
 
     function clampPage(page) {
@@ -748,6 +775,7 @@
       var pages = totalPages();
       if (pages === 0) {
         modsList.innerHTML = '<div class="mods-empty">未找到匹配的模组，试试其他关键词</div>';
+        updatePageCount(0);
         renderPager();
         return;
       }
@@ -756,6 +784,7 @@
       var start = (currentPage - 1) * PAGE_SIZE;
       var pageMods = filteredMods.slice(start, start + PAGE_SIZE);
       modsList.innerHTML = mapJoin(pageMods, function (m) { return buildModItem(m, cfg); });
+      updatePageCount(pageMods.length);
       renderPager();
     }
 
@@ -796,10 +825,11 @@
         pager.style.display = 'none';
         return;
       }
-      var html = '<span class="pager-info">第 ' + currentPage + ' / ' + pages + ' 页</span>';
+      var html = '';
+      // html += '<span class="pager-info">第 ' + currentPage + ' / ' + pages + ' 页</span>';
 
       html += '<button type="button" class="pager-btn pager-prev" data-page="' + (currentPage - 1) + '"' +
-        (currentPage <= 1 ? ' disabled' : '') + '>‹ 上一页</button>';
+        ' title="上一页" aria-label="上一页"' + (currentPage <= 1 ? ' disabled' : '') + '>‹</button>';
 
       var items = pagerItems(currentPage, pages);
       for (var i = 0; i < items.length; i++) {
@@ -811,7 +841,7 @@
       }
 
       html += '<button type="button" class="pager-btn pager-next" data-page="' + (currentPage + 1) + '"' +
-        (currentPage >= pages ? ' disabled' : '') + '>下一页 ›</button>';
+        ' title="下一页" aria-label="下一页"' + (currentPage >= pages ? ' disabled' : '') + '>›</button>';
 
       pager.innerHTML = html;
       pager.style.display = '';
@@ -841,6 +871,8 @@
     /* ---------- 搜索 & 排序 ---------- */
     function applyFilter() {
       var kw = (searchInput.value || '').trim().toLowerCase();
+      /* 有搜索词时计数前缀「本页」才有意义（本页 < 命中总数）；无搜索时只报总数 */
+      if (countBoxEl) countBoxEl.classList.toggle('has-query', !!kw);
       if (!kw) {
         filteredMods = cfg.searchOnly ? [] : cfg.allMods.slice();
       } else {
@@ -874,8 +906,8 @@
     function applySort() {
       filteredMods.sort(function (a, b) {
         var byId = (a.id || '').localeCompare(b.id || '');
-        if (hasSubs && sortMode === 'downloads') {
-          // （倒序）下载：固定订阅数高到低；数字相同的按 ID 升序兜底，保证分页结果稳定
+        if (hasSubs && sortMode === 'subs') {
+          // （倒序）热度：固定热度（订阅数）高到低；数字相同的按 ID 升序兜底，保证分页结果稳定
           var diff = subsOf(b) - subsOf(a);
           if (diff !== 0) return diff;
           return byId;
@@ -896,46 +928,45 @@
 
     /**
      * 联机版：单个按钮，只有两种排序，点一下来回切：
-     *   ↑ 名称（正序，= 按 ID 小到大） ⇄ ↓ 下载（倒序，Steam 订阅数高到低）
-     * 方向跟着排序走、不单独切换，所以按钮用「朝上/朝下箭头图标」表示正序/倒序。
+     *   ↑ 名称（正序，= 按 ID 小到大） ⇄ ↓ 热度（倒序，subs 高到低）
+     * 箭头是同一个 SVG，倒序时加 .is-flipped 旋转 180°（见 ds-mods.css），
+     * 因此切换时图形与占位完全相同，按钮不会有任何横向抖动。
      */
     function updateSortModeButton() {
-      var iconAsc = sortModeBtn.querySelector('.icon-asc');
-      var iconDesc = sortModeBtn.querySelector('.icon-desc');
+      var arrow = sortModeBtn.querySelector('.sort-arrow');
       var modeLabel = sortModeBtn.querySelector('.sort-mode-label');
-      var isDownloads = sortMode === 'downloads';
+      var isSubsSort = sortMode === 'subs';
       if (modeLabel) modeLabel.textContent = SORT_MODE_LABEL[sortMode] || SORT_MODE_LABEL.name;
-      // 倒序 = 图标朝下，正序 = 图标朝上
-      if (iconAsc) iconAsc.style.display = isDownloads ? 'none' : 'inline-block';
-      if (iconDesc) iconDesc.style.display = isDownloads ? 'inline-block' : 'none';
-      sortModeBtn.classList.toggle('is-active', isDownloads);
+      // 倒序 = 箭头翻过来朝下，正序 = 朝上
+      if (arrow) arrow.classList.toggle('is-flipped', isSubsSort);
+      sortModeBtn.classList.toggle('is-active', isSubsSort);
       sortModeBtn.setAttribute('data-mode', sortMode);
       sortModeBtn.setAttribute('data-dir', dirOfMode(sortMode));
-      sortModeBtn.setAttribute('aria-pressed', isDownloads ? 'true' : 'false');
-      sortModeBtn.setAttribute('title', isDownloads
-        ? '当前：倒序 · 订阅（高到低）'
-        : '当前：正序 · 名称（小到大）');
+      sortModeBtn.setAttribute('aria-pressed', isSubsSort ? 'true' : 'false');
+      sortModeBtn.setAttribute('title', isSubsSort
+        ? '当前：倒序 · 热度（从高到低），点击切换为正序 · 名称'
+        : '当前：正序 · 名称（ID 小到大），点击切换为倒序 · 热度（从高到低）');
     }
 
-    /** 单机版：沿用原有的正序/倒序按钮外观 */
+    /** 单机版：同样只有两态（正序 / 倒序），按钮外观与联机版一致（.sort-gray-btn） */
     function updateSortDirButton() {
       if (!sortToggleBtn) return;
-      var iconAsc = sortToggleBtn.querySelector('.icon-asc');
-      var iconDesc = sortToggleBtn.querySelector('.icon-desc');
+      var arrow = sortToggleBtn.querySelector('.sort-arrow');
       var label = sortToggleBtn.querySelector('.sort-label');
       var isAsc = sortDir === 'asc';
-      if (iconAsc) iconAsc.style.display = isAsc ? 'inline-block' : 'none';
-      if (iconDesc) iconDesc.style.display = isAsc ? 'none' : 'inline-block';
+      if (arrow) arrow.classList.toggle('is-flipped', !isAsc);
       if (label) label.textContent = isAsc ? '正序' : '倒序';
       sortToggleBtn.setAttribute('data-sort', sortDir);
-      sortToggleBtn.setAttribute('title', '当前' + (isAsc ? '正序' : '倒序') + '，点击切换');
+      sortToggleBtn.setAttribute('title', isAsc
+        ? '当前：正序（ID 小到大），点击切换为倒序'
+        : '当前：倒序（ID 大到小），点击切换为正序');
     }
 
     /* ---------- 事件 ---------- */
     if (sortModeBtn) {
       sortModeBtn.addEventListener('click', function () {
-        // 只有两种排序，来回切：名称（正序） ⇄ 下载（倒序）
-        sortMode = sortMode === 'downloads' ? 'name' : 'downloads';
+        // 只有两种排序，来回切：名称（正序） ⇄ 热度（倒序）
+        sortMode = sortMode === 'subs' ? 'name' : 'subs';
         saveSortMode(sortMode);
         updateSortModeButton();
         applyFilter();

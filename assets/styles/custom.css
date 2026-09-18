@@ -323,12 +323,13 @@ a img.book-icon:not([src$=".svg"]) {
 }
 
 /* ========== 浮动按钮：亮/暗模式写死实色，hover 全锁色 ==========
-   选择器用 #id（元素+ID）比纯 #id 特异性更高，碾压浏览器 UA/任何主题样式
+   选择器用 #id（元素+ID）比纯 #id 特异性更高，碾压浏览器 UA/任何主题样式。
+   右下角现在只有一个悬浮按钮 #theme-switcher（主体是「主题切换 / 返回顶部」二合一，
+   见 assets/js/modules/theme-switcher.js），所以配色规则只需要覆盖它。
    配色方案：亮模式白底深字，暗模式深灰底白字，带 1px 细描边，不突兀 */
 
 /* --- 亮色主题（light）：白底 #fff + 深灰字 #111827 + 浅灰描边 #d1d5db --- */
-:root[data-theme*="light"] #theme-switcher,
-:root[data-theme*="light"] #back-to-top {
+:root[data-theme*="light"] #theme-switcher {
   background: #ffffff !important;
   background-color: #ffffff !important;
   background-image: none !important;
@@ -349,8 +350,7 @@ a img.book-icon:not([src$=".svg"]) {
 }
 
 /* --- 暗色主题（dark）：深灰 #3f3f46 + 白字 #fafafa + 描边 #52525b --- */
-:root[data-theme*="dark"] #theme-switcher,
-:root[data-theme*="dark"] #back-to-top {
+:root[data-theme*="dark"] #theme-switcher {
   background: #3f3f46 !important;
   background-color: #3f3f46 !important;
   background-image: none !important;
@@ -377,11 +377,7 @@ a img.book-icon:not([src$=".svg"]) {
 :root[data-theme*="light"] #theme-switcher:hover,
 :root[data-theme*="light"] #theme-switcher:active,
 :root[data-theme*="light"] #theme-switcher:focus,
-:root[data-theme*="light"] #theme-switcher:focus-visible,
-:root[data-theme*="light"] #back-to-top:hover,
-:root[data-theme*="light"] #back-to-top:active,
-:root[data-theme*="light"] #back-to-top:focus,
-:root[data-theme*="light"] #back-to-top:focus-visible {
+:root[data-theme*="light"] #theme-switcher:focus-visible {
   background: #ffffff !important;
   background-color: #ffffff !important;
   background-image: none !important;
@@ -403,11 +399,7 @@ a img.book-icon:not([src$=".svg"]) {
 :root[data-theme*="dark"] #theme-switcher:hover,
 :root[data-theme*="dark"] #theme-switcher:active,
 :root[data-theme*="dark"] #theme-switcher:focus,
-:root[data-theme*="dark"] #theme-switcher:focus-visible,
-:root[data-theme*="dark"] #back-to-top:hover,
-:root[data-theme*="dark"] #back-to-top:active,
-:root[data-theme*="dark"] #back-to-top:focus,
-:root[data-theme*="dark"] #back-to-top:focus-visible {
+:root[data-theme*="dark"] #theme-switcher:focus-visible {
   background: #3f3f46 !important;
   background-color: #3f3f46 !important;
   background-image: none !important;
@@ -430,23 +422,30 @@ a img.book-icon:not([src$=".svg"]) {
    配色源自用户提供的 GitHub Dark 风格 + GitHub 官方 Primer Design Tokens
    ========================================================================== */
 
-/* github-light（浅色默认） */
+/* github-light（浅色默认）
+   底色：用户改成 #f0f0f2（比纯白柔和，也不再走 GitHub 的偏冷蓝灰）。
+   跟着底色把整套灰阶调成同色相的中性灰，并重算层次（相对亮度比，1.00 = 看不出）：
+     面板  --gray-100 #e4e4e7  与底色 1.11（原 #f6f8fa 在 #f0f0f2 上只有 1.06，浮不起来）
+     描边  --gray-200 #c9c9ce  与底色 1.45（原 #d0d7de 偏蓝、对比也偏弱）
+     弱文字--gray-500 #63636b  对底色 5.2 / **对面板 4.7**（hover 态文字落在面板上，也过 AA 4.5）
+     强调正文--gray-700 #1f2328 与正文色同值
+   正文对底色 13.9、对面板 12.5；链接 #4184c4 对底色 3.5、对面板 3.1（非文本元素 ≥3 达标）。 */
 :root[data-theme="github-light"] {
   color-scheme: light;
 
-  --body-background: #ffffff;
+  --body-background: #f0f0f2;
   --body-font-color: #1f2328;
   --icon-filter: none;
 
   --color-link: #4184c4;
   --color-visited-link: #8250df;
 
-  --gray-100: #f6f8fa;
-  --gray-200: #d0d7de;
-  --gray-500: #656d76;
+  --gray-100: #e4e4e7;
+  --gray-200: #c9c9ce;
+  --gray-500: #63636b;
   --gray-700: #1f2328;
 
-  --color-accent-default:   #656d76;
+  --color-accent-default:   #63636b;
   --color-accent-note:      #0969da;
   --color-accent-tip:       #1a7f37;
   --color-accent-important: #8250df;
@@ -454,23 +453,29 @@ a img.book-icon:not([src$=".svg"]) {
   --color-accent-caution:   #cf222e;
 }
 
-/* github-dark */
+/* github-dark
+   底色：用户改成 #1b1c1e（比 #0d1117 中性、略亮一点）。灰阶同步调中性并补层次：
+     面板  --gray-100 #26272b  与底色 1.14
+     描边  --gray-200 #383a3f  与底色 1.50
+     弱文字--gray-500 #a2a3aa  对底色 6.8 / 对面板 5.9
+     正文  --body-font-color #dcdce0 对底色 12.5、对面板 10.9；
+     强调 --gray-700 与正文同值；链接 #79aede 对底色 7.3、对面板 6.3。 */
 :root[data-theme="github-dark"] {
   color-scheme: dark;
 
-  --body-background: #0d1117;
-  --body-font-color: #c9d1d9;
+  --body-background: #1b1c1e;
+  --body-font-color: #dcdce0;
   --icon-filter: brightness(0) invert(1);
 
   --color-link: #79aede;
   --color-visited-link: #a371f7;
 
-  --gray-100: #161b22;
-  --gray-200: #30363d;
-  --gray-500: #8b949e;
-  --gray-700: #c9d1d9;
+  --gray-100: #26272b;
+  --gray-200: #383a3f;
+  --gray-500: #a2a3aa;
+  --gray-700: #dcdce0;
 
-  --color-accent-default:   #8b949e;
+  --color-accent-default:   #a2a3aa;
   --color-accent-note:      #58a6ff;
   --color-accent-tip:       #2ea043;
   --color-accent-important: #a371f7;
@@ -604,6 +609,8 @@ a img.book-icon:not([src$=".svg"]) {
   display: block;
 }
 
+
+
 /* ========== block 修饰的按钮（button shortcode 加 class="btn-block"） ========== */
 /* 撑满内容区宽度，图标文字水平居中；特异性高于主题 a.book-btn[href] 规则 */
 a.book-btn.btn-block[href] {
@@ -656,6 +663,34 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
   box-sizing: border-box;
 }
 .btn-row a.book-btn[href] > * + * { margin-left: 6px; }
+
+/* ========== button 短代码（a.book-btn）配色：蓝色边框 + 灰色文字 ==========
+   主题里生效的那条规则选择器是 `.markdown a.book-btn[href]`（特异性 0,3,1），
+   只写 `a.book-btn[href]`（0,2,1）是**盖不住**它的 —— 必须同样带上 .markdown 前缀。
+   配色：描边保持主题的 --color-link（亮色 #4184c4 / 暗色 #79aede 蓝），
+         文字用弱化灰 --gray-500（亮 #656d76 / 暗 #8b949e）——正文色配蓝框太扎眼，
+         灰字与蓝框的对比度更协调。
+   hover/focus 文字加深到正文色，描边维持蓝色。 */
+.markdown a.book-btn[href] {
+  color: var(--gray-500);
+}
+
+.markdown a.book-btn[href]:hover,
+.markdown a.book-btn[href]:focus,
+.markdown a.book-btn[href]:focus-visible {
+  color: var(--body-font-color);
+  /* 显式写回蓝色描边：主题的 .markdown a[href]:hover 会把 border-color 改成蓝，
+     这里保留同一取值，避免以后误加灰框规则把它顶掉 */
+  border-color: var(--color-link);
+  text-decoration: none;
+}
+
+/* 心形图标单独上红色（其余文字保持灰度） */
+a.book-btn.btn-sponsor[href] .book-sponsor-icon {
+  width: 1em;
+  height: 1em;
+  color: var(--color-accent-caution, #cf222e);
+}
 
 /* ========== 图片轮播组件（gallery shortcode） ========== */
 .book-gallery {
@@ -828,7 +863,7 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
      不掐掉会出现横向滚动条、还能把整页拖偏。
      掐在 main 上而不是 html/body 上：溢出源就在 main 内部，裁掉这一层就不会往上传播，
      同时避免给根元素加 overflow —— 旧 iOS 上根元素带 overflow 时 position:fixed
-     元素的行为会变得不可靠（本站 #theme-switcher / #back-to-top 都靠 fixed 贴屏）。 */
+     元素的行为会变得不可靠（本站 #theme-switcher 靠 fixed 贴屏）。 */
   main.container.flex {
     --bk-drawer: 0px;
     --bk-drawer-progress: 0;
@@ -955,13 +990,24 @@ a.book-btn.btn-block[href] > * + * { margin-left: 6px; }
     pointer-events: auto;
   }
 
-  /* —— 右下角悬浮按钮（#theme-switcher / #back-to-top，JS 内联 z-index:9998/9999 的
+  /* 点遮罩关菜单时，它本身是个 <label for="menu-control">，Safari 会把 label 当成可聚焦元素，
+     点完就留下系统默认的蓝色 focus ring；部分浏览器还有蓝色 tap highlight。
+     这里统一抹掉（遮罩没有可见焦点指示的必要，键盘用户走的是菜单按钮/链接）。 */
+  .book-menu-overlay,
+  .book-menu-overlay:focus,
+  .book-menu-overlay:focus-visible,
+  .book-menu-overlay:active {
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    box-shadow: none !important;
+  }
+
+  /* —— 右下角多功能悬浮按钮（#theme-switcher：主题 / 返回顶部，JS 内联 z-index:9999 的
      body 直接子元素）：抽屉打开或拖动中压到遮罩(20)之下，跟着背景一起"让位"。
-     不压的话它们会浮在遮罩上、还能被点到，和抽屉的层级关系就乱了 —— */
+     不压的话它会浮在遮罩上、还能被点到，和抽屉的层级关系就乱了 —— */
   #menu-control:checked ~ #theme-switcher,
-  #menu-control:checked ~ #back-to-top,
-  body.bk-dragging #theme-switcher,
-  body.bk-dragging #back-to-top {
+  body.bk-dragging #theme-switcher {
     z-index: 15 !important;
   }
 
@@ -1144,6 +1190,28 @@ h1.book-article-title {
   font-weight: 600;
   line-height: 1.25;
   margin: 0 0 var(--space-16);
+}
+
+/* ==========================================================================
+   引用块（markdown 的 > ）
+   主题里 blockquote 只有左侧 4px 竖条 + 圆角、**没有背景色**，而页面底色本身已是微灰
+   （--body-background），于是普通引用和正文段落几乎没区别。这里只补背景，不动竖条。
+
+   注意（踩过两次坑）：
+   1. 普通 `> 引用` 会被主题的 blockquote 渲染钩子变成 <blockquote class="book-hint">，
+      所以要给「无类型」的引用补底色，必须带上 .book-hint 才盖得住主题的
+      `.markdown .book-hint{background-color:color-mix(...)}`（同为 (0,2,0)，靠后者胜）。
+   2. 但 note / tip / important / warning / caution / info / success / danger / default
+      这些**带类型**的提示框必须原样保留语义色！所以用 :not() 把它们排除在外
+      —— 之前没排除，等于把所有提示框都刷成灰底，把颜色顶掉了。
+   3. 竖条（border-inline-start-color / border-color）一律不碰：
+      主题的 `.markdown .book-hint{border-color:var(--accent-color)}` 自带语义色，
+      连无类型引用也因此有一条中性色竖条，保持原样即可。
+   ========================================================================== */
+.markdown blockquote:not(.note):not(.tip):not(.important):not(.warning):not(.caution):not(.info):not(.success):not(.danger):not(.default),
+.markdown blockquote.book-hint:not(.note):not(.tip):not(.important):not(.warning):not(.caution):not(.info):not(.success):not(.danger):not(.default) {
+  background: var(--gray-100);
+  background-color: var(--gray-100);
 }
 
 /* ==========================================================================
@@ -1342,24 +1410,8 @@ h1.book-article-title {
 }
 
 /* ---------- 位置三：首页 hero 区（两个版本按钮下方）的赞助按钮 ---------- */
-/* 走站内普通描边按钮的样式（与"手游-单机版/联机版"同族），只有心是红的 */
-a.book-btn.btn-sponsor[href] {
-  color: var(--gray-500);
-}
-
-a.book-btn.btn-sponsor[href]:hover,
-a.book-btn.btn-sponsor[href]:focus,
-a.book-btn.btn-sponsor[href]:focus-visible {
-  color: var(--body-font-color);
-  text-decoration: none;
-}
-
-a.book-btn.btn-sponsor[href] .book-sponsor-icon {
-  width: 1em;
-  height: 1em;
-  color: var(--color-accent-caution, #cf222e);
-}
-
+/* 文字配色/悬停已由上面通用的 a.book-btn[href] 规则统一处理（灰度文字），
+   这里只把心形图标单独上红色（图标规则见上方「描边按钮的文字配色」小节）。 */
 a.book-btn.btn-sponsor[href] .book-sponsor-icon svg {
   width: 100%;
   height: 100%;
