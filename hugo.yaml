@@ -139,8 +139,8 @@ params:
   # 注意：后端 /ds/api/pan 已同时收录「联机版(dst)」与「单机版(ds)」的记录
   #       （dst: WS…/游戏/LocalSend；ds: BM…/WS_…），故两版模组列表均走 modal。
   #       游戏下载页(ds-pans/dst-pans)固定为直链展示，不在弹框范围内。
-  dsPanMode: "modal"      # 单机版：模组列表(ds-mods) 走当前页邮箱弹框
-  dstPanMode: "modal"     # 联机版：模组列表(dst-mods) 走当前页邮箱弹框
+  dsPanMode: "direct"      # 单机版：模组列表(ds-mods) 走当前页邮箱弹框
+  dstPanMode: "direct"     # 联机版：模组列表(dst-mods) 走当前页邮箱弹框
 
   # ------- 网盘总开关（3 个：分别控制是否启用对应网盘） -------
   # true / 未配置（默认）= 启用；false = 整站关闭该网盘的所有入口：
