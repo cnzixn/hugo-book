@@ -2,6 +2,10 @@ baseURL: https://bxq.me/
 title: 饥荒模组手册
 theme: hugo-book
 
+# 生成 /robots.txt（模板在 layouts/robots.txt：全站放行 + 显式放行 AdSense 的
+# Mediapartners-Google 抓取器 + 声明 sitemap 地址）。默认为 false，不打开就没有这个文件。
+enableRobotsTXT: true
+
 # 站点默认语言：中文（影响 <html lang>、界面文案、搜索索引语言）
 defaultContentLanguage: zh
 languageCode: zh-cn
@@ -133,21 +137,24 @@ params:
   BookSponsorLabel: " "
 
   # ------- 网盘直链策略（下载入口模式） -------
+  # 只影响「点击下载按钮之后的交互」，不影响数据格式：
+  #   两种模式下 /ds-mods.json、/dst-mods.json 都只写分享段（slug/pwd），
+  #   不含域名、不含完整链接；直链一律由前端用 params.panHosts 现拼（防抓取）。
   # modal  = 模组列表点击「下载」在当前页面弹框：输入/校验注册邮箱(记 localStorage)，
-  #          通过后用新标签页打开真实网盘直链。静态页/JSON 不内嵌真实直链（防抓取）。
-  # direct = 旧行为：直接把网盘直链写进页面/JSON，点击新标签打开。
+  #          通过后用新标签页打开后端下发的网盘链接（同样会过一遍 /s/ 规范化）
+  # direct = 点击下载按钮直接新标签打开（地址由 JS 用 slug + panHosts 现拼）
   # 注意：后端 /ds/api/pan 已同时收录「联机版(dst)」与「单机版(ds)」的记录
-  #       （dst: WS…/游戏/LocalSend；ds: BM…/WS_…），故两版模组列表均走 modal。
+  #       （dst: WS…/游戏/LocalSend；ds: BM…/WS_…），故两版模组列表均可走 modal。
   #       游戏下载页(ds-pans/dst-pans)固定为直链展示，不在弹框范围内。
-  dsPanMode: "direct"      # 单机版：模组列表(ds-mods) 走当前页邮箱弹框
-  dstPanMode: "direct"     # 联机版：模组列表(dst-mods) 走当前页邮箱弹框
+  dsPanMode: "direct"      # 单机版：模组列表(ds-mods)
+  dstPanMode: "direct"     # 联机版：模组列表(dst-mods)
 
   # ------- 网盘总开关（3 个：分别控制是否启用对应网盘） -------
   # true / 未配置（默认）= 启用；false = 整站关闭该网盘的所有入口：
   #   - 模组列表(ds-mods/dst-mods)的下载按钮：关闭后连"暂无"灰按钮都不渲染
   #   - 网盘下载弹框：不再提供该网盘选项（也不使用后端返回的该网盘链接）
   #   - 游戏下载页(ds-pans/dst-pans)：不再渲染该网盘标签页
-  #   - direct 模式：不会把该网盘真实直链写进 /ds-mods.json 等数据文件
+  #   - 模组列表 JSON：该网盘的 slug/pwd 不写入（按钮也不渲染）
   # 注意：只能显式写 true / false（写成字符串 "false" 同样按关闭处理）
   panBaiduEnabled: true    # 百度网盘
   panXunleiEnabled: false   # 迅雷网盘

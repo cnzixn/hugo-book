@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 史诗血条（Epic Healthbar）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 为战斗界面增加风格化的首领血条组件，提供当前首领的更多战斗信息。
 

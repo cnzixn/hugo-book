@@ -1,11 +1,16 @@
 {{/*
   dst-mods shortcode：饥荒联机版模组列表（复用 ds-mods 抽离的 JS/CSS）
   用法：{{< dst-mods >}}
+
+  【网盘链接规范化】
+  - 分享链接只保留「/s/」之后的分享段（layouts/_partials/docs/pan-url.html），前缀一律丢弃
+  - JSON 里任何模式都只写 slug + pwd（不含域名、不含完整链接，域名由 data-pan-hosts 注入），
+    直链一律由 JS 用 params.panHosts 现拼；panMode 只决定点击下载后是弹框校验还是直接打开
 */}}
 
 {{- $panData := index hugo.Data "dst_pan" -}}
 {{- $currentDate := now.Format "20060102" -}}
-{{- /* 网盘链接策略：modal(默认)=不内嵌直链，点击下载在当前页弹框校验邮箱后新标签打开；direct=旧行为直链 */ -}}
+{{- /* 网盘链接策略：modal=点击下载在当前页弹框校验邮箱后新标签打开；direct=直接新标签打开 */ -}}
 {{- $panMode := $.Site.Params.dstPanMode | default "modal" -}}
 {{- /* 网盘总开关（params.panBaiduEnabled / panXunleiEnabled / panQuarkEnabled） */ -}}
 {{- $panSw := partial "docs/pan-switches.html" . -}}
@@ -17,6 +22,9 @@
 {{- range $id, $itemData := $panData -}}
   {{- if (findRE `^WS\d{6,20}$` (upper $id)) -}}
     {{- $wsCount = add $wsCount 1 -}}
+    {{- /* data 记录形如「单键 dict 的数组」：[{name: …}, {url1: …}, …]，
+           且允许整条缺 url2 之类的字段；where 过滤掉缺字段的记录后再取第一条，
+           没有就得到 nil，交给 pan-url.html 按「无链接」处理（不用 .Get：记录是 slice 不是 map） */ -}}
     {{- $name := index (where $itemData "name" "!=" nil) 0 "name" | default "未知" -}}
     {{- $size := index (where $itemData "size" "!=" nil) 0 "size" -}}
     {{- /* size 为 0 / 0B（没量到文件大小）时按空处理，列表里不显示「(0)」 */ -}}
@@ -27,23 +35,28 @@
     {{- $subs := index (where $itemData "subs" "ne" nil) 0 "subs" | default 0 -}}
     {{- if not (findRE `^\d+$` (printf "%v" $subs)) -}}{{- $subs = 0 -}}{{- end -}}
     {{- $subs = int $subs -}}
-    {{- $baiduUrl := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
-    {{- $xunleiUrl := index (where $itemData "url2" "ne" nil) 0 "url2" -}}
-    {{- $quarkUrl := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
-    {{- /* 总开关关闭的网盘：先清空 url → 下面 has* 判定自然为 false（按钮不渲染，direct 模式也不写进 JSON） */ -}}
-    {{- if not $panSw.baidu -}}{{- $baiduUrl = "" -}}{{- end -}}
-    {{- if not $panSw.xunlei -}}{{- $xunleiUrl = "" -}}{{- end -}}
-    {{- if not $panSw.quark -}}{{- $quarkUrl = "" -}}{{- end -}}
-    {{- $hasBaidu := gt (len (findRE `^https://pan\.baidu\.com/s/` $baiduUrl)) 0 -}}
-    {{- $hasXunlei := gt (len (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl)) 0 -}}
-    {{- $hasQuark := gt (len (findRE `^https://pan\.quark\.cn/s/` $quarkUrl)) 0 -}}
-    {{- $item := dict "id" $id "name" $name "size" $size "tags" $tags "subs" $subs "hasBaidu" $hasBaidu "hasXunlei" $hasXunlei "hasQuark" $hasQuark -}}
-    {{- if eq $panMode "direct" -}}
-      {{- /* 直链模式才把真实 url 写进 JSON（原代码保留，切回 direct 即恢复） */ -}}
-      {{- if not (findRE `^https://pan\.baidu\.com/s/` $baiduUrl) -}}{{- $baiduUrl = "" -}}{{- end -}}
-      {{- if not (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl) -}}{{- $xunleiUrl = "" -}}{{- end -}}
-      {{- if not (findRE `^https://pan\.quark\.cn/s/` $quarkUrl) -}}{{- $quarkUrl = "" -}}{{- end -}}
-      {{- $item = merge $item (dict "baiduUrl" $baiduUrl "xunleiUrl" $xunleiUrl "quarkUrl" $quarkUrl) -}}
+    {{- $baiduRaw := index (where $itemData "url1" "ne" nil) 0 "url1" -}}
+    {{- $xunleiRaw := index (where $itemData "url2" "ne" nil) 0 "url2" -}}
+    {{- $quarkRaw := index (where $itemData "url3" "ne" nil) 0 "url3" -}}
+    {{/* 网盘链接统一规范化：只保留「/s/」之后的分享段，用官方域名重建短链（data 源里的前缀一律丢弃）
+        返回：url=规范短链 / slug=分享段 / pwd=提取码；总开关关闭的网盘按「无链接」处理 */}}
+    {{- $diskKey := dict "baidu" "b" "xunlei" "x" "quark" "q" -}}
+    {{- $shares := dict -}}
+    {{- range $k, $raw := (dict "baidu" $baiduRaw "xunlei" $xunleiRaw "quark" $quarkRaw) -}}
+      {{- $pan := partial "docs/pan-url.html" (dict "url" $raw "site" $.Site) -}}
+      {{- if and $pan.ok (index $panSw $k) -}}
+        {{- $short := index $diskKey $k -}}
+        {{- $shares = merge $shares (dict (printf "%sSlug" $short) $pan.slug (printf "%sPwd" $short) $pan.pwd) -}}
+      {{- end -}}
+    {{- end -}}
+    {{/* JSON 只写分享段，且网盘名缩写成单字母（省字节）：b=百度 x=迅雷 q=夸克 → bSlug/bPwd…
+       任何模式（含 direct）都不含域名、不含完整链接，直链一律由前端用 data-pan-hosts 注入的官方域名现拼
+       （见 assets/js/ds-mods.js 的 buildPanUrl）；有没有链接看 xxSlug 是否为空，不再写 hasXxx 标记。
+       某网盘没有分享段时该键直接不写（不再是 null） */ -}}
+    {{- $item := merge (dict "id" $id "name" $name "size" $size "tags" $tags "subs" $subs) $shares -}}
+    {{- /* 详情页地址：没有详情页就完全不写 u，前端据此把卡片做成不可点击 */ -}}
+    {{- with $.Site.GetPage (printf "/docs/dst-book/section-2-resources/mods/%s" $id) -}}
+      {{- $item = merge $item (dict "u" .RelPermalink) -}}
     {{- end -}}
     {{- $wsItems = $wsItems | append $item -}}
   {{- end -}}
@@ -102,6 +115,7 @@
         data-current-date="{{ $currentDate }}"
         data-sort-downloads="true"
         data-pan-mode="{{ $panMode }}"
+        data-pan-hosts="{{ $panSw.hosts | jsonify }}"
         data-pan-baidu-enabled="{{ $panSw.baidu }}"
         data-pan-xunlei-enabled="{{ $panSw.xunlei }}"
         data-pan-quark-enabled="{{ $panSw.quark }}"

@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 建筑对齐增强（Structure Alignment Pro）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 由 Structure Alignment Plus 大幅重构而来，为的是更好的连贯性与可扩展性，后续还会加入更多功能。
 

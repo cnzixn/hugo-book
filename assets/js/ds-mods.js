@@ -32,6 +32,12 @@
   /* ---- 网盘相关常量 ---- */
   var DISK_ORDER = ['baidu', 'xunlei', 'quark'];
   var DISK_LABEL = { baidu: '百度网盘', xunlei: '迅雷网盘', quark: '夸克网盘' };
+  /**
+   * JSON 里的字段前缀：网盘名缩写成单字母，省数据体积
+   *   b=百度  x=迅雷  q=夸克  →  bSlug/bPwd、xSlug/xPwd、qSlug/qPwd
+   * 只影响 JSON 字段名；代码里其它地方（开关、域名表、图标、CSS 类）仍用全名 baidu/xunlei/quark。
+   */
+  var DISK_KEY = { baidu: 'b', xunlei: 'x', quark: 'q' };
   var DISK_ICON = {
     baidu: '/img/icons/pan_baidu.webp',
     xunlei: '/img/icons/pan_xunlei.webp',
@@ -43,6 +49,91 @@
    * 由 loadConfig() 读 #mods-data 的 data-pan-*-enabled 覆盖（缺失时默认全开）。
    */
   var panEnabled = { baidu: true, xunlei: true, quark: true };
+  /**
+   * 网盘官方域名表（hugo.yaml → params.panHosts，由 shortcode 注入 #mods-data 的 data-pan-hosts）
+   * 数据里只存「/s/」之后的分享段（slug/pwd），下载时才用这里的域名拼成完整直链，
+   * 因此页面 HTML 和 JSON 里都不会出现带前缀的原始链接，换域名也只改一处配置。
+   */
+  var panHosts = { baidu: 'pan.baidu.com', xunlei: 'pan.xunlei.com', quark: 'pan.quark.cn' };
+
+  /* ---- 网盘链接规范化（与 layouts/_partials/docs/pan-url.html 同一套规则） ---- */
+
+  /**
+   * 只保留「/s/」之后的分享段：
+   *   取最后一个 /s/（跳过 /s/ 后可能出现的 /list/ 路径）到 ? # 之间
+   *   例：https://jump.example.com/pan.baidu.com/s/1AbC?pwd=x1y2 → { slug:'1AbC', pwd:'x1y2' }
+   * 解析不出来返回 null（调用方各自决定退回原值还是当作无链接）。
+   */
+  function parseShareSeg(raw) {
+    if (!raw) return null;
+    var text = String(raw).trim();
+    var m = /(?:^|\/)s\/([A-Za-z0-9._~%-]+)/g;
+    var last = null;
+    var hit;
+    while ((hit = m.exec(text)) !== null) {
+      last = hit[1];
+      m.lastIndex = hit.index + hit[0].length;   // 允许 /s/xxx/list/yyy，取最后一个段
+    }
+    if (!last) return null;
+    var pwd = '';
+    var q = /[?&]pwd=([^&#]*)/.exec(text);
+    if (q && q[1]) pwd = q[1];
+    return { slug: last, pwd: pwd };
+  }
+
+  /**
+   * 从完整链接反推是哪个网盘：在整个原始字符串里找官方域名
+   * （前缀域名里内嵌完整官方链接、或域名被 percent 编码后出现在查询串里都能认出来）；
+   * 认不出来返回 ''，由调用方决定兜底。
+   * 与 layouts/_partials/docs/pan-url.html 的判定口径保持一致。
+   */
+  function diskOfUrl(raw) {
+    var text = String(raw || '').toLowerCase();
+    if (!text) return '';
+    return DISK_ORDER.filter(function (k) {
+      return text.indexOf(String(panHosts[k] || '').toLowerCase()) !== -1;
+    })[0] || '';
+  }
+
+  /**
+   * 用官方域名把 slug（+提取码）拼成完整分享短链；异常输入返回 ''。
+   */
+  function buildPanUrl(disk, slug, pwd) {
+    if (!disk || !slug) return '';
+    var host = panHosts[disk] || '';
+    if (!host) return '';
+    return 'https://' + host + '/s/' + slug + (pwd ? '?pwd=' + pwd : '');
+  }
+
+  /**
+   * 后端/JSON 给的链接 → 重建后的规范短链：
+   * 丢掉「/s/」之前的一切（跳转域名、镜像域名、推广前缀…），拼不出来才退回原值。
+   */
+  function normalizePanUrl(raw) {
+    var seg = parseShareSeg(raw);
+    if (!seg) return raw || '';
+    // 域名不是三家官方的：只要带 /s/ 段就按百度网盘重建（前缀丢弃，避免放行未知跳转域）
+    return buildPanUrl(diskOfUrl(raw) || 'baidu', seg.slug, seg.pwd) || String(raw);
+  }
+
+  /**
+   * 取某条模组、某个网盘的分享段（shortcode 只写缩写字段：bSlug/bPwd、xSlug/xPwd、qSlug/qPwd）。
+   * 兼容旧数据：全名 slug 字段（baiduSlug…）与更早的直链字段（baiduUrl…）。
+   * 没有分享段返回 null。
+   */
+  function shareOf(mod, disk) {
+    var key = DISK_KEY[disk] || disk;
+    var slug = mod[key + 'Slug'] || mod[disk + 'Slug'] || '';
+    var pwd = mod[key + 'Pwd'] || mod[disk + 'Pwd'] || '';
+    if (slug) return { slug: slug, pwd: pwd };
+    return parseShareSeg(mod[disk + 'Url'] || mod[key + 'Url'] || '');
+  }
+
+  /** 某条模组、某个网盘最终要打开的规范短链；无链接返回 '' */
+  function panUrlOf(mod, disk) {
+    var seg = shareOf(mod, disk);
+    return seg ? buildPanUrl(disk, seg.slug, seg.pwd) : '';
+  }
 
   /**
    * localStorage 安全访问（隐私模式 Safari 会抛 quota exceeded 异常）
@@ -127,8 +218,11 @@
           subs: dataEl.dataset.sortDownloads === 'true',
           imgBase: dataEl.dataset.imgBase || '/img/bm/',
           imgFallback: dataEl.dataset.imgFallback || '/img/bm/none.png',
-          // 网盘直链策略：modal=点击在当前页弹框校验邮箱后新标签打开（页面不内嵌直链）；direct=直接输出直链
+          // 网盘直链策略：只影响点击下载后的交互（modal=弹框校验邮箱；direct=直接新标签打开）
+          // 两种模式的地址都由 slug + panHosts 现拼，JSON 里不含完整链接
           panMode: dataEl.dataset.panMode || 'direct',
+          // 网盘官方域名表（shortcode 注入的 JSON；缺失时沿用代码里的默认三家域名）
+          panHosts: parsePanHosts(dataEl.dataset.panHosts),
           // 网盘总开关（缺省=启用）；显式 "false" 才关闭
           panEnabled: {
             baidu: dataEl.dataset.panBaiduEnabled !== 'false',
@@ -163,6 +257,22 @@
       }
       xhrGet(dataSrc, parseAndBuild, reject);
     });
+  }
+
+  /**
+   * 解析 shortcode 注入的网盘域名表（data-pan-hosts）
+   * 非法 JSON / 空值 / 非字符串值一律忽略，缺的键沿用默认域名，保证永远是 3 个可用域名。
+   */
+  function parsePanHosts(raw) {
+    var hosts = { baidu: panHosts.baidu, xunlei: panHosts.xunlei, quark: panHosts.quark };
+    if (!raw) return hosts;
+    try {
+      var parsed = JSON.parse(raw);
+      DISK_ORDER.forEach(function (k) {
+        if (parsed && typeof parsed[k] === 'string' && parsed[k]) hosts[k] = parsed[k];
+      });
+    } catch (e) { /* 配置坏了就沿用默认域名 */ }
+    return hosts;
   }
 
   /**
@@ -244,11 +354,11 @@
 
   /**
    * 构造某网盘的直链下载 URL（仅 direct 模式使用）
-   * 返回真实直链（旧行为，带 &t= 时间戳防缓存）
+   * 数据里只有 slug/pwd（或旧的完整 url），这里统一用官方域名重建成规范短链；
+   * 拼不出来返回 null（按钮渲染成「暂无」）。
    */
-  function buildDownloadTarget(mod, cfg, disk) {
-    var url = disk === 'baidu' ? mod.baiduUrl : (disk === 'xunlei' ? mod.xunleiUrl : mod.quarkUrl);
-    return url ? url + '&t=' + cfg.currentDate : null;
+  function buildDownloadTarget(mod, disk) {
+    return panUrlOf(mod, disk) || null;
   }
 
   /**
@@ -261,7 +371,8 @@
     var idLower = (mod.id || '').toLowerCase();
     var nameLower = (mod.name || '').toLowerCase();
     var isModal = (cfg.panMode === 'modal' || cfg.panMode === 'jump'); // jump 为旧别名，视同 modal
-    var site = getSiteOrigin();
+    // 详情页地址（shortcode 注入的 u 字段）：空 = 这条模组没有详情页，卡片不做跳转
+    var pageUrl = mod.u || '';
     var tagsHtml = buildTagsHtml(mod.tags);
     var on = cfg.panEnabled || panEnabled;
     /* 订阅数只在本页开启排序时展示（单机版没有该字段，不渲染空文字）。
@@ -270,30 +381,42 @@
     var subsTitle = subsText ? '热度 ' + (typeof mod.subs === 'number' ? mod.subs : parseInt(mod.subs, 10)) : '';
 
     // 逐个网盘生成下载按钮；总开关关闭的网盘整条不渲染（连"暂无"灰按钮也不留）
+    // 「有没有链接」直接看分享段：JSON 里有 xxxSlug（或旧数据的 xxxUrl 能解析出 /s/ 段）才算有
     var actions = '';
     for (var i = 0; i < DISK_ORDER.length; i++) {
       var disk = DISK_ORDER[i];
       if (!on[disk]) continue;
-      var has = disk === 'baidu' ? mod.hasBaidu : (disk === 'xunlei' ? mod.hasXunlei : mod.hasQuark);
+      var has = !!shareOf(mod, disk);
       var title = DISK_LABEL[disk] + '下载';
       actions += isModal
-        ? buildModalBtn(disk, title, mod.id, has)
-        : buildDirectBtn(disk, title, has ? buildDownloadTarget(mod, cfg, disk) : null);
+        ? buildModalBtn(disk, title, mod.id, has, mod)
+        : buildDirectBtn(disk, title, has ? buildDownloadTarget(mod, disk) : null);
     }
 
+    var thumbImg =
+      '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">';
+    /* 有详情页 → 缩略图是按钮、名字可点击跳转；
+       没有详情页（如单机版 BMxxx）→ 渲染成普通元素，不再跳到不存在的 /p/xxx（那是 404） */
+    var thumbHtml = pageUrl
+      ? '<button class="action-btn" aria-label="' + mod.id + '" onclick="event.stopPropagation();window.location.href=\'' + pageUrl + '\'">' + thumbImg + '</button>'
+      : '<span class="action-btn" aria-hidden="true">' + thumbImg + '</span>';
+    var nameAttrs = pageUrl
+      ? ' role="link" tabindex="0"' +
+        ' onclick="event.stopPropagation();window.location.href=\'' + pageUrl + '\'"' +
+        ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=\'' + pageUrl + '\'}"'
+      : '';
+
     return (
-      '<div class="mod-item" data-id="' + idLower + '" data-name="' + nameLower + '">' +
+      '<div class="mod-item' + (pageUrl ? '' : ' is-static') + '" data-id="' + idLower + '" data-name="' + nameLower + '">' +
         '<div class="item-main">' +
           '<div class="item-info">' +
             '<div class="item-thumb">' +
-              '<button class="action-btn" data-href="/p/' + mod.id + '" aria-label="' + mod.id + '" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'">' +
-                '<img src="' + cfg.imgBase + mod.id + '.png" alt="' + mod.id + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.imgFallback + '\'">' +
-              '</button>' +
+              thumbHtml +
               /* 热度缩写成「12.3万」：浮在图片左下角（绝对定位，不占位，
                  这样图片才能一直顶到卡片的上/左/下三边） */
               (subsText ? '<span class="item-subs" title="' + subsTitle + '">' + subsText + '</span>' : '') +
             '</div>' +
-            '<div class="mod-name" role="link" tabindex="0" onclick="event.stopPropagation();window.location.href=\'' + site + '/p/' + mod.id + '\'" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.location.href=\'' + site + '/p/' + mod.id + '\'}">' +
+            '<div class="mod-name"' + nameAttrs + '>' +
               '<div class="mod-name-sub">' + mod.name + '</div>' +
               '<div class="mod-name-top">' +
                 buildWorkshopIdLink(mod.id) + (mod.size ? ' (' + mod.size + ')' : '') + tagsHtml +
@@ -306,11 +429,17 @@
     );
   }
 
-  /** direct 模式：新标签打开直链 */
+  /**
+   * direct 模式：新标签打开直链。
+   * 不把 URL 写进 onclick（链接里的引号/& 会撑破属性），改为 data-disk + data-slug + data-pwd，
+   * 由列表容器上的委托点击统一 window.open —— 地址始终由 JS 用官方域名重建。
+   */
   function buildDirectBtn(cls, title, url) {
     if (url) {
+      var seg = parseShareSeg(url) || { slug: '', pwd: '' };
       return (
-        '<button onclick="event.stopPropagation();window.open(\'' + url + '\',\'_blank\')" class="action-btn ' + cls + '" title="' + title + '">' +
+        '<button type="button" class="action-btn ' + cls + '" title="' + title + '：' + url + '"' +
+          ' data-pan-direct="1" data-disk="' + cls + '" data-slug="' + seg.slug + '" data-pwd="' + seg.pwd + '">' +
           '<img src="/img/icons/pan_' + cls + '.webp" alt="' + title + '" loading="lazy">' +
         '</button>'
       );
@@ -322,8 +451,8 @@
     );
   }
 
-  /** modal 模式：打开当前页网盘弹框（不暴露直链） */
-  function buildModalBtn(cls, title, fileId, available) {
+  /** modal 模式：打开当前页网盘弹框（不暴露直链；分享段一并带上，后端返回的链接也要过同一套规范化） */
+  function buildModalBtn(cls, title, fileId, available, mod) {
     if (!available) {
       return (
         '<button class="action-btn ' + cls + '" title="暂无' + title + '" disabled>' +
@@ -331,9 +460,10 @@
         '</button>'
       );
     }
+    var seg = shareOf(mod, cls) || { slug: '', pwd: '' };
     return (
       '<button class="action-btn ' + cls + '" title="' + title + '" ' +
-        'onclick="event.stopPropagation();window.ModsList&&window.ModsList.PanDialog&&window.ModsList.PanDialog.open({p:\'' + fileId + '\',disk:\'' + cls + '\'})">' +
+        'onclick="event.stopPropagation();window.ModsList&&window.ModsList.PanDialog&&window.ModsList.PanDialog.open({p:\'' + fileId + '\',disk:\'' + cls + '\',slug:\'' + seg.slug + '\',pwd:\'' + seg.pwd + '\'})">' +
         '<img src="/img/icons/pan_' + cls + '.webp" alt="' + title + '" loading="lazy">' +
       '</button>'
     );
@@ -359,14 +489,17 @@
     return /^(?:OU_\d{15,25}|BU_[0-9a-f]{16})$/i.test((v || '').trim());
   }
 
-  function usableDiskUrl(url) {
-    if (!url) return '';
-    try {
-      var parsed = new URL(url, window.location.href);
-      return /^\/s\//.test(parsed.pathname) ? url : '';
-    } catch (e) {
-      return '';
-    }
+  /**
+   * 后端返回的网盘链接 → 可用于跳转的规范短链。
+   * 规则与短代码一致：只认「/s/」之后的分享段，用对应网盘的官方域名重建；
+   * 只有 /s/ 段存在才算有效（其它路径/未知跳转域一律丢弃，返回 '' 让弹框按「无链接」处理）。
+   * disk 命中时用该网盘域名，否则从后端域名反推，再不行按百度网盘重建。
+   */
+  function usableDiskUrl(url, disk) {
+    if (DISK_ORDER.indexOf(disk) === -1) return normalizePanUrl(url);   // 不知道网盘：从链接域名反推
+    var seg = parseShareSeg(url);
+    if (!seg) return '';
+    return buildPanUrl(disk, seg.slug, seg.pwd);
   }
 
   function escHtml(s) {
@@ -529,7 +662,7 @@
       // 只保留"总开关启用 + 后端确实返回了有效链接"的网盘
       var links = {};
       DISK_ORDER.forEach(function (k) {
-        if (panEnabled[k]) links[k] = usableDiskUrl(data[k]);
+        if (panEnabled[k]) links[k] = usableDiskUrl(data[k], k);
       });
       cur.links = links;
 
@@ -651,6 +784,9 @@
         sess: session,
         p: opts.p || '',
         disk: (opts.disk || '').toLowerCase(),
+        // 分享段（shortcode 由 slug/pwd 给出）：当前用于兜底/调试，真实链接仍以后端校验结果为准
+        slug: opts.slug || '',
+        pwd: opts.pwd || '',
         email: getStorageItem(PAN_EMAIL_KEY) || '',
         mid: getStorageItem(PAN_MID_KEY) || '',
         links: null,
@@ -694,6 +830,8 @@
       .then(function (cfg) {
         // 网盘总开关：进列表渲染前生效（弹框共用同一份配置）
         if (cfg.panEnabled) panEnabled = cfg.panEnabled;
+        // 网盘官方域名表：重建直链用（缺省沿用代码里的默认三家域名）
+        if (cfg.panHosts) panHosts = cfg.panHosts;
         bootstrap(cfg);
       })
       .catch(function (err) {
@@ -986,6 +1124,22 @@
       clearTimeout(searchTimer);
       searchTimer = setTimeout(applyFilter, SEARCH_DEBOUNCE_MS);
     });
+
+    /* ---------- 网盘跳转（委托） ----------
+       direct 模式按钮只带 data-disk/data-slug/data-pwd（不再把 URL 塞进 onclick 属性），
+       这里统一用官方域名重建成规范短链后 window.open；
+       下方 modal 模式的按钮行为不变：走 PanDialog.open（校验邮箱后才由后端给链接）。 */
+    modsList.addEventListener('click', function (e) {
+      var node = e.target;
+      while (node && node !== modsList) {
+        if (node.getAttribute && node.getAttribute('data-pan-direct')) break;
+        node = node.parentNode;
+      }
+      if (!node || node === modsList) return;
+      e.stopPropagation();
+      var url = buildPanUrl(node.getAttribute('data-disk'), node.getAttribute('data-slug'), node.getAttribute('data-pwd'));
+      if (url) window.open(url, '_blank', 'noopener');
+    });
   }
 
   function mapJoin(arr, fn) {
@@ -1001,5 +1155,15 @@
 
   ready(init);
 
-  global.ModsList = { init: init, PanDialog: PanDialog };
+  global.ModsList = {
+    init: init,
+    PanDialog: PanDialog,
+    // 网盘链接工具（/s/ 规范化 + 官方域名重建），供页面其它脚本复用：
+    //   ModsList.buildPanUrl('baidu', '1AbC', 'x1y2') → https://pan.baidu.com/s/1AbC?pwd=x1y2
+    //   ModsList.panUrlOf(mod, 'quark')              → 按 JSON 里的 slug/pwd 拼直链
+    buildPanUrl: buildPanUrl,
+    panUrlOf: panUrlOf,
+    normalizePanUrl: normalizePanUrl,
+    panHosts: function () { return panHosts; }
+  };
 })(window);

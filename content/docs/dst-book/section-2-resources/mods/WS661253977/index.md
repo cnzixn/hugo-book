@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 死亡不掉落（Don't Drop Everything）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 玩家死亡后进入灵魂状态时，不会把身上的物品全部掉落。
 

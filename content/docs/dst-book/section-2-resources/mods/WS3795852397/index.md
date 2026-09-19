@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## Kyno 的滤镜（Kyno's Color Cubes）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 为每个**季节**与**满月**新增色彩立方（滤镜）。
 

@@ -23,7 +23,10 @@ bookHidden: true
 
 ## 网址
 
-- 主站：https://b.bxq.me
-- 备用：https://b.225228.xyz
+- 主站：https://bxq.me
+- 备用：https://b.bxq.me、https://b.225228.xyz （内容与主站相同，建议统一使用主站地址访问）
 
 ---
+
+本站的 Cookie 与广告说明、模组版权归属与免责声明见 [隐私政策与免责声明](/privacy/)。
+

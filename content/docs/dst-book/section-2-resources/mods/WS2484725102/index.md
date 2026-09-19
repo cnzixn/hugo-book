@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 升级箱子（Upgradeable Chest）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 用木板升级箱子，容量更大而占用空间不变。
 

@@ -1,0 +1,17 @@
+# 饥荒模组手册 - robots.txt
+# 由 Hugo 模板生成（layouts/robots.txt），改这里而不是 static/robots.txt
+
+# 全部放行：本站靠自然搜索带来流量，没有任何需要屏蔽的私有目录
+User-agent: *
+Allow: /
+
+# AdSense 的抓取器（负责分析页面并投放相关广告）显式放行
+# 注意：不要在其它规则里 Disallow 掉它，否则会被判「无法抓取页面」而拒审
+User-agent: Mediapartners-Google
+Allow: /
+
+# 图片/广告素材抓取器
+User-agent: Googlebot-Image
+Allow: /
+
+Sitemap: {{ "sitemap.xml" | absURL }}

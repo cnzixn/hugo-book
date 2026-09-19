@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 种植助手（Planting Helper）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 客户端批量种植工具，可用网格方式种植草、树枝、灌木与树木。
 

@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 自动血量适配（Automatic Health Adjust）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 根据当前在线玩家数量自动调整怪物血量。每当有玩家加入或离开，都会重新计算。
 

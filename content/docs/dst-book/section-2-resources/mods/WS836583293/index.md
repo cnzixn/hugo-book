@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 物品信息（Item Info）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 属于 **CLIENT 模组**，在任何服务器上都能使用，无需服务器安装。
 

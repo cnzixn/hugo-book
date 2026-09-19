@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 青蛙都摔死了（Frogs Fell to Death...）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 从那么高的地方摔下来，想必很疼吧……
 

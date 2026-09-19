@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 可开采的宝石（Mineable Gems）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 让开采石头（boulders）时有几率额外掉落宝石，掉落几率可在模组配置中调整。
 

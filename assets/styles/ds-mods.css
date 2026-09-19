@@ -153,6 +153,37 @@
 .mods-list button,
 .mods-list input { font-family: inherit; }
 
+/* ---------- 桌面端：双列 ----------
+   断点为什么是 75rem（1200px）而不是 60rem：
+   主题在 >56rem 时同时常驻「左侧菜单 16rem」和「右侧目录 16rem」，而本页目录是空的
+   （<nav id=TableOfContents> 无内容，但 <aside class=book-toc> 仍 flex: 0 0 16rem 占位），
+   所以正文宽 ≈ 视口 − 544px（<90rem 时）。960px 视口下正文只有约 416px，
+   分两列会挤成 200px/列（缩略图 64 + 按钮 88 就没剩多少给名字了）。
+   75rem 起正文 ≥ 656px → 每列 ≥ 322px；1366 笔记本约 405px/列，1920 屏约 418px/列。
+   想更早双列，要么把断点调小并同时收紧卡片（--thumb-size / .action-btn），
+   要么先把空目录那一栏收掉（.book-toc:has(#TableOfContents:empty){display:none}），
+   后者会影响全站所有空目录页面，改动前先确认。
+
+   卡片内部不用改 —— .item-main 是 flex、.mod-name 有 min-width:0 且可横向滑动，
+   名字再长也只是多滑一段，不会换行把卡片撑高（卡片高度恒等于 4rem 的缩略图），
+   所以同一行两张卡天然等高。
+   ⚠ 必须把基础规则里的 `.mods-list > * + * { margin-top: .75rem }` 清掉：
+   不清的话第二列每张卡都被额外顶开 0.75rem，行距会变成 gap + margin 两倍，
+   同一行的两张卡还会因为高度不同而上下错位。
+   不需要双列时整段删掉即可回到单列。 */
+@media screen and (min-width: 75rem) {
+  .mods-list {
+    display: grid;
+    /* minmax(0, 1fr) 而非 1fr：防止某张卡的长内容把这一列撑得比另一列宽 */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .mods-list > * + * { margin-top: 0; }
+  /* 空列表/加载失败提示只有一个子元素，双列下会被塞进左半列；
+     让它横跨整行，保持居中 */
+  .mods-list > .mods-empty { grid-column: 1 / -1; }
+}
+
 .mod-item {
   background: var(--gray-100);
   border: 1px solid var(--gray-200);
@@ -165,6 +196,8 @@
   transition: all 0.2s ease;
 }
 .mod-item:hover { background: var(--body-background); }
+/* 没有详情页的模组（如单机版 BMxxx）：整张卡不做跳转，鼠标不要显示手型 */
+.mod-item.is-static { cursor: default; }
 
 /* 卡片主行：高度完全由左列（正方形图标）决定 —— 特意不加 min-height，
    否则文字/按钮那一侧会把卡片撑高，图片就贴不到卡片下边框了。 */

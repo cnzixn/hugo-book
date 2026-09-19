@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 骨架扩充（Skeletons Plus）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 原版里每位幸存者死后留下的骨架都一样，这个模组为每位 DST 幸存者配上各自独特的骨架。
 

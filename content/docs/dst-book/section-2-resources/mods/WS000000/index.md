@@ -23,4 +23,3 @@ aliases:
 - Custom nickname: enter `/nn <new name>` in chat
 - Debug command: enter `/db <debug code>` in chat
 - Radial wheel for mobile hotkeys
-

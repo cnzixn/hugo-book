@@ -1,0 +1,69 @@
+{{/*
+  网盘分享链接规范化 —— 整站统一入口（只保留「/s/」之后的分享段）
+
+  背景：data 源里的网盘链接可能带各种前缀（跳转域名、镜像域名、推广参数…），
+        早先模板用 `findRE "^https://pan\.baidu\.com/s/"` 硬校验前缀，
+        带前缀的链接会被静默判成「暂无网盘」直接丢掉。
+        本 partial 改为：无视「/s/」之前的一切，只抽出分享段 + 提取密码，
+        再用官方域名重建规范短链；解析不出来时退回原值（不静默丢弃）。
+
+  规则：
+    1) 分享段取**最后一个** `/s/` 到 `?` / `#` 之间（容忍 /s/xxx/list/yyy、#/ 之类）
+    2) 密码只从 `?pwd=` 读取；percent 编码保留原样（拼回时与 data 源一致）
+    3) 重建形式：https://<官方域名>/s/<分享段>?pwd=<密码>（无密码则不带查询串）
+    4) 解析不出来 → ok=false，url 返回原值
+
+  用法（必须传 dict，.site 用于解析 panHosts 默认值）：
+    {{- $pan := partial "docs/pan-url.html" (dict "url" $rawUrl "site" .Site) -}}
+    {{- if $pan.ok -}}… {{ $pan.url }} …{{- end -}}
+
+  返回：dict "ok" <bool> "url" <string> "slug" <string> "pwd" <string>
+                      "host" <string> "disk" <string>
+*/}}
+
+{{- $url := .url | default "" -}}
+{{- $site := .site -}}
+{{- $hostMap := and $site $site.Params.panHosts | default (dict "baidu" "pan.baidu.com" "xunlei" "pan.xunlei.com" "quark" "pan.quark.cn") -}}
+
+{{- $out := dict "ok" false "url" $url "slug" "" "pwd" "" "host" "" "disk" "" -}}
+{{- $host := "" -}}
+{{- $path := "" -}}
+{{- $disk := "" -}}
+
+{{- if $url -}}
+  {{- $parsed := urls.Parse $url -}}
+  {{- $host = strings.ToLower ($parsed.Host | default "") -}}
+  {{- $path = $parsed.Path | default "" -}}
+
+  {{/* 1. 先在整个原始链接里找官方域名（前缀域名里内嵌完整官方链接也能识别） */ -}}
+  {{- $lower := strings.ToLower $url -}}
+  {{- range $k, $h := $hostMap -}}
+    {{- if not $disk -}}
+      {{- if strings.Contains $lower (strings.ToLower $h) -}}
+        {{- $disk = $k -}}
+        {{- $host = $h -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{/* 2. 整个链接里没有官方域名：只要带 /s/ 段就按「百度网盘」重建（前缀丢弃，避免放行未知跳转域） */ -}}
+  {{- if not (findRE `/s/` $path) -}}
+    {{- $disk = "" -}}
+  {{- else if not $disk -}}
+    {{- $disk = "baidu" -}}
+    {{- $host = index $hostMap "baidu" -}}
+  {{- end -}}
+
+  {{- if $disk -}}
+    {{- $match := index (findRE `/s/[A-Za-z0-9._~%-]+` $path) 0 -}}
+    {{- if $match -}}
+      {{- $slug := strings.TrimPrefix "/s/" $match -}}
+      {{- $pwd := $parsed.Query.Get "pwd" | default "" -}}
+      {{- $canonical := printf "https://%s/s/%s" $host $slug -}}
+      {{- if $pwd -}}{{- $canonical = printf "%s?pwd=%s" $canonical $pwd -}}{{- end -}}
+      {{- $out = dict "ok" true "url" $canonical "slug" $slug "pwd" $pwd "host" $host "disk" $disk -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $out -}}

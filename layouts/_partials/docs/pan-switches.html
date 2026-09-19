@@ -12,10 +12,13 @@
   ⚠ 这里不能用 default 兜底：Hugo 的 default 会把 false 当成"空值"返回默认值，
     所以改用 printf "%v" 转字符串后与 "false" 比较，只有显式关闭才算关闭。
 
-  返回：dict "baidu" <bool> "xunlei" <bool> "quark" <bool>
+  返回值：dict "baidu" <bool> "xunlei" <bool> "quark" <bool> "hosts" <dict>
+          hosts = 官方域名表（hugo.yaml → params.panHosts，缺省见下），
+          列表页会把它注入 data-pan-hosts，供 ds-mods.js 按 slug 重建直链。
   用法：{{- $panSw := partial "docs/pan-switches.html" . -}}
 */}}
 {{- $baidu := ne (printf "%v" .Site.Params.panBaiduEnabled) "false" -}}
 {{- $xunlei := ne (printf "%v" .Site.Params.panXunleiEnabled) "false" -}}
 {{- $quark := ne (printf "%v" .Site.Params.panQuarkEnabled) "false" -}}
-{{- return (dict "baidu" $baidu "xunlei" $xunlei "quark" $quark) -}}
+{{- $hosts := .Site.Params.panHosts | default (dict "baidu" "pan.baidu.com" "xunlei" "pan.xunlei.com" "quark" "pan.quark.cn") -}}
+{{- return (dict "baidu" $baidu "xunlei" $xunlei "quark" $quark "hosts" $hosts) -}}

@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 温暖龙鳞石（Scaled Stone）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 新增「龙鳞石」的制作配方。龙鳞石本质上是一颗 **90°C 的暖石**，可以再通过特定物品将其转变为「龙鳞冰石」（Scaled Ice Stone）。
 

@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 显示攻击范围（Display Attack Range [fixed]）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 > 本模组修复了 Display Attack Range（工坊 ID `2078243581`）在遇到深海蠕虫（great depth worms）时崩溃的问题。
 

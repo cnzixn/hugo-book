@@ -1,1 +1,4 @@
+{{/* 页脚只保留版权行 —— 不挂隐私政策等合规链接。
+     /privacy/ 页面仍然正常生成、可访问，并已进 sitemap.xml，搜索引擎会自行抓取。
+     若之后需要给它一个站内入口，加进顶部导航（menu）或 /about/ 页面即可，别加回页脚。 */}}
 <small>{{ .Site.Title }} - © {{ now.Year }} - {{ default .Site.Copyright .Params.Copyright | .RenderString }}</small>

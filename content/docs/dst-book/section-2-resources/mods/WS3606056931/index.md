@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 状态变化显示（Stat Change Display · 2026 优化版）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 显示三项属性（饥饿、理智、生命）的变化数值。
 

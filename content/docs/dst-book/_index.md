@@ -1,6 +1,6 @@
 ---
 title: "手游 - 联机版"
-weight: 2
+weight: 1
 bookCollapseSection: true
 bookIcon: dst_icon.webp
 aliases:
@@ -16,19 +16,10 @@ aliases:
 
 {{<button href="https://playdigious.com/games/dont-starve-together" class="btn-block">}}{{< svg "bi-globe2" >}} Playdigious{{</button>}}
 
-## 试玩版
+## 获取游戏
 -----
 
-- 此版本**支持模组**，只可以“离线模式”，支持“局域网”联机。
-
-{{< dst-pans "游戏" >}}
-
-
-
-## 官方版
------
-
-- 需付费购买，官网可能无法访问，请使用“加速器”。
+- 请通过官方渠道购买正版游戏；官网如果无法访问，请使用“加速器”。
 - 流程：注册“美区”账号，用招行的“万事达借记卡”付款。（个人推荐方式，仅供参考）
 
 

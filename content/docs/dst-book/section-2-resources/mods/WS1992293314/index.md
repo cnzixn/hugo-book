@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 噩梦 HUD（Nightmare HUD）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 以噩梦主题重制饥荒联机版的整体 HUD。包含制作栏、皮肤容器、箱子、理智/饥饿/生命、潮湿度、海狸化和船只计量表、时钟、温度、月相、地图、库存、背包、天体传送门等界面，并兼容 Combined Status 与 Fast Equip。
 

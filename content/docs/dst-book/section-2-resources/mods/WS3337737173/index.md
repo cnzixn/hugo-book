@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## blacksouls 小红帽（蕾克）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 新增角色蕾克，以及随从「小小魄罗」。
 

@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 超级堆叠上限（Super Stack Size）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 ### 自定义物品堆叠上限
 

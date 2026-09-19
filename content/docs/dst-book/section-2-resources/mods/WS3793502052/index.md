@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 钠优化（DST Sodium）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 借鉴 Minecraft Sodium 的思路，减少不必要的后台工作，将集中的计算负担分散处理，以改善大型世界和长期存档中的帧时间稳定性。
 

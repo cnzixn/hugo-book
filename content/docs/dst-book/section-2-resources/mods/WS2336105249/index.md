@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 再次烹饪（Crockpot Repeater）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 在**空**的烹饪锅上按下「烹饪」按钮，即可重复上一次做过的料理配方。
 

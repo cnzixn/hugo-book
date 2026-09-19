@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 十二符咒（Twelve Charms）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 十二生肖符咒玩法。
 

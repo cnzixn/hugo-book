@@ -6,21 +6,29 @@
 
   网盘总开关：hugo.yaml → params.panBaiduEnabled / panXunleiEnabled / panQuarkEnabled
               false 时对应网盘标签页不渲染；三个都关闭时只显示一条提示。
+  链接规范化：只保留「/s/」之后的分享段，用 params.panHosts 里的官方域名重建短链
+              （见 layouts/_partials/docs/pan-url.html），页面上显示/打开的都是重建后的链接。
 */}}
 {{- $name := .Get 0 -}}
 {{- $panSw := partial "docs/pan-switches.html" . -}}
 
 {{- with index hugo.Data.dst_pan $name -}}
-  {{- $baiduUrl := index (where . "url1" "ne" nil) 0 "url1" -}}
-  {{- $xunleiUrl := index (where . "url2" "ne" nil) 0 "url2" -}}
-  {{- $quarkUrl := index (where . "url3" "ne" nil) 0 "url3" -}}
-  {{- if not (findRE `^https://pan\.baidu\.com/s/` $baiduUrl) -}}{{- $baiduUrl = "" -}}{{- end -}}
-  {{- if not (findRE `^https://pan\.xunlei\.com/s/` $xunleiUrl) -}}{{- $xunleiUrl = "" -}}{{- end -}}
-  {{- if not (findRE `^https://pan\.quark\.cn/s/` $quarkUrl) -}}{{- $quarkUrl = "" -}}{{- end -}}
-  {{- /* 网盘总开关关闭：等同于该网盘无链接 */ -}}
-  {{- if not $panSw.baidu -}}{{- $baiduUrl = "" -}}{{- end -}}
-  {{- if not $panSw.xunlei -}}{{- $xunleiUrl = "" -}}{{- end -}}
-  {{- if not $panSw.quark -}}{{- $quarkUrl = "" -}}{{- end -}}
+  {{- /* data 记录形如「单键 dict 的数组」：[{name: …}, {url1: …}, …]，
+         缺字段（如整条没有 url2）时 where 过滤后为空 → nil，交给 pan-url.html 按「无链接」处理 */ -}}
+  {{- $baiduUrl := "" -}}
+  {{- $xunleiUrl := "" -}}
+  {{- $quarkUrl := "" -}}
+  {{- range $k, $raw := (dict "baidu" (index (where . "url1" "ne" nil) 0 "url1")
+                             "xunlei" (index (where . "url2" "ne" nil) 0 "url2")
+                             "quark" (index (where . "url3" "ne" nil) 0 "url3")) -}}
+    {{- /* 只保留「/s/」之后的分享段，用官方域名重建规范短链（前缀由 pan-url.html 统一丢弃） */ -}}
+    {{- $pan := partial "docs/pan-url.html" (dict "url" $raw "site" $.Site) -}}
+    {{- $url := "" -}}
+    {{- if and $pan.ok (index $panSw $k) -}}{{- $url = $pan.url -}}{{- end -}}
+    {{- if eq $k "baidu" -}}{{- $baiduUrl = $url -}}
+    {{- else if eq $k "xunlei" -}}{{- $xunleiUrl = $url -}}
+    {{- else -}}{{- $quarkUrl = $url -}}{{- end -}}
+  {{- end -}}
   {{- $firstDisk := "baidu" -}}
   {{- if not $baiduUrl -}}{{- $firstDisk = "xunlei" -}}{{- end -}}
   {{- if not $baiduUrl -}}{{- if not $xunleiUrl -}}{{- $firstDisk = "quark" -}}{{- end -}}{{- end -}}

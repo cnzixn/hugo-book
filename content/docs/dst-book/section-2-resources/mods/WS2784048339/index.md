@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 储藏室·新地窖（Storeroom (New)）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 这是原版「储藏室」模组（工坊 ID `623749604`）的更新版本。
 

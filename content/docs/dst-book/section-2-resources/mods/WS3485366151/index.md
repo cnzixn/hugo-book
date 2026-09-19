@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 横板技能施法（Horizontal Skill Casting）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 把角色的技能轮盘改写成**横向布局**，并提供高度可自定义的快捷键绑定与瞬时施法。
 

@@ -11,7 +11,6 @@ processing_status: "completed"
 
 ## 快餐（Fast Food [4]）
 
-> 中文草稿：根据创意工坊描述整理，后续可继续校对。
 
 新增 4 种快餐料理：
 
