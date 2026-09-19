@@ -16,10 +16,15 @@
 {{- $panSw := partial "docs/pan-switches.html" . -}}
 
 
-{{/* ========== 1. 构建 WS000000-WSxxxxxxxxxxxx 切片 ========== */}}
+{{/* ========== 1. 构建 WS 社区条目 + WSxxxxxxxxxxxx 工坊模组切片 ========== */}}
 {{- $wsItems := slice -}}
 {{- $wsCount := 0 -}}
 {{- range $id, $itemData := $panData -}}
+  {{- /* WS + 数字即收录：既包含社区自定义条目（WS 后面 0 开头，如 WS000000 服务端 /
+         WS000001 客户端），也包含创意工坊模组。
+         社区条目**也要在列表里提供网盘下载**，只是前端不给它们拼 Steam 创意工坊链接
+         （见 assets/js/ds-mods.js 的 buildWorkshopIdLink：首位是 0 直接返回纯文本），
+         所以这里不要再按「首位不能是 0」把社区条目挡在列表外。 */ -}}
   {{- if (findRE `^WS\d{6,20}$` (upper $id)) -}}
     {{- $wsCount = add $wsCount 1 -}}
     {{- /* data 记录形如「单键 dict 的数组」：[{name: …}, {url1: …}, …]，

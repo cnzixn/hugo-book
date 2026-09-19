@@ -1,0 +1,98 @@
+/* ==========================================================================
+ * compat.css —— 浏览器兼容层（旧 iOS / 旧 Safari 专用兜底）
+ * --------------------------------------------------------------------------
+ * 为什么单独一个文件：
+ *   兼容代码混在 custom.css 里很难审计（"这段到底影响谁"），单独成文件后可以
+ *   一眼看完，也可以整体下线（把 html-head-styles.htm 里追加本文件那一行删掉即可）。
+ *
+ * 它在产物里的位置：
+ *   layouts/_partials/docs/html-head-styles.htm 把本文件追加在主题
+ *   assets/styles/index.yaml 列表**之后**，所以 book.min.css 里 compat.css 永远
+ *   排在 custom.css 后面 —— 同特异性时本文件胜出，这是兜底能生效的前提。
+ *   （本文件不写进主题的 index.yaml：那是 themes/ 子模块，不该为了站点需求改动。）
+ *
+ * 什么该放这里：
+ *   只在旧浏览器生效、且**不依赖书写顺序**的独立规则，典型就是 @supports 特性探测块。
+ *
+ * 什么**不能**放这里（必须留在原规则里、紧贴标准声明）：
+ *   display:-webkit-box 紧接 display:flex、position:-webkit-sticky 紧接 position:sticky、
+ *   height:100vh 紧接 height:100dvh、min-height:100vh 紧接 -webkit-fill-available、
+ *   -webkit-line-clamp 配 display:-webkit-box、-webkit-transform 紧接 transform …
+ *   这些靠"上一条兜底、下一条标准"的相邻顺序生效（浏览器丢弃不认识的声明、保留
+ *   认识的；把两条拆到两个文件、靠加载顺序反而说不清哪条生效），搬出来会破坏回退
+ *   关系，所以它们仍然散落在 custom.css / ds-mods.css 的原规则里，这是有意为之。
+ *
+ * --------------------------------------------------------------------------
+ * 本项目「兼容性」代码的三层分布（改兼容问题前先看这里，别漏层）：
+ *   ① 构建期 —— 原生 CSS 嵌套 → Sass 展开：
+ *        layouts/_partials/docs/html-head-styles.htm（项目覆写 partial，Concat 后接
+ *        css.Sass）。这一层修的是**多级菜单**：主题 book.css 用原生嵌套写
+ *        nav/ul/ul、.book-menu 等规则，旧 WebKit（Safari <17.2 / Chrome <120）解析到
+ *        嵌套块会整段丢弃 → 菜单无缩进、折叠失效（全展开）、链接变回默认蓝色。
+ *        它**不是**一条 CSS 规则，所以搬不进本文件；而且它挂了整个主题样式表的
+ *        生存，本文件也依赖它（本文件是同一管线的最后一环，同样被 Sass 展开；
+ *        若哪天把本文件改成独立 <link> 输出，注意它就不能再用原生嵌套语法了）。
+ *   ② 文件级兼容层 —— 本文件：能独立成块、只靠 @supports 生效的兜底/增强。
+ *   ③ 规则级兜底 —— 留在 custom.css / ds-mods.css 原规则内（上面那串"紧接"写法），
+ *        例：移动端抽屉菜单的 position:-webkit-sticky/sticky、100vh/100dvh、
+ *        -webkit-overflow-scrolling: touch、以及各处 -webkit-box 前缀。
+ *
+ * 通用注意事项（本项目踩过两次）：
+ *   声明里带 var() 时不能用「兜底值 + 带 var() 的新值」双声明写法 —— 解析阶段会
+ *   先当合法（pending substitution），到计算值阶段才发现不支持该函数，属
+ *   invalid at computed-value time，属性取初始值，前面那条兜底**不会**被恢复。
+ *   所以凡涉及 var() 的特性增强/兜底，一律用 @supports 隔离，本文件两个例子都是。
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * 1. 图片轮播左右箭头：背景色
+ *    旧浏览器（无 color-mix）用亮/暗主题通用的半透明灰兜底；支持的浏览器
+ *    再切到主题灰变体（探测条件用字面色，避开 var() 求值陷阱）。
+ *    .gallery-nav 的定位/尺寸/hover 等仍然在 custom.css 里。
+ * -------------------------------------------------------------------------- */
+.gallery-nav {
+  background: rgba(128, 128, 128, 0.7);
+}
+
+@supports (background: color-mix(in srgb, #000 50%, transparent)) {
+  .gallery-nav {
+    background: color-mix(in srgb, var(--gray-100) 80%, transparent);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * 2. 带类型提示框（> [!NOTE] / [!TIP] / [!WARNING] …）的底纹
+ *    现象：iPhone 6s 这类上不了 iOS 16 的设备上，提示框只剩左侧竖条、没有底色。
+ *    原因：带类型提示框的底色**只有一处来源** —— 主题 shortcodes.css 的
+ *         .markdown .book-hint{background-color:color-mix(in srgb,var(--accent-color) 10%,transparent)}
+ *         而 color-mix() 要 Safari 16.2+（iOS 16.2+，2022-12）；iPhone 6s 最高
+ *         iOS 15.8，于是这条声明被整条丢弃，background-color 回到 initial =
+ *         transparent；竖条色 border-color:var(--accent-color) 是普通 var()，
+ *         所以照常显示 —— 旧机上的观感就是"有竖条、没底色"。
+ *    等价性：rgba(accent, .1) 与 color-mix(accent 10%, transparent) 叠在页面底色上
+ *         结果完全一致（亮色下逐像素相同），新浏览器继续走主题那条，不受影响。
+ *    验证：桌面 Chrome 上本块默认不命中；临时把 not 去掉即可看到兜底色作对比。
+ * -------------------------------------------------------------------------- */
+@supports not (background-color: color-mix(in srgb, #000 10%, transparent)) {
+  /* github-light（本站默认亮色，色值取自 custom.css 的 :root[data-theme="github-light"]） */
+  .markdown .book-hint.note,
+  .markdown .book-hint.info      { background-color: rgba(9, 105, 218, 0.10); }
+  .markdown .book-hint.tip,
+  .markdown .book-hint.success   { background-color: rgba(26, 127, 55, 0.10); }
+  .markdown .book-hint.important { background-color: rgba(130, 80, 223, 0.10); }
+  .markdown .book-hint.warning   { background-color: rgba(154, 103, 0, 0.10); }
+  .markdown .book-hint.caution,
+  .markdown .book-hint.danger    { background-color: rgba(207, 34, 46, 0.10); }
+  .markdown .book-hint.default   { background-color: rgba(99, 99, 107, 0.10); }
+
+  /* github-dark（色值取自 custom.css 的 :root[data-theme="github-dark"]） */
+  :root[data-theme*="dark"] .markdown .book-hint.note,
+  :root[data-theme*="dark"] .markdown .book-hint.info      { background-color: rgba(88, 166, 255, 0.10); }
+  :root[data-theme*="dark"] .markdown .book-hint.tip,
+  :root[data-theme*="dark"] .markdown .book-hint.success   { background-color: rgba(46, 160, 67, 0.10); }
+  :root[data-theme*="dark"] .markdown .book-hint.important { background-color: rgba(163, 113, 247, 0.10); }
+  :root[data-theme*="dark"] .markdown .book-hint.warning   { background-color: rgba(210, 153, 29, 0.10); }
+  :root[data-theme*="dark"] .markdown .book-hint.caution,
+  :root[data-theme*="dark"] .markdown .book-hint.danger    { background-color: rgba(218, 54, 51, 0.10); }
+  :root[data-theme*="dark"] .markdown .book-hint.default   { background-color: rgba(162, 163, 170, 0.10); }
+}

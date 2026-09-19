@@ -336,14 +336,19 @@
   /**
    * WS 前缀数字 ID → Steam 创意工坊链接；其余本地 ID（BM…等）原样返回纯文本
    * 例：WS123456 → https://steamcommunity.com/sharedfiles/filedetails/?id=123456
-   * （WS000000 之类无有效数字的 ID 不生成链接）
+   *
+   * 社区自定义条目（WS 后面 0 开头，如 WS000000 / WS000001）**不能拼链接**：
+   * 它们不是 Steam 工坊 ID，Steam 数字 ID 也永远不会以 0 开头。早期实现是
+   * 无脑 replace(/^0+/, '') 去掉前导零，于是 WS000001 被拼成了 ?id=1（指向别人的条目），
+   * 只有 WS000000 因为去零后为空才侥幸躲过。这里改成「首位是 0 就只显示纯文本」。
    */
   function buildWorkshopIdLink(id) {
     var raw = id || '';
     var m = /^WS(\d+)$/i.exec(raw);
-    var digits = (m && m[1]) ? m[1].replace(/^0+/, '') : '';
-    var name = 'workshop-'+ digits;
-    if (!digits) return raw;
+    var digits = m && m[1] ? m[1] : '';
+    // 以 0 开头 = 社区自定义条目，没有对应的创意工坊页面，不生成链接
+    if (!digits || digits.charAt(0) === '0') return raw;
+    var name = 'workshop-' + digits;
     return (
       '<a class="workshop-id-link" href="https://steamcommunity.com/sharedfiles/filedetails/?id=' + digits + '"' +
         ' target="_blank" rel="noopener noreferrer"' +

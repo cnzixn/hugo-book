@@ -14,14 +14,16 @@ bookCollapseSection: false
 -----
 
 > [!WARNING]
-> - 安卓玩家请使用 `MT管理器` 签名并安装 `apk` 安装包。  
-> - 苹果玩家请搜索“TrollStore ”、“LiveContainer”相关教程。  
+> - 安卓：使用 `MT管理器` ，长按 `apk` 安装包 -> 签名。  
+> - 苹果：请搜索“TrollStore ”、“LiveContainer”相关教程。  
 
 {{% steps %}}
 
 1. ## 游戏
 
-   从 [[游戏试玩]](/p/ds-apps) 下载，安装并试玩。
+   试玩版，支持巨人国+海难，请加群下载：
+   {{< button href="https://qm.qq.com/q/3xoKf5H4EM" class="btn-block" >}}{{< svg "bi-tencent-qq" >}} 安卓Q群【696529613】 {{< /button >}}
+   {{< button href="https://qm.qq.com/q/88L6QyUQVi" class="btn-block" >}}{{< svg "bi-tencent-qq" >}} 苹果Q群【905142474】 {{< /button >}}
 
 2. ## 模组
 

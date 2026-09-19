@@ -12,6 +12,8 @@
 
 原始 txt 格式（每个条目 3 行一组）：
     第1行: {MOD_ID}.{中文名}.zip\t{文件大小}\t   （tab 分隔，末尾 tab 可选）
+           也兼容「只有编号、没有中文名」的写法：{MOD_ID}.zip\t{大小}\t
+           （夸克导出常见，此时 name 留空，合并时由旧值/百度侧兜底，不会被空串抹掉）
     第2行: https://pan.baidu.com/s/xxx?pwd=xxxx  或  https://pan.quark.cn/s/xxx
     第3行: {提取码}\t分享成功
 
@@ -41,6 +43,9 @@
   页面（ds-mods / dst-mods / ds-pans / dst-pans）对 0 一律不显示大小，不会出现「(0)」。
 * 合并只更新 name/size/url1/url3：tags 与 subs（Steam 订阅数，见 fetch_dst_workshop_subs.py）
   一律沿用旧值，不会因为 txt 里没有对应列而被清掉；新增条目这两项留空，等后续补齐。
+* **社区自定义条目（WS 后面 0 开头，如 WS000000 / WS000001）不是创意工坊模组**，
+  但**这里照常合并**网盘链接（和工坊模组一视同仁）；
+  「不是工坊模组」只影响页面展示（不给它们拼 Steam 工坊链接），见 is_community_id()。
 * yml 里的注释**不会保留**：回写时按固定格式重写（只输出 key + name/tags/url1~url3/subs/size）。
   想把说明长期留存，请写在 txt 侧或另外记文档。
 """
@@ -147,10 +152,34 @@ def discover_prefixes():
     return groups
 
 
+# 「社区自定义条目」的 ID 规则：WS 后面直接跟 0 开头的编号（WS000000、WS000001…）。
+# 这些不是 Steam 创意工坊 ID（工坊数字 ID 不会以 0 开头），而是站内「社区」自建条目，
+# 例如 WS000000 手游优化-服务端、WS000001 手游优化-客户端，由人工维护。
+#
+# 注意：这个判断**只给页面展示用**（见 is_community_id 的调用方），
+# merge_pans.py 的网盘链接合并**照常处理**这些条目 —— 它们和工坊模组一样，
+# 百度/夸克的链接该更新就更新，不要因为 ID 是 0 开头就跳过合并。
+COMMUNITY_ID_RE = re.compile(r"^WS0\d*$", re.I)
+
+
+def is_community_id(ws_id):
+    """True = WS 后面是 0 开头的编号，属于社区自定义条目，不是创意工坊模组。"""
+    return bool(COMMUNITY_ID_RE.match((ws_id or "").strip()))
+
+
 def parse_pan_txt(txt_path):
     """
     解析 百度/夸克 txt，返回 { ws_id: {url, size, name, pwd} }
     name 去掉尾部 .zip；size 原样保留（如 "127.24MB"）。
+
+    第1行兼容两种写法：
+      * 带中文名：`WS3597024951.景熹家居.zip` → ws_id=WS3597024951, name=景熹家居
+      * 只有编号（夸克导出常见）：`WS3597024951.zip` → ws_id=WS3597024951, name=""
+      没有中文名不算错误：name 留空，合并时该字段自动沿用旧值 / 由百度侧兜底，
+      否则整条记录会被当作「格式奇怪」丢掉，夸克链接（url3）就永远合不进来。
+
+    社区条目（ID 以 0 开头，见 COMMUNITY_ID_RE）会被跳过：它们不是创意工坊模组，
+    不参与 txt 合并，完全沿用 yml 里的手工数据。
 
     解析方式：先滤掉空行与整行注释，再按 3 行一组切分（文件名行 / URL 行 / 提取码行）。
       * 有「空行」或「注释行（`#` 开头）」是安全的 —— 滤掉之后行号依然连续，组不会错位，
@@ -196,11 +225,16 @@ def parse_pan_txt(txt_path):
             body = filename
         dot_pos = body.find(".")
         if dot_pos == -1:
-            # 奇怪格式就整体当 name，WS id 空
-            i += 3
-            continue
-        ws_id = body[:dot_pos]
-        name = body[dot_pos + 1:]
+            # 只有编号、没有中文名（夸克导出常见）：整段当 ws_id，name 留空。
+            # 这样记录照样进 result，url3 能被合并；name 由旧值/百度侧兜底，不会被空串抹掉。
+            ws_id = body.strip()
+            if not ws_id:
+                i += 3
+                continue
+            name = ""
+        else:
+            ws_id = body[:dot_pos]
+            name = body[dot_pos + 1:]
 
         # 第2行：URL
         url = line2.strip()

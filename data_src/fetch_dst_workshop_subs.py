@@ -22,7 +22,8 @@
   * 默认同时处理 `data/dst_pan.yml` 与 `data_src/dst_pan.yml`（仓库里两份内容相同）。
   * `data_src/merge_pans.py` 已同步支持保留 subs：先跑 merge 合并网盘链接，再跑本脚本补订阅数。
   * `--dry-run` 只打印结果不落盘；Steam 偶发 504/超时，脚本按 `--retries` 指数退避重试。
-  * WS000000 不是有效工坊 ID，会被自动跳过（Steam 不会返回条目）。
+  * `WS000000`、`WS000001` 这类「WS 后面 0 开头」的是社区自定义条目，不是工坊模组，
+    会被自动跳过（Steam 不会返回条目）。
   * 历史遗留的 `- lifetime_subs:` 行已废弃，本脚本再次运行会自动清理。
 
 用法：
@@ -56,6 +57,16 @@ API_URL = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDeta
 BATCH_SIZE = 100        # Steam 单次请求上限
 SUB_FIELDS = ("subs",)              # 需要写入/更新的字段
 LEGACY_FIELDS = ("lifetime_subs",)  # 旧字段，遇到就顺手删掉
+
+# 社区自定义条目：WS 后面 0 开头（WS000000 / WS000001…）。
+# Steam 工坊数字 ID 不会以 0 开头，这些是站内社区自建条目，没有工坊页面，
+# 一律跳过抓取（否则 Steam 只会返回「未找到」，白白多打一次请求）。
+COMMUNITY_ID_RE = re.compile(r"^WS0\d*$", re.I)
+
+
+def is_community_id(key):
+    """True = 社区自定义条目（WS+0 开头），不是创意工坊模组。"""
+    return bool(COMMUNITY_ID_RE.match((key or "").strip()))
 
 KEY_RE = re.compile(r"^(?P<key>[^:\s-][^:]*):\s*$")
 FIELD_RE = re.compile(r"^\s*-\s*(?P<k>[A-Za-z0-9_]+):(?P<v>.*?)\s*$")
@@ -256,9 +267,10 @@ def main():
     if args.limit > 0:
         keys = keys[:args.limit]
 
-    fetch_keys = [k for k in keys if k.upper() != "WS000000"]
-    if len(fetch_keys) != len(keys):
-        print("[跳过] WS000000 不是有效的 Steam 工坊 ID")
+    fetch_keys = [k for k in keys if not is_community_id(k)]
+    skipped = [k for k in keys if is_community_id(k)]
+    if skipped:
+        print("[跳过] 社区自定义条目（WS+0 开头，无有效 Steam 工坊 ID）: " + " ".join(skipped))
 
     subs_map = OrderedDict()
     for offset in range(0, len(fetch_keys), BATCH_SIZE):

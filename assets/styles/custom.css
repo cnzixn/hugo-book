@@ -766,11 +766,8 @@ a.book-btn.btn-sponsor[href] .book-sponsor-icon {
   justify-content: center;
   border: none;
   border-radius: 50%;
-  /* color-mix 兼容性：兜底用亮/暗主题通用的半透明灰色
-     注意：不能用「rgba + color-mix(var) 双声明」兜底——含 var() 的声明运行时才求值，
-     「支持 var 但不支持 color-mix」的浏览器（Chrome 49-110 等）会整条 background
-     按初始值变透明，rgba 兜底失效；必须用 @supports 隔离（见下方规则） */
-  background: rgba(128, 128, 128, 0.7);
+  /* background 的兜底 + color-mix 增强已抽到 assets/styles/compat.css
+     （特性探测块必须用 @supports 隔离，隔离原因见该文件头部说明） */
   color: var(--body-font-color);
   font-size: 20px;
   line-height: 1;
@@ -781,12 +778,8 @@ a.book-btn.btn-sponsor[href] .book-sponsor-icon {
   -webkit-appearance: none;
   appearance: none;
 }
-/* 支持 color-mix 的浏览器才启用主题灰色变体（检测值用字面色，避开 var() 求值陷阱） */
-@supports (background: color-mix(in srgb, #000 50%, transparent)) {
-  .gallery-nav {
-    background: color-mix(in srgb, var(--gray-100) 80%, transparent);
-  }
-}
+/* 支持 color-mix 的浏览器启用主题灰色变体、不支持时的半透明灰兜底
+   → 已整体移到 assets/styles/compat.css（本文件不再有 @supports 块） */
 .gallery-prev {
   left: 8px;
 }
@@ -1213,6 +1206,12 @@ h1.book-article-title {
   background: var(--gray-100);
   background-color: var(--gray-100);
 }
+
+/* ==========================================================================
+   带类型提示框（> [!NOTE] / [!TIP] / [!WARNING] …）的底纹兜底
+   → 已抽到 assets/styles/compat.css（旧 iOS 无 color-mix 时补 rgba 底纹，
+     必须用 @supports not(...) 隔离，原因见该文件头部说明）
+   ========================================================================== */
 
 /* ==========================================================================
    赞助支持入口（隐藏页 /sponsor/ 的按钮入口）
