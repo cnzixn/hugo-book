@@ -1,0 +1,26 @@
+{{/*
+  js shortcode：在「单个页面」按需引入 assets/js/ 下的脚本（其它页面不受影响）
+  用法：
+    {{< js "js/dc.min.js" >}}              或   {{< js src="js/dc.min.js" >}}
+    {{< js "js/foo.js" sync="true" >}}     sync 时不加 defer（脚本需在解析中同步执行时用）
+  为什么必须用短代码，而不是在 md 里直接写 <script src="/js/xxx.js">：
+    1) Hugo 只发布 static/ 目录；assets/ 里的文件必须经过 resources 管道处理
+       （resources.Get → .RelPermalink）才会生成带哈希的真实文件，否则 404；
+    2) 带 baseURL 子路径部署（如 /hugo-book/）时，RelPermalink 会自动补前缀，
+       手写的 /js/xxx.js 会失效；
+    3) 短代码输出不经过 goldmark，即使以后关掉 unsafe 也不会被吞掉。
+  说明：
+  - Fingerprint "sha256" → 文件名带内容哈希（改内容即换名字，缓存友好），并输出 integrity
+  - 已经压缩过的文件（*.min.js）不再走 Minify：压缩混淆代码可能破坏其内部自检逻辑
+  - 默认 defer：等 HTML 解析完再执行，脚本可直接操作页面元素，且不阻塞首屏
+*/ -}}
+{{- $src := .Get "src" | default (.Get 0) -}}
+{{- if not $src -}}
+  {{- errorf "js 短代码缺少脚本路径（%s）：写法应为 {{< js \"js/xxx.js\" >}}" .Position -}}
+{{- end -}}
+{{- with resources.Get $src -}}
+  {{- $js := . | resources.Fingerprint "sha256" -}}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"{{ if ne ($.Get "sync") "true" }} defer{{ end }}></script>
+{{- else -}}
+  {{- errorf "js 短代码找不到资源 %q（%s）：路径相对于 assets/ 目录" $src .Position -}}
+{{- end -}}
