@@ -10,7 +10,8 @@ bookCollapseSection: false
   D4F323F3876EBF86B9282335AACFB775.webp
 {{< /gallery >}}
 
-## 安装步骤
+
+## 安装流程
 -----
 
 > [!WARNING]
@@ -33,6 +34,8 @@ bookCollapseSection: false
 
 
 {{% /steps %}}
+
+超级萌新请看这个：[《模组安装流程》](/p/new-player)
 
 ## 资料
 -----

@@ -10,7 +10,8 @@ bookCollapseSection: false
   49AC483F2482238446724C7AAD9353B6.webp
 {{< /gallery >}}
 
-## 安装步骤
+
+## 安装流程
 
 -----
 
@@ -34,6 +35,7 @@ bookCollapseSection: false
 
 {{% /steps %}}
 
+超级萌新请看这个：[《模组安装流程》](/p/new-player)
 
 ## 相关资料
 
